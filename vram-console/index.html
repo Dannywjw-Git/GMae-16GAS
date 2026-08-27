@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VRAM 场景调度指挥中心</title>
+<style>
+  :root {
+    --bg: #1D1F27; --card: #262A36; --card2: #2E3342; --line: #3A4052;
+    --txt: #E8EAED; --sub: #9AA0AE; --dim: #6B7280;
+    --g1: #FF6B6B; --g2: #4ECDC4;
+    --ok: #4ECDC4; --warn: #FFB86B; --bad: #FF6B6B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--txt); font-family:"Segoe UI","Microsoft YaHei",sans-serif; font-size:14px; }
+  .wrap { max-width:1000px; margin:0 auto; padding:18px 16px 40px; }
+  header { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:6px; }
+  h1 { font-size:19px; font-weight:600; background:linear-gradient(90deg,var(--g1),var(--g2)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .meta { color:var(--dim); font-size:12px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .card h2 { font-size:12px; color:var(--sub); font-weight:500; margin-bottom:10px; letter-spacing:.5px; display:flex; justify-content:space-between; align-items:center; }
+  .card h2 .hint { font-size:11px; color:var(--dim); font-weight:400; letter-spacing:0; }
+  /* banners: only on anomaly */
+  #banners { margin-bottom:12px; }
+  .banner { border-radius:10px; padding:9px 14px; margin-bottom:6px; font-size:13px; border:1px solid; }
+  .banner.bad  { background:rgba(255,107,107,.12); border-color:var(--bad); color:#FFB4B4; }
+  .banner.warn { background:rgba(255,184,107,.12); border-color:var(--warn); color:#FFD9A8; }
+  /* VRAM bar */
+  .vram-nums { display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px; flex-wrap:wrap; gap:4px; }
+  .vram-nums b { font-size:17px; }
+  .used { color:var(--g2); } .free { color:var(--ok); } .total { color:var(--sub); }
+  .bar { height:24px; border-radius:8px; background:var(--card2); overflow:hidden; border:1px solid var(--line); position:relative; }
+  .bar-fill { height:100%; transition:width .4s ease; border-radius:8px 0 0 8px; }
+  .lv-safe { background:linear-gradient(90deg,#2E7D72,#4ECDC4); }
+  .lv-mid { background:linear-gradient(90deg,#8A5A1F,#FFB86B); }
+  .lv-high { background:linear-gradient(90deg,#8A2E2E,#FF6B6B); }
+  .bar-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+  .curline { margin-top:8px; font-size:12px; color:var(--g2); display:flex; gap:14px; flex-wrap:wrap; }
+  .curline span { display:inline-flex; align-items:center; gap:6px; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--dim); display:inline-block; }
+  .dot.ok { background:var(--ok); } .dot.bad { background:var(--bad); }
+  /* occupancy distribution: segmented main bar + legend */
+  #vSegs { display:flex; height:100%; }
+  #vSegs .seg { height:100%; transition:width .5s ease; }
+  #vSegs .seg.model { background:linear-gradient(90deg,#2E7D72,#4ECDC4); }
+  #vSegs .seg.fooocus { background:linear-gradient(90deg,#8A5A1F,#FFB86B); }
+  #vSegs .seg.comfy { background:linear-gradient(90deg,#8A2E2E,#FF6B6B); animation:pulse 1.2s infinite; }
+  #vSegs .seg.base { background:#4B5263; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  .dist-legend { display:flex; gap:10px 14px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--sub); }
+  .dist-legend .lg { display:inline-flex; align-items:center; gap:4px; }
+  .dist-legend .lg::before { content:""; width:8px; height:8px; border-radius:2px; display:inline-block; background:var(--dim); }
+  .dist-legend .lg.model::before { background:var(--ok); }
+  .dist-legend .lg.fooocus::before { background:var(--warn); }
+  .dist-legend .lg.comfy::before { background:var(--g1); }
+  .dist-legend .lg.base::before { background:#4B5263; }
+  .dist-legend .lg.free::before { background:var(--card2); border:1px solid var(--line); }
+  /* scenes: one-tap switch */
+  .scenes { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .scene { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 8px; cursor:pointer; text-align:center; transition:.15s; }
+  .scene:hover { border-color:var(--g2); transform:translateY(-1px); }
+  .scene.active { border-color:var(--g2); box-shadow:0 0 0 1px var(--g2), 0 4px 14px rgba(78,205,196,.15); }
+  .scene .ic { font-size:20px; }
+  .scene .nm { margin-top:5px; font-size:13px; font-weight:500; }
+  .scene .modes { margin-top:4px; font-size:10px; color:var(--warn); background:rgba(255,184,107,.10); border:1px solid rgba(255,184,107,.35); border-radius:10px; padding:1px 6px; display:inline-block; }
+  .scene .dsline { margin-top:4px; font-size:10px; color:var(--sub); line-height:1.4; padding:0 4px; }
+  .scene .vr { margin-top:4px; font-size:11px; color:var(--g2); }
+  .scene.busy { opacity:.5; pointer-events:none; }
+  /* budget table: authoritative occupancy ledger */
+  table.bt { width:100%; border-collapse:collapse; font-size:12px; }
+  table.bt th, table.bt td { border:1px solid var(--line); padding:6px 10px; text-align:left; white-space:nowrap; }
+  table.bt th { background:var(--card2); color:var(--sub); font-weight:500; font-size:11px; }
+  table.bt td.vram { color:var(--g2); font-family:Consolas,monospace; }
+  table.bt td.bad { color:var(--bad); }
+  table.bt td.st { font-family:Consolas,monospace; }
+  table.bt .on { color:var(--ok); } table.bt .off { color:var(--dim); }
+  table.bt tr.currow td { background:rgba(78,205,196,.06); }
+  table.bt tr.hoverrow td { background:rgba(255,184,107,.12); }
+  table.bt td.use { color:var(--sub); font-size:11px; white-space:normal; min-width:150px; }
+  /* combo chips */
+  .combo-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .combo { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:7px 14px; font-size:12px; cursor:pointer; transition:.15s; color:var(--sub); }
+  .combo:hover { border-color:var(--g2); color:var(--g2); }
+  .combo.active { border-color:var(--g2); color:var(--g2); background:rgba(78,205,196,.08); }
+  .combo.deny { cursor:not-allowed; opacity:.5; }
+  .combo.busy { opacity:.5; pointer-events:none; }
+  .combo .ctx { font-size:10px; color:var(--dim); margin-left:4px; }
+  /* log */
+  #log { max-height:150px; overflow-y:auto; font-family:Consolas,monospace; font-size:12px; color:var(--sub); background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; white-space:pre-wrap; word-break:break-all; }
+  @media (max-width:720px){ .scenes { grid-template-columns:repeat(3,1fr); } table.bt td { white-space:normal; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>⚡ VRAM 场景调度指挥中心</h1>
+    <div class="meta" id="meta">--</div>
+  </header>
+
+  <div id="banners"></div>
+
+  <div class="card">
+    <h2>GPU 显存 · RTX 4060 Ti 16GB <span class="hint">空载底噪 ~1.0G（实测 905~1062 MiB）· 可给 AI ~15G · 打满=死机</span></h2>
+    <div class="vram-nums">
+      <span>已用 <b class="used" id="vUsed">--</b></span>
+      <span>空闲 <b class="free" id="vFree">--</b></span>
+      <span>总计 <b class="total" id="vTotal">--</b></span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="vSegs"></div><div class="bar-label" id="vPct">--</div></div>
+    <div class="dist-legend" id="distLegend"></div>
+    <div class="curline" id="curline">--</div>
+  </div>
+
+  <div class="card">
+    <h2>场景切换 <span class="hint">点击即切换 · 自动释放冲突占用</span></h2>
+    <div class="scenes" id="scenes"></div>
+  </div>
+
+  <div class="card">
+    <h2>显存占用总览 <span class="hint">所需显存=权威账本 · 状态=实时</span></h2>
+    <table class="bt" id="bt">
+      <tr><th>服务</th><th>所需显存</th><th>允许状态</th><th>实时状态</th></tr>
+      <tr><td colspan="4" style="color:var(--dim);border:none;padding:2px">加载中…</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>对话态 · 模型组合 <span class="hint">27B 独占自动先停 9B</span></h2>
+    <div class="combo-row" id="combos"></div>
+  </div>
+
+  <div class="card">
+    <h2>操作日志</h2>
+    <div id="log">等待操作…</div>
+  </div>
+</div>
+
+<script>
+/* ===== 场景定义：vr=切换后目标占用（一行数字）  tip=切换动作（悬停提示） ===== */
+const SCENES = [
+  {id:"dialogue", ic:"💬", nm:"对话态", vr:"~7.6~9.7G",
+   tip:"停 Fooocus + 停 ComfyUI（回对话态=无文生图容器，释放 WSL RAM/稳态互斥）→ 9B 按需自动加载"},
+  {id:"comfy", ic:"🎨", nm:"ComfyUI", modes:"🎨画图 · 🎵写歌 · 🎬视频", vr:"6.5~14.5G",
+   tip:"ComfyUI 一个容器干三件事：画图（SDXL/Flux）、写歌（Music 3）、视频（MiniMax H3），换活就换模型。流程：停 Fooocus → gpu_release（ollama stop 全部 + 显存<4G）→ 启 ComfyUI(--reserve-vram 2.5) → 等 :8188"},
+  {id:"fooocus", ic:"🖼️", nm:"Fooocus", ds:"零门槛画图 · 启动预加载 6.9G · 用毕必停", vr:"~6.9G",
+   tip:"停 ComfyUI → gpu_release（显存<4G）→ 启 Fooocus（预加载 1-2 分钟）→ 等 :7865；用毕必停"},
+  {id:"game", ic:"🎮", nm:"游戏态", vr:"2~4G",
+   tip:"停 ComfyUI/Fooocus → game-on.ps1（先切 OWUI 默认模型 off 再卸载大模型）"},
+];
+const SCENE_BUDGET = {
+  dialogue: "对话态账本：9B + 底噪 ≈7.6~9.7G · 余量充足 ✓",
+  comfy:    "ComfyUI 三合一账本：🎨 SDXL ≈9.6G ✓ / Flux 13G 顶格 / 🎵 Music 峰值 14.5G（08-24 实测，生成完自动卸载回底噪 ~1G）/ 🎬 MiniMax H3 ~12.8-14G 独占全卡（08-25 实测，4 分钟出片）",
+  music:    "（音乐态已并入 ComfyUI 卡，本行仅兼容旧 API）",
+  fooocus:  "Fooocus 账本：6.9G 预加载 · 用毕必须停容器（R6）",
+  game:     "游戏账本：2-4G + 底噪 ≈3-7G 宽松",
+};
+/* ===== 占用总览（权威账本 + 实时状态映射 + 场景联动） =====
+   scenes = 该行所属场景（用于与场景卡联动高亮）；use = 用途简介 */
+const ALL = ["dialogue","comfy","fooocus","game"];
+/* 表达规范：
+   服务列 = 名称（平台/型号）；显存列 = 数值（顶格/独占提示在允许状态列）；
+   允许状态 = 仅{场景}可用 + 附加限制；用途 = 一句白话 */
+const BUDGET_ROWS = [
+  {svc:"🖥️ 系统底噪", vram:"空载 ~1.0G（实测 0.9~1.1G）", allow:"任意场景 · 固定", key:null, scenes:ALL, use:"桌面、浏览器等系统占用（Ollama 空载时实测 905~1062 MiB）"},
+  {svc:"💬 9B 对话模型（qwen3.5）", vram:"6.6~8.4G（16K）", allow:"仅对话态", key:"qwen3.5:9b", scenes:["dialogue"], use:"日常聊天、写作、知识库问答"},
+  {svc:"💬 0.6B 轻任务（qwen3）", vram:"~1.6G（16K）", allow:"仅对话态", key:"qwen3:0.6b", scenes:["dialogue"], use:"后台小任务（标题、改写）"},
+  {svc:"💬 27B 原版（iq3xxs）", vram:"~15.8G", allow:"仅对话态 · 独占全卡", key:"27b-iq3xxs", scenes:["dialogue"], use:"难问题、长文档分析"},
+  {svc:"💬 27B Uncensored（rvn）", vram:"~15.7G", allow:"仅对话态 · 独占全卡", key:"27b-rvn", scenes:["dialogue"], use:"无限制版，重活专用"},
+  {svc:"🎨 SDXL（ComfyUI）", vram:"~6.5G", allow:"仅 ComfyUI 场景", key:null, cont:"comfyui", model_id:"SDXL", scenes:["comfy"], use:"画图（标准质量）"},
+  {svc:"🎨 Flux Q5（ComfyUI）", vram:"~13G", allow:"仅 ComfyUI 场景 · 独占全卡（顶格）", key:null, cont:"comfyui", model_id:"Flux-Q5", scenes:["comfy"], use:"画图（高质量）"},
+  {svc:"🎵 Music 3（ComfyUI）", vram:"峰值 14.5G（08-24 实测）", allow:"仅 ComfyUI 场景 · 独占全卡", key:null, cont:"comfyui", model_id:"Music3", scenes:["comfy"], use:"AI 写歌（30s≈82s / 60s≈127s / 90s≈3-5 分钟，生成完自动卸载回底噪）"},
+  {svc:"🎬 MiniMax H3（ComfyUI）", vram:"~12.8-14G（08-25 实测）", allow:"仅 ComfyUI 场景 · 独占全卡", key:null, cont:"comfyui", model_id:"MiniMax-H3", scenes:["comfy"], use:"文生/图生视频+原生音频（Turbo LoRA 4 步，~4 分钟出片）"},
+  {svc:"🖼️ Fooocus（极简端）", vram:"~6.9G", allow:"仅 Fooocus 场景 · 用毕必停", key:null, cont:"fooocus", scenes:["fooocus"], use:"简单画图，零门槛"},
+  {svc:"🔍 rerank 桩（9997）", vram:"0（CPU）", allow:"任意场景", key:null, scenes:ALL, use:"搜资料时排先后（禁删）"},
+  {svc:"🎮 Sunshine（串流）", vram:"2~4G", allow:"仅游戏态", key:null, scenes:["game"], use:"打游戏串流用"},
+];
+/* ===== 组合 ===== */
+const COMBOS = [
+  {id:"9b",         nm:"9B 主力", ctx:"16K", rec:true,  heavy:false},
+  {id:"0.6b",       nm:"0.6B 轻量", ctx:"16K", rec:false, heavy:false},
+  {id:"27b-iq3xxs", nm:"27B 原版", ctx:"8K",  rec:false, heavy:true},
+  {id:"27b-rvn",    nm:"27B Uncensored", ctx:"8K", rec:false, heavy:true},
+  {id:"none",       nm:"休眠",     ctx:"-",   rec:false, heavy:false},
+];
+const COMBO_TIP = {
+  "9b":"日常对话/写作/RAG 主力 · 16K 保长对话实用价值（较 8K 仅 +0.3G，勿降档）",
+  "0.6b":"仅 task 类轻活 · 日常请用 9B，过度降档失去实用价值",
+  "27b-iq3xxs":"独占全卡 · 深度分析重活专用 · 8K 为安全上限",
+  "27b-rvn":"独占全卡 · Uncensored · 重活专用",
+  "none":"卸载全部模型 · 夜间/空闲省显存",
+};
+
+let busy = false;
+const $ = id => document.getElementById(id);
+function log(msg){
+  const el=$("log");
+  if(el.textContent==="等待操作…") el.textContent="";
+  const t="["+new Date().toLocaleTimeString()+"]";
+  el.textContent = el.textContent + (el.textContent?"\n":"") + t+" "+msg;
+  el.scrollTop=el.scrollHeight;
+}
+function fmtMb(m){ return m>=1024 ? (m/1024).toFixed(1)+"G" : m+"M"; }
+
+/* ===== 渲染 ===== */
+function renderScenes(scene){
+  $("scenes").innerHTML = SCENES.map(s=>
+    `<div class="scene ${s.id===scene?"active":""}" onclick="switchScene('${s.id}')" title="${s.tip}"
+         onmouseenter="hoverScenes('${s.id}')" onmouseleave="hoverScenes('${scene}')">
+       <div class="ic">${s.ic}</div><div class="nm">${s.nm}</div>${s.modes?`<div class="modes">${s.modes}</div>`:(s.ds?`<div class="dsline">${s.ds}</div>`:"")}<div class="vr">${s.vr}</div>
+     </div>`).join("");
+}
+function renderCombos(curCombo, scene){
+  const inDialogue = scene==="dialogue";
+  $("combos").innerHTML = COMBOS.map(c=>{
+    const cls = (c.id===curCombo?"active":"") + (inDialogue?"":" deny");
+    return `<span class="combo ${cls}" title="${COMBO_TIP[c.id]}" onclick="${inDialogue?"switchCombo('"+c.id+"')":"denyCombo()"}">
+      ${c.nm}${c.rec?' <span style="color:var(--g2)">★</span>':""}<span class="ctx">${c.ctx}</span>
+    </span>`;
+  }).join("");
+}
+function renderBudget(d){
+  const names=(d.ollama.models||[]).map(m=>m.name);
+  const load = n => names.some(x=>x.includes(n)) ? '<span class="on">● 加载中</span>' : '<span class="off">○ 未加载</span>';
+  /* ComfyUI：每个模型独立检查状态（从 history 推断 + 显存验证） */
+  const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+  const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+  const comfyModelMap = {};
+  comfyModels.forEach(m=>{ comfyModelMap[m.id] = m; });
+  const comfyModelStatus = modelId => {
+    if(!d.containers.comfyui) return '<span class="off">○ 停止</span>';
+    const m = comfyModelMap[modelId];
+    if(m){
+      if(comfyLikelyLoaded){
+        return `<span class="on">● 加载中 ~${m.vram_gb}G</span>`;
+      } else {
+        return '<span class="off">○ 最近用过（已卸载）</span>';
+      }
+    }
+    return '<span class="off">○ 未使用</span>';
+  };
+  const cont = n => {
+    if(!d.containers[n]) return '<span class="off">○ 停止</span>';
+    if(n==="comfyui"){
+      if(comfyModels.length>0){
+        const modelNames = comfyModels.map(m=>m.name).join("+");
+        if(comfyLikelyLoaded){
+          return `<span class="on">● ${modelNames}（加载中）</span>`;
+        } else {
+          return `<span class="off">○ 最近：${modelNames}（已卸载）</span>`;
+        }
+      }
+      return '<span class="off">○ 模型未载 · 容器运行</span>';
+    }
+    return '<span class="warn">● 运行 · 预载 6.9G</span>';
+  };
+  const rows = BUDGET_ROWS.map(r=>{
+    let st;
+    if(r.key) st = load(r.key);
+    else if(r.model_id) st = comfyModelStatus(r.model_id);
+    else if(r.cont) st = cont(r.cont);
+    else if(r.svc.includes("底噪")) st = '<span class="off">恒在</span>';
+    else if(r.svc.includes("rerank")) st = '<span class="on">常驻（CPU）</span>';
+    else st = '<span class="off">—</span>';
+    const vramCls = (r.vram.includes("15")||r.vram.includes("13")) ? "bad" : "";
+    const cur = r.scenes.includes(d.scene) ? ' currow' : "";
+    return `<tr class="${cur.trim()}" data-scenes="${r.scenes.join(',')}">
+      <td>${r.svc}</td><td class="vram ${vramCls}">${r.vram}</td><td>${r.allow}</td><td class="st">${st}</td><td class="use">${r.use}</td></tr>`;
+  }).join("");
+  $("bt").innerHTML = `<tr><th>服务</th><th>所需显存</th><th>允许状态</th><th>实时状态</th><th>用途</th></tr>` + rows;
+}
+function hoverScenes(id){
+  const rows = document.querySelectorAll("#bt tr[data-scenes]");
+  rows.forEach(r=>{
+    const hit = r.dataset.scenes.split(",").includes(id);
+    r.classList.toggle("hoverrow", hit);
+  });
+}
+/* 当前占用构成：主显存条按服务分段着色（估算），图例列"谁占了多少" */
+function renderDistribution(d){
+  if(!d.gpu || !d.gpu.ok){ $("vSegs").innerHTML=""; $("distLegend").innerHTML=""; return; }
+  const used=d.gpu.used_mb, free=d.gpu.free_mb;
+  const parts=[];
+  let known=0;
+  // 底噪永远在最左边（系统基础占用，实测 0.9~1.1G，上限 1.5G）
+  const BASELINE_MAX = 1536;
+  const comfyUp=d.containers.comfyui;
+  // 先计算已知模型/容器占用
+  (d.ollama.models||[]).forEach(m=>{
+    const mb=Math.round(m.size_gb*1024);
+    known+=mb;
+  });
+  if(d.containers.fooocus){ known+=Math.round(6.9*1024); }
+  let rest=Math.max(0,used-known);
+  // 底噪：ComfyUI运行时取 min(rest, 1.5G)；未运行时全部是底噪
+  const base = comfyUp ? Math.min(rest, BASELINE_MAX) : rest;
+  parts.push({ic:"🖥️",name:"系统底噪",mb:base,cls:"base"});
+  const afterBase = Math.max(0, rest-base);
+  // Ollama 模型
+  (d.ollama.models||[]).forEach(m=>{
+    const mb=Math.round(m.size_gb*1024);
+    if(mb>50) parts.push({ic:"💬",name:m.name,mb,cls:"model"});
+  });
+  // Fooocus
+  if(d.containers.fooocus){ parts.push({ic:"🖼️",name:"Fooocus",mb:Math.round(6.9*1024),cls:"fooocus"}); }
+  // ComfyUI 动态（底噪之外的剩余）
+  if(comfyUp && afterBase>50){
+    const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+    const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+    const comfyLabel = (comfyLikelyLoaded && comfyModels.length>0)
+      ? "🎨 ComfyUI: " + comfyModels.map(m=>m.name).join("+")
+      : "🎨 ComfyUI 动态";
+    parts.push({ic:"🎨",name:comfyLabel,mb:afterBase,cls:"comfy"});
+  }
+  const shown=parts.filter(p=>p.mb>50);
+  const total=d.gpu.total_mb;
+  /* 段宽相对总量：主条=16G 全量，空闲=深色背景，每段占总量比例即真实占比 */
+  const pct=p=>total>0?(p.mb/total*100):0;
+  $("vSegs").innerHTML = shown.map(p=>`<span class="seg ${p.cls}" style="width:${Math.max(1.5,pct(p)).toFixed(1)}%"></span>`).join("");
+  const legend = shown.map(p=>`<span class="lg ${p.cls}">${p.ic} ${p.name} ${fmtMb(p.mb)}（${pct(p).toFixed(0)}%）</span>`).join("");
+  const dynNote = comfyUp && !shown.some(p=>p.cls==="comfy") ? '<span class="lg comfy">🎨 ComfyUI 运行中（调用时动态占用）</span>' : "";
+  $("distLegend").innerHTML = legend + dynNote + `<span class="lg free">⬜ 空闲 ${fmtMb(free)}（${(free/total*100).toFixed(0)}%）</span>`;
+}
+function renderBanners(d){
+  const b=[];
+  const g=d.gpu, o=d.ollama;
+  if(g.ok && g.used_mb > 14*1024) b.push(`<div class="banner bad">🔴 显存 ${fmtMb(g.used_mb)} 超 14G 警戒！立即查白占方（容器/进程），打满=死机</div>`);
+  else if(g.ok && g.used_mb > 12*1024) b.push(`<div class="banner warn">⚠️ 显存 ${fmtMb(g.used_mb)} 接近 12G，检查多余占用（如 Fooocus 常驻）</div>`);
+  if(!o.ok) b.push(`<div class="banner bad">⛔ Ollama 无响应 → 执行 docker restart ollama（容器化版）</div>`);
+  if(d.scene==="dialogue" && d.containers.fooocus) b.push(`<div class="banner warn">⚠️ Fooocus 在对话态运行 = 违规 R6（预加载 6.9G 白占）→ 点「Fooocus」卡停止或切场景</div>`);
+  $("banners").innerHTML = b.join("");
+}
+
+/* ===== 操作 ===== */
+function switchScene(id){
+  if(busy) return;
+  const s = SCENES.find(x=>x.id===id); if(!s) return;
+  busy=true; log("▶ 切换: "+id+"（"+s.nm+" · "+s.vr+"）");
+  document.querySelectorAll(".scene").forEach(e=>e.classList.add("busy"));
+  fetch("/api/scene",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scene:id})})
+    .then(r=>r.json()).then(d=>{
+      if(d.actions) d.actions.forEach(a=>{
+        const star=a.rc===0?"✔":"✘";
+        log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
+      });
+      log(d.ok?"✅ 完成：当前 "+s.nm:"❌ 异常: "+id);
+      refresh();
+    }).catch(e=>log("✘ 请求失败: "+e))
+    .finally(()=>{ busy=false; document.querySelectorAll(".scene").forEach(e=>e.classList.remove("busy")); });
+}
+function switchCombo(id){
+  if(busy) return;
+  const c = COMBOS.find(x=>x.id===id); if(!c) return;
+  if(c.heavy && !confirm("切换为「"+c.nm+"」？\n将先卸载 9B/0.6B（27B 独占全卡）· ctx "+c.ctx+"\n"+COMBO_TIP[id])) return;
+  busy=true; log("▶ 组合: "+id+"（"+c.nm+" @ "+c.ctx+"）");
+  document.querySelectorAll(".combo").forEach(e=>e.classList.add("busy"));
+  fetch("/api/combo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({combo:id})})
+    .then(r=>r.json()).then(d=>{
+      if(d.actions) d.actions.forEach(a=>{
+        const star=a.rc===0?"✔":"✘";
+        log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
+      });
+      log(d.ok?"✅ 组合完成："+c.nm:"❌ 组合异常");
+      refresh();
+    }).catch(e=>log("✘ 请求失败: "+e))
+    .finally(()=>{ busy=false; document.querySelectorAll(".combo").forEach(e=>e.classList.remove("busy")); });
+}
+function denyCombo(){ alert("当前非对话态，组合切换已禁用——先切回「对话态」再换模型组合。"); }
+
+/* ===== 刷新 ===== */
+function refresh(){
+  fetch("/api/status",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    const g=d.gpu;
+    if(g.ok){
+      const pct=Math.round(g.used_mb/g.total_mb*100);
+      $("vUsed").textContent=fmtMb(g.used_mb); $("vFree").textContent=fmtMb(g.free_mb); $("vTotal").textContent=fmtMb(g.total_mb);
+      $("vPct").textContent=pct+"% 已用";
+    } else { $("vPct").textContent="nvidia-smi 不可用"; }
+    const sc = SCENES.find(s=>s.id===d.scene);
+    const oDot = $("oDot")||null;
+    $("meta").textContent = "更新 "+new Date(d.ts*1000).toLocaleTimeString()+" · Ollama "+(d.ollama.ok?"正常":"异常");
+    const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+    const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+    let comfyInfo = "";
+    if(comfyModels.length>0){
+      const names = comfyModels.map(m=>m.name+"("+m.vram_gb+"G)").join("+");
+      comfyInfo = comfyLikelyLoaded
+        ? ` · ComfyUI 加载中：${names}`
+        : ` · ComfyUI 最近：${names}（已卸载）`;
+    } else if(d.containers.comfyui){
+      comfyInfo = " · ComfyUI 容器运行（模型未载）";
+    }
+    $("curline").innerHTML =
+      `<span><span class="dot ok"></span> 当前场景：<b>${sc?sc.ic+" "+sc.nm:d.scene}</b></span>
+       <span>${SCENE_BUDGET[d.scene]||""}</span>
+       <span>Ollama 已加载 ${(d.ollama.models||[]).length} 个 · ${d.ollama.ok?"正常":"无响应"}${comfyInfo}</span>`;
+    renderScenes(d.scene);
+    renderCombos(inferCombo(d.ollama.models), d.scene);
+    renderBudget(d);
+    renderDistribution(d);
+    renderBanners(d);
+  }).catch(e=>{ $("meta").textContent="状态获取失败: "+e; });
+}
+function inferCombo(models){
+  const names=(models||[]).map(m=>m.name);
+  if(names.some(n=>n.includes("27b-rvn")))    return "27b-rvn";
+  if(names.some(n=>n.includes("27b-iq3xxs"))) return "27b-iq3xxs";
+  if(names.some(n=>n.includes("qwen3.5:9b"))) return "9b";
+  if(names.some(n=>n.includes("qwen3:0.6b"))) return "0.6b";
+  return "none";
+}
+refresh();
+setInterval(()=>{ if(!busy) refresh(); }, 3000);
+</script>
+</body>
+</html>

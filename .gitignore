@@ -1,0 +1,41 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Temp
+_tmp/
+_temp/
+*.tmp
+*.bak
+
+# Output (generated files)
+outputs/
+examples/output-samples/*
+!examples/output-samples/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Env
+.env
+.env.local
+*.key
+*.pem
