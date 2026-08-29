@@ -64,6 +64,9 @@ PORT = int(os.environ.get("VRAM_CONSOLE_PORT", "8787"))
 HOST = os.environ.get("VRAM_CONSOLE_HOST", "0.0.0.0")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# 认证模块（邮件+密码+Session，2026-08-29 主公批准）
+import auth as auth_mod
+
 
 def _load_token():
     """Token 认证配置：优先环境变量 VRAM_CONSOLE_TOKEN，其次本地 .api_token 文件。
@@ -2291,16 +2294,93 @@ def read_html():
         return b"index.html not found"
 
 
+def read_login_html():
+    """读取登录页 HTML（login.html），不存在时返回内置最小登录页"""
+    path = os.path.join(BASE_DIR, "login.html")
+    try:
+        with open(path, "rb") as f:
+            return f.read()
+    except Exception:
+        # 内置最小登录页（login.html 不存在时的兜底）
+        return ("""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>GMae 登录</title>
+<style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+.box{background:#1e293b;padding:32px;border-radius:12px;width:320px}
+h1{color:#0d9488;margin:0 0 24px;font-size:24px}
+input{width:100%;padding:10px;margin:8px 0;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;box-sizing:border-box}
+button{width:100%;padding:12px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-top:16px;font-size:16px}
+button:hover{background:#0f766e}
+.msg{margin-top:12px;font-size:14px;min-height:20px}
+.err{color:#f87171}.ok{color:#4ade80}
+a{color:#0d9488;text-decoration:none;cursor:pointer}
+.tab{display:flex;margin-bottom:16px;border-bottom:1px solid #334155}
+.tab div{padding:8px 16px;cursor:pointer;color:#94a3b8}
+.tab div.active{color:#0d9488;border-bottom:2px solid #0d9488}
+.hidden{display:none}
+</style></head><body>
+<div class="box">
+<h1>GMae 调度中心</h1>
+<div class="tab"><div class="active" onclick="showTab('login')">登录</div><div onclick="showTab('setup')">首次设置</div><div onclick="showTab('forgot')">忘记密码</div></div>
+<div id="login">
+<input id="login-email" placeholder="邮箱" type="email">
+<input id="login-password" placeholder="密码" type="password">
+<label style="font-size:14px;color:#94a3b8"><input type="checkbox" id="login-remember" style="width:auto;margin-right:6px">记住我 30 天</label>
+<button onclick="doLogin()">登录</button>
+</div>
+<div id="setup" class="hidden">
+<input id="setup-email" placeholder="管理员邮箱" type="email">
+<input id="setup-password" placeholder="设置密码（至少6位）" type="password">
+<input id="setup-password2" placeholder="确认密码" type="password">
+<button onclick="doSetup()">创建管理员账户</button>
+</div>
+<div id="forgot" class="hidden">
+<input id="forgot-email" placeholder="注册邮箱" type="email">
+<button onclick="doForgot()">发送验证码</button>
+<div id="reset-step" class="hidden" style="margin-top:16px">
+<input id="reset-code" placeholder="6位验证码" maxlength="6">
+<input id="reset-password" placeholder="新密码（至少6位）" type="password">
+<button onclick="doReset()">重置密码</button>
+</div>
+</div>
+<div class="msg" id="msg"></div>
+</div>
+<script>
+function showTab(t){document.querySelectorAll('.tab div').forEach((e,i)=>e.classList.toggle('active',['login','setup','forgot'][i]===t));['login','setup','forgot'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==t));document.getElementById('msg').textContent='';}
+function msg(t,c){var e=document.getElementById('msg');e.textContent=t;e.className='msg '+(c||'');}
+async function api(url,data){var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});return await r.json();}
+async function doLogin(){var e=document.getElementById('login-email').value,p=document.getElementById('login-password').value,r=document.getElementById('login-remember').checked;if(!e||!p)return msg('请输入邮箱和密码','err');var d=await api('/api/auth/login',{email:e,password:p,remember:r});if(d.ok){msg('登录成功，正在跳转...','ok');setTimeout(()=>location.href='/',800);}else msg(d.error||'登录失败','err');}
+async function doSetup(){var e=document.getElementById('setup-email').value,p=document.getElementById('setup-password').value,p2=document.getElementById('setup-password2').value;if(!e||!p)return msg('请输入邮箱和密码','err');if(p!==p2)return msg('两次密码不一致','err');var d=await api('/api/auth/setup',{email:e,password:p});if(d.ok){msg('创建成功，请登录','ok');showTab('login');}else msg(d.message||'创建失败','err');}
+async function doForgot(){var e=document.getElementById('forgot-email').value;if(!e)return msg('请输入邮箱','err');var d=await api('/api/auth/forgot',{email:e});msg(d.message,d.ok?'ok':'err');if(d.ok)document.getElementById('reset-step').classList.remove('hidden');}
+async function doReset(){var e=document.getElementById('forgot-email').value,c=document.getElementById('reset-code').value,p=document.getElementById('reset-password').value;var d=await api('/api/auth/reset',{email:e,code:c,password:p});if(d.ok){msg('密码重置成功，请登录','ok');showTab('login');}else msg(d.message||'重置失败','err');}
+</script></body></html>""").encode("utf-8")
+
+
 class Handler(BaseHTTPRequestHandler):
     def _check_auth(self):
-        """Token 认证：设置了 VRAM_CONSOLE_TOKEN 时需匹配 X-API-Key 请求头"""
-        if not API_TOKEN:
+        """认证检查：Session Cookie（浏览器）优先，其次 API Token（脚本/自动化）。
+        未设置管理员时所有请求放行（首次设置引导）。设置了管理员但未登录 → 401。"""
+        # 未设置管理员：放行（首次设置引导）
+        if not auth_mod.has_admin():
             return True
-        provided = self.headers.get("X-API-Key", "")
-        if provided == API_TOKEN:
+        # 1. Session Cookie 认证（浏览器）
+        cookies = auth_mod.parse_cookie(self.headers.get("Cookie", ""))
+        session_id = cookies.get(auth_mod.SESSION_COOKIE_NAME, "")
+        if session_id and auth_mod.get_session(session_id):
             return True
-        self._json({"ok": False, "error": "unauthorized: missing or invalid X-API-Key"}, 401)
+        # 2. API Token 认证（脚本/自动化，向后兼容）
+        if API_TOKEN:
+            provided = self.headers.get("X-API-Key", "")
+            if provided == API_TOKEN:
+                return True
+        self._json({"ok": False, "error": "unauthorized: please login first", "need_login": True}, 401)
         return False
+
+    def _current_user(self):
+        """获取当前登录用户邮箱，未登录返回 None"""
+        cookies = auth_mod.parse_cookie(self.headers.get("Cookie", ""))
+        session_id = cookies.get(auth_mod.SESSION_COOKIE_NAME, "")
+        sess = auth_mod.get_session(session_id)
+        return sess.get("user_email") if sess else None
 
     def _send(self, code, body, ctype="application/json"):
         self.send_response(code)
@@ -2315,10 +2395,19 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/" or self.path == "/index.html":
-            self._send(200, read_html(), "text/html")
+            # 未设置管理员或未登录 → 返回登录页；已登录 → 返回主应用
+            if not auth_mod.has_admin() or not self._current_user():
+                self._send(200, read_login_html(), "text/html")
+            else:
+                self._send(200, read_html(), "text/html")
+        elif self.path == "/login":
+            self._send(200, read_login_html(), "text/html")
         elif self.path == "/api/health":
             # 健康检查不需要认证，方便外部监控
             self._json(health_check())
+        elif self.path == "/api/auth/status":
+            # 认证状态不需要登录（登录页需要判断是否已设置管理员）
+            self._json(auth_mod.auth_status())
         elif self.path == "/api/status":
             if not self._check_auth():
                 return
@@ -2376,16 +2465,47 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "not found"}, 404)
 
     def do_POST(self):
-        if not self._check_auth():
-            return
-        # 所有 POST 操作前失效 status 缓存，确保操作完成后前端拿到最新数据
-        invalidate_status_cache()
+        # 认证相关 API 不需要登录（登录/注册/忘记密码）
         length = int(self.headers.get("Content-Length", 0) or 0)
         try:
             data = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
         except Exception:
-            self._json({"ok": False, "error": "invalid JSON body"}, 400)
+            data = {}
+
+        if self.path == "/api/auth/setup":
+            ok, msg = auth_mod.setup_admin(data.get("email", ""), data.get("password", ""))
+            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
             return
+        elif self.path == "/api/auth/login":
+            ok, user = auth_mod.authenticate(data.get("email", ""), data.get("password", ""))
+            if ok:
+                session_id = auth_mod.create_session(user["email"], remember=data.get("remember", False))
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Set-Cookie", "{}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={}".format(
+                    auth_mod.SESSION_COOKIE_NAME, session_id,
+                    auth_mod.SESSION_REMEMBER_TTL if data.get("remember") else auth_mod.SESSION_DEFAULT_TTL))
+                body = json.dumps({"ok": True, "message": "登录成功", "email": user["email"]}, ensure_ascii=False).encode("utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                self._json({"ok": False, "error": "邮箱或密码不正确"}, 401)
+            return
+        elif self.path == "/api/auth/forgot":
+            ok, msg = auth_mod.generate_reset_code(data.get("email", ""))
+            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            return
+        elif self.path == "/api/auth/reset":
+            ok, msg = auth_mod.reset_password(data.get("email", ""), data.get("code", ""), data.get("password", ""))
+            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            return
+
+        # 以下 API 需要认证
+        if not self._check_auth():
+            return
+        # 所有 POST 操作前失效 status 缓存，确保操作完成后前端拿到最新数据
+        invalidate_status_cache()
         if self.path == "/api/scene":
             self._json(scene_switch(data.get("scene", "")))
         elif self.path == "/api/combo":
@@ -2416,6 +2536,23 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/api/scan/register":
             self._json(scan_register(data.get("source", "comfyui"), data.get("name", ""),
                                      data.get("vram_gb"), data.get("category", "image")))
+        elif self.path == "/api/auth/logout":
+            cookies = auth_mod.parse_cookie(self.headers.get("Cookie", ""))
+            session_id = cookies.get(auth_mod.SESSION_COOKIE_NAME, "")
+            auth_mod.destroy_session(session_id)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Set-Cookie", "{}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0".format(auth_mod.SESSION_COOKIE_NAME))
+            body = json.dumps({"ok": True, "message": "已登出"}, ensure_ascii=False).encode("utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        elif self.path == "/api/auth/change-password":
+            email = self._current_user()
+            ok, msg = auth_mod.change_password(email or "", data.get("old_password", ""), data.get("new_password", ""))
+            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            return
         else:
             self._json({"ok": False, "error": "not found"}, 404)
 
@@ -2430,10 +2567,11 @@ if __name__ == "__main__":
         start_comfy_ws()      # ComfyUI WebSocket 实时事件监听（daemon，断线自愈）
         start_qos()           # Step5 QoS 水位节拍线程（daemon，15s）
         start_auto_scanner()  # P0-3 自动扫描器（daemon，60s 轮询，新模型自动登记）
-        auth_note = "token" if API_TOKEN else "no-auth"
-        log_event("server_start", host=HOST, port=PORT, auth=auth_note, log_file=LOG_FILE)
-        if not API_TOKEN:
-            log_event("security_warning", message="no API_TOKEN set - any device can control AI environment")
+        auth_note = "session+token" if auth_mod.has_admin() else "setup-required"
+        log_event("server_start", host=HOST, port=PORT, auth=auth_note, log_file=LOG_FILE,
+                  admin_exists=auth_mod.has_admin(), smtp_configured=bool(auth_mod.SMTP_PASSWORD))
+        if not auth_mod.has_admin():
+            log_event("auth_setup_required", message="no admin account set - please visit / to setup first admin")
         server.serve_forever()
     except KeyboardInterrupt:
         log_event("server_stop", reason="keyboard_interrupt")
