@@ -115,26 +115,19 @@ _MODEL_NAME_RE = re.compile(r'^[A-Za-z0-9._:/\-]+$')
 
 
 def _safe_model_name(name):
-    """校验模型名是否安全，返回 (ok, name_or_error)"""
+    """校验模型名是否安全，返回 (ok, name_or_error)。
+    禁止路径穿越（..）、绝对路径开头、shell 元字符。"""
     if not name or not isinstance(name, str):
         return False, "empty model name"
     if len(name) > 128:
         return False, "model name too long"
+    if ".." in name:
+        return False, "invalid model name (path traversal '..' not allowed)"
+    if name.startswith("/") or name.startswith("\\"):
+        return False, "invalid model name (absolute path not allowed)"
     if not _MODEL_NAME_RE.match(name):
         return False, "invalid model name (only letters, digits, . : / - allowed)"
     return True, name
-
-
-def run(cmd, timeout=30):
-    """执行固定命令（shell=True），仅用于内部硬编码命令，不可传入用户输入"""
-    try:
-        p = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-        out = (p.stdout or "") + (p.stderr or "")
-        return p.returncode, out.strip()
-    except subprocess.TimeoutExpired:
-        return -1, "TIMEOUT"
-    except Exception as e:
-        return -2, str(e)
 
 
 def run_args(args, timeout=30):
@@ -150,11 +143,21 @@ def run_args(args, timeout=30):
 
 
 def run_ps1(path, timeout=120):
-    return run('powershell -NoProfile -ExecutionPolicy Bypass -File "{}"'.format(path), timeout)
+    """执行 PowerShell 脚本（shell=False + 参数数组，路径经硬编码常量传入）"""
+    try:
+        p = subprocess.run(
+            ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", path],
+            shell=False, capture_output=True, text=True, timeout=timeout)
+        out = (p.stdout or "") + (p.stderr or "")
+        return p.returncode, out.strip()
+    except subprocess.TimeoutExpired:
+        return -1, "TIMEOUT"
+    except Exception as e:
+        return -2, str(e)
 
 
 def gpu_status():
-    rc, out = run("nvidia-smi --query-gpu=memory.total,memory.used,memory.free,utilization.gpu --format=csv,noheader,nounits", 10)
+    rc, out = run_args(["nvidia-smi", "--query-gpu=memory.total,memory.used,memory.free,utilization.gpu", "--format=csv,noheader,nounits"], 10)
     if rc != 0:
         return {"ok": False, "error": out[:200]}
     parts = [x.strip() for x in out.strip().split(",")]
@@ -165,7 +168,7 @@ def gpu_status():
 
 def _container_pids(cont):
     """容器内进程 PID → comm 映射（docker exec ps，只读）。"""
-    rc, out = run("docker exec {} ps -eo pid=,comm=".format(cont), 10)
+    rc, out = run_args(["docker", "exec", cont, "ps", "-eo", "pid=,comm="], 10)
     if rc != 0:
         return {}
     pmap = {}
@@ -185,7 +188,7 @@ def _gpu_app_pids(names=None):
         names = docker_containers()
     for cont in ("comfyui", "ollama", "fooocus"):
         if cont in names:
-            rc, out = run("docker exec {} nvidia-smi --query-compute-apps=pid --format=csv,noheader".format(cont), 10)
+            rc, out = run_args(["docker", "exec", cont, "nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader"], 10)
             if rc == 0:
                 pids = [l.strip() for l in out.splitlines() if l.strip().isdigit()]
                 if pids:
@@ -198,7 +201,7 @@ def desktop_gpu_processes():
     """宿主机侧 nvidia-smi 进程表 → Windows 桌面 GPU 进程（PID+进程名）。
     WSL2 GPU-PV 实测：宿主机 nvidia-smi 能列出 Windows 桌面进程的 PID+process_name，
     但 used_memory 为 [N/A]（拿不到逐进程显存）。与容器账本互补 → 拼成完整显存账本。"""
-    rc, out = run("nvidia-smi --query-compute-apps=pid,process_name --format=csv,noheader", 10)
+    rc, out = run_args(["nvidia-smi", "--query-compute-apps=pid,process_name", "--format=csv,noheader"], 10)
     desktop = []
     if rc == 0:
         for line in out.splitlines():
@@ -496,7 +499,7 @@ def _find_pid_container(pid):
     for cont in ("comfyui", "ollama", "fooocus"):
         if cont in names and pid in _container_pids(cont):
             return cont
-    rc, out = run("docker ps --format {{.Names}}", 10)
+    rc, out = run_args(["docker", "ps", "--format", "{{.Names}}"], 10)
     if rc == 0:
         for cont in out.splitlines():
             cont = cont.strip()
@@ -519,7 +522,7 @@ def gpu_guard_kick(pid):
     comm = cmap.get(pid, "")
     if comm.lower() in PROTECT_COMMS:
         return {"ok": False, "error": "拒绝驱逐 protect 进程 %s (PID %s)" % (comm, pid)}
-    rc, out = run("docker exec %s kill -9 %s" % (cont, pid), 10)
+    rc, out = run_args(["docker", "exec", cont, "kill", "-9", pid], 10)
     if rc == 0:
         _proc_events.appendleft({"ts": int(time.time()), "event": "kick", "pid": pid,
                                  "name": comm, "app": cont, "used_mb": 0})
@@ -551,7 +554,7 @@ def ollama_tags():
 
 
 def docker_containers():
-    rc, out = run("docker ps --format {{.Names}}", 10)
+    rc, out = run_args(["docker", "ps", "--format", "{{.Names}}"], 10)
     if rc != 0:
         return []
     return [x.strip() for x in out.splitlines() if x.strip()]
@@ -1630,7 +1633,18 @@ _auto_scanner_running = False
 
 
 def _estimate_ollama_vram(name):
-    """根据模型名粗略估算显存（参数×量化系数），仅用于自动登记初始值，后续需实测验证。"""
+    """估算 ollama 模型显存（P0-3 合并版：优先实际文件大小，失败回退模型名参数×量化系数）。
+    用于自动登记的新模型初始值，后续需实测验证。"""
+    # 方式1：优先用 /api/tags 实际文件大小 + 上下文/计算缓冲（更准确）
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        for m in d.get("models", []):
+            if m.get("name") == name:
+                return round(m.get("size", 0) / 1e9 + 0.8, 1)
+    except Exception:
+        pass
+    # 方式2：回退到模型名参数×量化系数估算（ollama 未运行时的兜底）
     n = name.lower()
     import re
     m = re.search(r'(\d+\.?\d*)b', n)
@@ -2177,19 +2191,6 @@ def model_action(name, action):
 # 新装模型自动登记（auto=True），已删模型标 installed=False（保留元数据供重装恢复）。
 # ComfyUI 主模型目录（与扫描器一致：checkpoints/unet/diffusion_models 是可登记模型；vae/clip/text_encoders 是配套，不单独显示/登记）
 _COMFY_MODEL_DIRS = ["checkpoints", "unet", "diffusion_models"]
-
-
-def _estimate_ollama_vram(name):
-    """估算 ollama 模型显存：/api/tags 文件大小 + 上下文/计算缓冲（用于自动登记的新模型）。"""
-    try:
-        with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=5) as r:
-            d = json.loads(r.read().decode("utf-8"))
-        for m in d.get("models", []):
-            if m.get("name") == name:
-                return round(m.get("size", 0) / 1e9 + 0.8, 1)
-    except Exception:
-        pass
-    return 6.0
 
 
 def _sync_ollama_models():

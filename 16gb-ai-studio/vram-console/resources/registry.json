@@ -126,7 +126,7 @@
       {
         "id": "bge-m3:latest",
         "name": "BGE-M3 Embedding",
-        "vram_gb": 0,
+        "vram_gb": 1.5,
         "ctx": 8192,
         "exclusive": false,
         "category": "embedding",
@@ -135,14 +135,14 @@
         "full_name": "BGE-M3 Embedding",
         "vendor": "北京智源研究院 (BAAI)",
         "release": "2024",
-        "desc": "多语言 embedding，检索/RAG 向量化（CPU）",
+        "desc": "多语言 embedding，检索/RAG 向量化（CPU）（vram 已修正：embedding 模型约 1.5GB）",
         "detail": "BGE-M3 多语言嵌入模型，用于知识库检索与 RAG 向量化。CPU 运行，不占显存。",
         "modality": "text"
       },
       {
         "id": "bge-m3-cpu:latest",
         "name": "BGE-M3 CPU",
-        "vram_gb": 0,
+        "vram_gb": 1.5,
         "ctx": 8192,
         "exclusive": false,
         "category": "embedding",
@@ -151,14 +151,14 @@
         "full_name": "BGE-M3 Embedding (CPU)",
         "vendor": "北京智源研究院 (BAAI)",
         "release": "2024",
-        "desc": "BGE-M3 的 CPU 专用版本（不占显存）",
+        "desc": "BGE-M3 的 CPU 专用版本（不占显存）（vram 已修正：embedding 模型约 1.5GB）",
         "detail": "BGE-M3 的 CPU 专用运行版本，用于强制 CPU 向量化场景，不占 GPU 显存。",
         "modality": "text"
       },
       {
         "id": "qllama/bge-reranker-v2-m3:latest",
         "name": "BGE Reranker V2 M3",
-        "vram_gb": 0,
+        "vram_gb": 1.5,
         "ctx": 8192,
         "exclusive": false,
         "category": "reranker",
@@ -167,7 +167,7 @@
         "full_name": "BGE Reranker V2 M3",
         "vendor": "北京智源研究院 (BAAI)",
         "release": "2024",
-        "desc": "rerank 重排，检索结果排序（CPU）",
+        "desc": "rerank 重排，检索结果排序（CPU）（vram 已修正：embedding 模型约 1.5GB）",
         "detail": "BGE Reranker V2 M3 重排模型，对检索结果二次排序提高精度。CPU 运行不占显存，登记簿标记禁删。",
         "modality": "text"
       },
@@ -190,7 +190,8 @@
         "speed_gen_tok_s": 35.3,
         "multimodal": false,
         "notes": "无审查RP，DavidAU出品，Qwen3.5架构",
-        "modality": "text"
+        "modality": "text",
+        "ctx": 65536
       },
       {
         "id": "gemma-4-12b-it:q4km",
@@ -210,7 +211,8 @@
         "speed_gen_tok_s": 29.5,
         "multimodal": false,
         "notes": "旧GGUF纯文本版（无vision/audio张量），think:false必需",
-        "modality": "text"
+        "modality": "text",
+        "ctx": 131072
       },
       {
         "id": "gemma-4-12b-it:q8_0",
@@ -229,7 +231,8 @@
         "speed_gen_tok_s": 19,
         "multimodal": true,
         "notes": "Q8权重11.8G+KV，16G卡全档超13G，仅适合20G+机器，不推荐日常",
-        "modality": "multimodal"
+        "modality": "multimodal",
+        "ctx": 65536
       },
       {
         "id": "gemma4:12b-it-q4_K_M",
@@ -249,7 +252,8 @@
         "speed_gen_tok_s": 30.0,
         "multimodal": true,
         "notes": "官方多模态版（vision+audio完整），64K选定，think:false必需",
-        "modality": "multimodal"
+        "modality": "multimodal",
+        "ctx": 65536
       },
       {
         "id": "minicpm5-1b:q4km",
@@ -269,7 +273,8 @@
         "speed_gen_tok_s": 231,
         "multimodal": true,
         "notes": "小模型极省，生成快，纯文本（官方text-only）",
-        "modality": "multimodal"
+        "modality": "multimodal",
+        "ctx": 131072
       },
       {
         "id": "qwen3.5:0.8b",
@@ -290,7 +295,8 @@
         "speed_gen_tok_s": 154.8,
         "multimodal": true,
         "notes": "官方多模态，256K选定，三档全稳，替换qwen3:0.6b",
-        "modality": "multimodal"
+        "modality": "multimodal",
+        "ctx": 262144
       },
       {
         "id": "minicpm5-fable5:q8",
@@ -310,7 +316,8 @@
         "speed_gen_tok_s": 180,
         "multimodal": true,
         "notes": "Q8档仍省，RP模型，纯文本",
-        "modality": "multimodal"
+        "modality": "multimodal",
+        "ctx": 131072
       }
     ],
     "combos": {
