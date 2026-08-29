@@ -1,0 +1,116 @@
+﻿{
+    "7":  {
+              "inputs":  {
+                             "denoise":  1,
+                             "seed":  42,
+                             "negative":  [
+                                              "5",
+                                              0
+                                          ],
+                             "cfg":  6,
+                             "sampler_name":  "euler",
+                             "latent_image":  [
+                                                  "6",
+                                                  0
+                                              ],
+                             "scheduler":  "simple",
+                             "model":  [
+                                           "1",
+                                           0
+                                       ],
+                             "steps":  20,
+                             "positive":  [
+                                              "4",
+                                              0
+                                          ]
+                         },
+              "class_type":  "KSampler"
+          },
+    "9":  {
+              "inputs":  {
+                             "images":  [
+                                            "8",
+                                            0
+                                        ],
+                             "fps":  24
+                         },
+              "class_type":  "CreateVideo"
+          },
+    "10":  {
+               "inputs":  {
+                              "format":  "mp4",
+                              "filename_prefix":  "Wan22_test_001",
+                              "video":  [
+                                            "9",
+                                            0
+                                        ]
+                          },
+               "class_type":  "SaveVideo"
+           },
+    "3":  {
+              "inputs":  {
+                             "vae_name":  "wan2.2_vae.safetensors"
+                         },
+              "class_type":  "VAELoader"
+          },
+    "2":  {
+              "inputs":  {
+                             "clip_name":  "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+                             "type":  "wan"
+                         },
+              "class_type":  "CLIPLoader"
+          },
+    "1":  {
+              "inputs":  {
+                             "weight_dtype":  "default",
+                             "unet_name":  "wan2.2_ti2v_5B_fp16.safetensors"
+                         },
+              "class_type":  "UNETLoader"
+          },
+    "4":  {
+              "inputs":  {
+                             "text":  "A cute cat playing with a ball of yarn, cinematic lighting, high quality, detailed fur, smooth motion",
+                             "clip":  [
+                                          "2",
+                                          0
+                                      ]
+                         },
+              "class_type":  "CLIPTextEncode"
+          },
+    "6":  {
+              "inputs":  {
+                             "batch_size":  1,
+                             "width":  480,
+                             "vae":  [
+                                         "3",
+                                         0
+                                     ],
+                             "height":  480,
+                             "length":  17
+                         },
+              "class_type":  "Wan22ImageToVideoLatent"
+          },
+    "5":  {
+              "inputs":  {
+                             "text":  "blurry, low quality, distorted, ugly, watermark, text, static, noise",
+                             "clip":  [
+                                          "2",
+                                          0
+                                      ]
+                         },
+              "class_type":  "CLIPTextEncode"
+          },
+    "8":  {
+              "inputs":  {
+                             "samples":  [
+                                             "7",
+                                             0
+                                         ],
+                             "vae":  [
+                                         "3",
+                                         0
+                                     ]
+                         },
+              "class_type":  "VAEDecode"
+          }
+}

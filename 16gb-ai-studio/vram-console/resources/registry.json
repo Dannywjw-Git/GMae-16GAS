@@ -1,0 +1,609 @@
+{
+  "version": "1.1",
+  "description": "GPU Maestro 资源注册表 - 所有模型/容器/场景的唯一数据源",
+  "last_updated": "2026-08-28",
+  "ollama": {
+    "container": "ollama",
+    "port": 11434,
+    "models": [
+      {
+        "id": "qwen3.5:9b",
+        "name": "Qwen3.5 9B",
+        "vram_gb": 9.9,
+        "ctx": 16384,
+        "exclusive": false,
+        "category": "llm",
+        "combo": "9b",
+        "keep_alive": "30m",
+        "full_name": "Qwen3.5 9B Instruct",
+        "vendor": "阿里巴巴 通义千问",
+        "release": "2025",
+        "desc": "日常对话 / 写作 / RAG 主力，16K 长上下文",
+        "detail": "Qwen 系列旗舰 9B 量级对话模型，本地对话态默认主力。写作、翻译、知识库问答稳定，16K 上下文保长对话实用价值（较 8K 仅多占 ~0.3G，勿轻易降档）。",
+        "default_ctx": 131072,
+        "vram_verified": true,
+        "context_vram": {
+          "16384": 6.2,
+          "65536": 7.7,
+          "131072": 9.9,
+          "200704": 11.0
+        },
+        "max_safe_ctx": 200704,
+        "max_safe_vram": 11.0,
+        "speed_prefill_tok_s": 2641,
+        "speed_gen_tok_s": 43.3,
+        "multimodal": true,
+        "notes": "官方多模态，128K选定，196K极限安全",
+        "modality": "multimodal"
+      },
+      {
+        "id": "qwen3:0.6b",
+        "name": "Qwen3 0.6B",
+        "vram_gb": 5.4,
+        "ctx": 16384,
+        "exclusive": false,
+        "category": "llm",
+        "combo": "0.6b",
+        "keep_alive": "30m",
+        "full_name": "Qwen3 0.6B Instruct",
+        "vendor": "阿里巴巴 通义千问",
+        "release": "2025",
+        "desc": "超轻量模型，后台小任务（标题、改写）",
+        "detail": "0.6B 微型对话模型，仅用于 task 类轻后台任务（标题生成、文本改写）。日常对话请用 9B，过度降档会失去实用价值。",
+        "default_ctx": 40960,
+        "vram_verified": true,
+        "context_vram": {
+          "40960": 5.4
+        },
+        "max_safe_ctx": 40960,
+        "max_safe_vram": 5.4,
+        "speed_prefill_tok_s": 826,
+        "speed_gen_tok_s": 120.6,
+        "multimodal": false,
+        "notes": "轻量对话，Qwen3架构上限40K，生成极快",
+        "modality": "text"
+      },
+      {
+        "id": "qwythos-9b:q4km",
+        "name": "Qwythos 9B Q4KM",
+        "vram_gb": 7.5,
+        "vram_gb_note": "9B q4km 量化，文件 5.7G，显存约 6.5G（估算，可实测校准）",
+        "ctx": 8192,
+        "exclusive": false,
+        "category": "llm",
+        "combo": "qwythos-9b",
+        "keep_alive": "30m",
+        "full_name": "Qwythos 9B Q4KM",
+        "vendor": "社区量化",
+        "release": "2025",
+        "desc": "9B 写作/对话，q4km 量化省显存",
+        "detail": "9B 量级对话模型，q4km 量化（文件 5.7G，显存约 6.5G）。与 9B 主力互斥，按需切换。",
+        "default_ctx": 65536,
+        "vram_verified": true,
+        "context_vram": {
+          "16384": 6.0,
+          "65536": 7.5,
+          "131072": 10.3,
+          "196608": 12.5
+        },
+        "max_safe_ctx": 196608,
+        "max_safe_vram": 12.5,
+        "speed_prefill_tok_s": 2585,
+        "speed_gen_tok_s": 42.3,
+        "multimodal": false,
+        "notes": "无审查RP，Qwen3.5架构，192K极限安全",
+        "modality": "text"
+      },
+      {
+        "id": "darkidol-8b:q4km",
+        "name": "Darkidol 8B Q4KM",
+        "vram_gb": 7.0,
+        "vram_gb_note": "8B q4km 量化，文件 4.9G，显存约 5.5G（估算，可实测校准）",
+        "ctx": 8192,
+        "exclusive": false,
+        "category": "llm",
+        "combo": "darkidol-8b",
+        "keep_alive": "30m",
+        "full_name": "Darkidol 8B Q4KM",
+        "vendor": "社区量化",
+        "release": "2025",
+        "desc": "8B 角色/对话，q4km 量化省显存",
+        "detail": "8B 量级对话模型，q4km 量化（文件 4.9G，显存约 5.5G）。偏角色扮演与风格化对话，与主力模型互斥。",
+        "default_ctx": 16384,
+        "vram_verified": true,
+        "context_vram": {
+          "16384": 7.0,
+          "57344": 12.8
+        },
+        "max_safe_ctx": 57344,
+        "max_safe_vram": 12.8,
+        "speed_prefill_tok_s": 3222,
+        "speed_gen_tok_s": 47.4,
+        "multimodal": false,
+        "notes": "KV cache大户，Llama架构，16K选定，56K极限",
+        "modality": "text"
+      },
+      {
+        "id": "bge-m3:latest",
+        "name": "BGE-M3 Embedding",
+        "vram_gb": 0,
+        "ctx": 8192,
+        "exclusive": false,
+        "category": "embedding",
+        "device": "cpu",
+        "keep_alive": "30m",
+        "full_name": "BGE-M3 Embedding",
+        "vendor": "北京智源研究院 (BAAI)",
+        "release": "2024",
+        "desc": "多语言 embedding，检索/RAG 向量化（CPU）",
+        "detail": "BGE-M3 多语言嵌入模型，用于知识库检索与 RAG 向量化。CPU 运行，不占显存。",
+        "modality": "text"
+      },
+      {
+        "id": "bge-m3-cpu:latest",
+        "name": "BGE-M3 CPU",
+        "vram_gb": 0,
+        "ctx": 8192,
+        "exclusive": false,
+        "category": "embedding",
+        "device": "cpu",
+        "keep_alive": "30m",
+        "full_name": "BGE-M3 Embedding (CPU)",
+        "vendor": "北京智源研究院 (BAAI)",
+        "release": "2024",
+        "desc": "BGE-M3 的 CPU 专用版本（不占显存）",
+        "detail": "BGE-M3 的 CPU 专用运行版本，用于强制 CPU 向量化场景，不占 GPU 显存。",
+        "modality": "text"
+      },
+      {
+        "id": "qllama/bge-reranker-v2-m3:latest",
+        "name": "BGE Reranker V2 M3",
+        "vram_gb": 0,
+        "ctx": 8192,
+        "exclusive": false,
+        "category": "reranker",
+        "device": "cpu",
+        "keep_alive": "30m",
+        "full_name": "BGE Reranker V2 M3",
+        "vendor": "北京智源研究院 (BAAI)",
+        "release": "2024",
+        "desc": "rerank 重排，检索结果排序（CPU）",
+        "detail": "BGE Reranker V2 M3 重排模型，对检索结果二次排序提高精度。CPU 运行不占显存，登记簿标记禁删。",
+        "modality": "text"
+      },
+      {
+        "id": "defiant-9b:q4km",
+        "name": "defiant-9b:q4km",
+        "vram_gb": 8.6,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 65536,
+        "vram_verified": true,
+        "context_vram": {
+          "16384": 7.1,
+          "65536": 8.6,
+          "131072": 10.0
+        },
+        "max_safe_ctx": 131072,
+        "max_safe_vram": 10.0,
+        "speed_prefill_tok_s": 2559,
+        "speed_gen_tok_s": 35.3,
+        "multimodal": false,
+        "notes": "无审查RP，DavidAU出品，Qwen3.5架构",
+        "modality": "text"
+      },
+      {
+        "id": "gemma-4-12b-it:q4km",
+        "name": "gemma-4-12b-it:q4km",
+        "vram_gb": 11.2,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 131072,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 10.5,
+          "131072": 11.2
+        },
+        "max_safe_ctx": 131072,
+        "max_safe_vram": 11.2,
+        "speed_prefill_tok_s": 1690,
+        "speed_gen_tok_s": 29.5,
+        "multimodal": false,
+        "notes": "旧GGUF纯文本版（无vision/audio张量），think:false必需",
+        "modality": "text"
+      },
+      {
+        "id": "gemma-4-12b-it:q8_0",
+        "name": "gemma-4-12b-it:q8_0",
+        "vram_gb": 14.4,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 65536,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 14.4
+        },
+        "max_safe_ctx": 8192,
+        "max_safe_vram": 13.98,
+        "speed_prefill_tok_s": 1766,
+        "speed_gen_tok_s": 19,
+        "multimodal": true,
+        "notes": "Q8权重11.8G+KV，16G卡全档超13G，仅适合20G+机器，不推荐日常",
+        "modality": "multimodal"
+      },
+      {
+        "id": "gemma4:12b-it-q4_K_M",
+        "name": "gemma4:12b-it-q4_K_M",
+        "vram_gb": 10.4,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 65536,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 10.4,
+          "131072": 11.0
+        },
+        "max_safe_ctx": 131072,
+        "max_safe_vram": 11.0,
+        "speed_prefill_tok_s": 1650,
+        "speed_gen_tok_s": 30.0,
+        "multimodal": true,
+        "notes": "官方多模态版（vision+audio完整），64K选定，think:false必需",
+        "modality": "multimodal"
+      },
+      {
+        "id": "minicpm5-1b:q4km",
+        "name": "minicpm5-1b:q4km",
+        "vram_gb": 5.4,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 131072,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 3.6,
+          "131072": 5.4
+        },
+        "max_safe_ctx": 131072,
+        "max_safe_vram": 5.4,
+        "speed_prefill_tok_s": 16525,
+        "speed_gen_tok_s": 231,
+        "multimodal": true,
+        "notes": "小模型极省，生成快，纯文本（官方text-only）",
+        "modality": "multimodal"
+      },
+      {
+        "id": "qwen3.5:0.8b",
+        "name": "qwen3.5:0.8b",
+        "vram_gb": 6.6,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 262144,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 3.5,
+          "131072": 4.5,
+          "262144": 6.6
+        },
+        "max_safe_ctx": 262144,
+        "max_safe_vram": 6.6,
+        "speed_prefill_tok_s": 9747,
+        "speed_gen_tok_s": 154.8,
+        "multimodal": true,
+        "notes": "官方多模态，256K选定，三档全稳，替换qwen3:0.6b",
+        "modality": "multimodal"
+      },
+      {
+        "id": "minicpm5-fable5:q8",
+        "name": "minicpm5-fable5:q8",
+        "vram_gb": 5.8,
+        "exclusive": false,
+        "category": "llm",
+        "default_ctx": 131072,
+        "vram_verified": true,
+        "context_vram": {
+          "65536": 4.0,
+          "131072": 5.8
+        },
+        "max_safe_ctx": 131072,
+        "max_safe_vram": 5.8,
+        "speed_prefill_tok_s": 18076,
+        "speed_gen_tok_s": 180,
+        "multimodal": true,
+        "notes": "Q8档仍省，RP模型，纯文本",
+        "modality": "multimodal"
+      }
+    ],
+    "combos": {
+      "9b": {
+        "load": [
+          "qwen3.5:9b"
+        ],
+        "stop": [
+          "qwythos-9b:q4km",
+          "darkidol-8b:q4km"
+        ]
+      },
+      "0.6b": {
+        "load": [
+          "qwen3:0.6b"
+        ],
+        "stop": []
+      },
+      "qwythos-9b": {
+        "load": [
+          "qwythos-9b:q4km"
+        ],
+        "stop": [
+          "qwen3.5:9b",
+          "darkidol-8b:q4km"
+        ]
+      },
+      "darkidol-8b": {
+        "load": [
+          "darkidol-8b:q4km"
+        ],
+        "stop": [
+          "qwen3.5:9b",
+          "qwythos-9b:q4km"
+        ]
+      },
+      "none": {
+        "load": [],
+        "stop": "all"
+      }
+    }
+  },
+  "comfyui": {
+    "container": "comfyui",
+    "port": 8188,
+    "models": [
+      {
+        "id": "SDXL",
+        "name": "SDXL",
+        "vram_gb": 6.5,
+        "exclusive": false,
+        "category": "image",
+        "workflow": "sdxl_t2i.json",
+        "full_name": "Stable Diffusion XL 1.0 Base",
+        "vendor": "Stability AI",
+        "release": "2023-07",
+        "desc": "标准质量文生图，ComfyUI 画图主力",
+        "detail": "Stable Diffusion XL 1.0 基础模型，文生图标准质量（约 6.5G 显存）。在 ComfyUI 场景下运行，用于日常画图，速度与质量均衡。"
+      },
+      {
+        "id": "Flux-Q5",
+        "name": "Flux.1 Dev Q5",
+        "vram_gb": 11.7,
+        "vram_gb_note": "实测峰值 11.7G（原标称 13G 偏高，GGUF Q5 量化）",
+        "exclusive": true,
+        "category": "image",
+        "workflow": "flux-t2i.json",
+        "full_name": "Flux.1 Dev Q5 GGUF",
+        "vendor": "Black Forest Labs",
+        "release": "2024-08",
+        "desc": "高质量文生图，Q5 量化顶格跑（约 11.7G）",
+        "detail": "Flux.1 Dev 的 Q5 GGUF 量化版（Black Forest Labs 出品）。文生图高质量档，实测峰值 ~11.7G，接近独占全卡。比 SDXL 细节/构图更优，但生成更慢、占用更高。"
+      },
+      {
+        "id": "Music3",
+        "name": "MiniMax Music 3",
+        "vram_gb": 13,
+        "vram_gb_note": "实测峰值 ~12-13G（原标称 14.5G 偏高）",
+        "exclusive": true,
+        "category": "audio",
+        "workflow": "music3-t2audio.json",
+        "full_name": "MiniMax Music 3",
+        "vendor": "MiniMax (稀宇科技)",
+        "release": "2025",
+        "desc": "AI 写歌（文生音乐），30s~90s 片段",
+        "detail": "MiniMax Music 3 文生音乐模型，输入文字描述生成歌曲片段（30s≈82s / 60s≈127s / 90s≈3-5 分钟）。生成完自动卸载回底噪。"
+      },
+      {
+        "id": "Wan2.2-TI2V",
+        "name": "Wan2.2 TI2V 5B",
+        "vram_gb": 10.9,
+        "vram_gb_note": "实测峰值 ~10.9G（480x480x17帧），16GB 卡只能做氛围/意境类短片",
+        "exclusive": true,
+        "category": "video",
+        "workflow": "wan2.2_ti2v.json",
+        "full_name": "Wan2.2 TI2V 5B (FP16)",
+        "vendor": "阿里巴巴 通义万相",
+        "release": "2025",
+        "desc": "文生/图生视频，480p 氛围/意境类短片",
+        "detail": "通义万相 Wan2.2 TI2V 5B 文生视频模型（9.3GB FP16，峰值 ~10.9G）。16GB 卡实测只能做氛围/意境类短片（风景、慢镜头、单一主体）；人物复杂动作必翻车。必须配 wan2.2_vae.safetensors（48 通道）。"
+      },
+      {
+        "id": "ace_step_1.5_turbo_aio.safetensors",
+        "name": "ACE-Step 1.5",
+        "vram_gb": 6.0,
+        "exclusive": true,
+        "category": "music",
+        "full_name": "ACE-Step 1.5 Turbo",
+        "vendor": "阶跃星辰 (StepFun)",
+        "release": "2025",
+        "desc": "文生音乐（轻量），已测 7.5 分轻微断音",
+        "detail": "ACE-Step 1.5 Turbo 文生音乐模型（AI-All-in-One 单文件）。轻量写歌，评测 7.5 分，有轻微断音；Music3 表现更优，本模型作备选。"
+      },
+      {
+        "id": "LTX-2.5-Distilled-Q4_K_S.gguf",
+        "name": "LTX-2.5 Distilled",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "category": "video",
+        "full_name": "LTX-2.5 Distilled Q4_K_S GGUF",
+        "vendor": "Lightricks",
+        "release": "2025",
+        "desc": "文生视频（蒸馏版），Q4 量化省显存",
+        "detail": "LTX-2.5 Distilled 文生视频模型，Q4_K_S 量化（GGUF）。蒸馏版轻量快速，适合低显存跑短视频。已登记，工作流模板待导出。"
+      },
+      {
+        "id": "hunyuanvideo1.5_480p_t2v_cfg_distilled_fp8_scaled.safetensors",
+        "name": "HunyuanVideo 1.5",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "category": "video",
+        "full_name": "HunyuanVideo 1.5 480p T2V FP8",
+        "vendor": "腾讯 混元",
+        "release": "2025",
+        "desc": "文生视频（480p 蒸馏 FP8），短视频",
+        "detail": "腾讯混元 HunyuanVideo 1.5 480p 文生视频（CFG 蒸馏 FP8 版）。480p 短视频生成，FP8 量化省显存。已登记，工作流模板待导出。"
+      }
+    ]
+  },
+  "containers": [
+    {
+      "name": "comfyui",
+      "port": 8188,
+      "scenes": [
+        "comfy",
+        "h3",
+        "music"
+      ]
+    },
+    {
+      "name": "fooocus",
+      "port": 7865,
+      "scenes": [
+        "fooocus"
+      ]
+    },
+    {
+      "name": "ollama",
+      "port": 11434,
+      "scenes": [
+        "all"
+      ]
+    },
+    {
+      "name": "open-webui",
+      "port": 3000,
+      "scenes": [
+        "all"
+      ]
+    }
+  ],
+  "scenes": {
+    "dialogue": {
+      "label": "对话态",
+      "vram_budget_gb": 10,
+      "containers": [
+        "ollama",
+        "open-webui"
+      ]
+    },
+    "comfy": {
+      "label": "SDXL出图",
+      "vram_budget_gb": 12,
+      "containers": [
+        "comfyui",
+        "ollama"
+      ]
+    },
+    "h3": {
+      "label": "H3出视频",
+      "vram_budget_gb": 16,
+      "containers": [
+        "comfyui"
+      ],
+      "exclusive": true
+    },
+    "fooocus": {
+      "label": "Flux出图",
+      "vram_budget_gb": 16,
+      "containers": [
+        "fooocus"
+      ],
+      "exclusive": true
+    },
+    "music": {
+      "label": "音乐态",
+      "vram_budget_gb": 16,
+      "containers": [
+        "comfyui"
+      ],
+      "exclusive": true
+    },
+    "game": {
+      "label": "游戏态",
+      "vram_budget_gb": 5,
+      "containers": []
+    }
+  },
+  "gpu_guard": {
+    "description": "门卫登记簿（服务级）：managed=可安全驱逐的服务；protect=永不触碰；unknown_policy=未登记占用处理策略",
+    "managed": [
+      {
+        "name": "ollama",
+        "evict": "stop models",
+        "note": "Ollama 已加载模型（低优先级，先腾）"
+      },
+      {
+        "name": "comfyui",
+        "evict": "/free",
+        "note": "ComfyUI 卸载模型"
+      },
+      {
+        "name": "fooocus",
+        "evict": "docker stop",
+        "note": "Fooocus 容器（可安全重启）"
+      }
+    ],
+    "protect": [
+      {
+        "name": "open-webui",
+        "note": "Web 前端，永不驱逐"
+      },
+      {
+        "name": "immich",
+        "note": "照片库服务，永不驱逐"
+      },
+      {
+        "name": "ollama",
+        "note": "服务本体（仅驱逐其加载的模型，不杀容器）"
+      }
+    ],
+    "unknown_policy": "warn",
+    "warn_threshold_mb": 2048
+  },
+  "system": {
+    "gpu_vram_total_gb": 16,
+    "gpu_base_noise_gb": 1.0,
+    "vram_reserve_gb": 2.5,
+    "m1_threshold_mb": 4096,
+    "watchdog_restart_delay_s": 5,
+    "watchdog_max_restarts_per_hour": 10
+  },
+  "scanner": {
+    "description": "模型扫描器扫描目标（蓝图§10.3，配置驱动）：type=docker_dir 扫容器内目录；type=api 拉HTTP模型列表。换容器名/目录/API，或加其他容器（fooocus 等），只改这里，不碰代码。",
+    "targets": [
+      {
+        "source": "comfyui",
+        "type": "docker_dir",
+        "container": "comfyui",
+        "base": "/workspace/models",
+        "dirs": [
+          "checkpoints",
+          "unet",
+          "diffusion_models"
+        ],
+        "default_category": "image"
+      },
+      {
+        "source": "ollama",
+        "type": "api",
+        "url": "http://127.0.0.1:11434/api/tags"
+      },
+      {
+        "source": "fooocus",
+        "type": "docker_dir",
+        "container": "fooocus",
+        "base": "/app/models",
+        "dirs": [
+          "checkpoints"
+        ],
+        "default_category": "image",
+        "enabled": false
+      }
+    ]
+  }
+}

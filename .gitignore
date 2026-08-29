@@ -1,0 +1,82 @@
+# GMae 项目 .gitignore
+# 排除日志（可能很大）
+*.log
+logs/
+
+# 临时文件（下划线开头）
+_*
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 环境变量与密钥
+.env
+.env.local
+*.key
+*.pem
+
+# 编辑器/IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 模型文件（大文件，不入库）
+models/
+*.safetensors
+*.gguf
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# 输出产物（图/视频/音频，不入库）
+outputs/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp4
+*.avi
+*.mov
+*.wav
+*.mp3
+*.flac
+
+# 安装包/备份
+_installers/
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# Docker 数据（如果有）
+docker-data/
+volumes/
+
+# 备份文件
+*.bak
+*.backup
+*.old
+
+# 进程/PID 文件
+*.pid
+
+# 敏感文件
+.api_token
+*.token
+
+# 备份文件
+*.bak*
+*.bak_*
+

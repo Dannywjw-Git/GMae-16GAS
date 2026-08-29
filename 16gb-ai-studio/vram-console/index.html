@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VRAM 场景调度指挥中心</title>
+<style>
+  :root {
+    --bg: #1D1F27; --card: #262A36; --card2: #2E3342; --line: #3A4052;
+    --txt: #E8EAED; --sub: #9AA0AE; --dim: #6B7280;
+    --g1: #FF6B6B; --g2: #4ECDC4;
+    --ok: #4ECDC4; --warn: #FFB86B; --bad: #FF6B6B;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--txt); font-family:"Segoe UI","Microsoft YaHei",sans-serif; font-size:14px; }
+  .wrap { max-width:1180px; margin:0 auto; padding:14px 16px 60px; }
+  /* ===== Header：标题 + 主指标条（少即是多：核心状态一眼可见） ===== */
+  header { position:sticky; top:0; z-index:50; background:rgba(29,31,39,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); padding:8px 0; margin-bottom:12px; }
+  .hrow { max-width:1180px; margin:0 auto; padding:0 16px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  h1 { font-size:16px; font-weight:600; background:linear-gradient(90deg,var(--g1),var(--g2)); -webkit-background-clip:text; background-clip:text; color:transparent; white-space:nowrap; }
+  .hmeta { display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--sub); }
+  .hm-gpu { display:flex; align-items:center; gap:6px; }
+  .hm-bar { width:150px; height:8px; border-radius:5px; background:var(--card2); border:1px solid var(--line); overflow:hidden; }
+  .hm-fill { height:100%; background:linear-gradient(90deg,#2E7D72,#4ECDC4); transition:width .4s ease; }
+  .hm-fill.hot { background:linear-gradient(90deg,#8A5A1F,#FFB86B); }
+  .hm-fill.danger { background:linear-gradient(90deg,#8A2E2E,#FF6B6B); }
+  .hm-num { font-family:Consolas,monospace; color:var(--g2); }
+  .hm-scene { padding:2px 10px; border-radius:10px; background:var(--card2); border:1px solid var(--line); font-size:12px; }
+  .dot { width:8px; height:8px; border-radius:50%; background:var(--dim); display:inline-block; }
+  .dot.ok { background:var(--ok); } .dot.bad { background:var(--bad); }
+  .meta { color:var(--dim); font-size:11px; margin-left:auto; }
+  /* ===== 卡片 ===== */
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .card h2 { font-size:12px; color:var(--sub); font-weight:500; margin-bottom:10px; letter-spacing:.5px; display:flex; justify-content:space-between; align-items:center; }
+  .card h2 .hint { font-size:11px; color:var(--dim); font-weight:400; letter-spacing:0; }
+  /* banners: only on anomaly */
+  #banners { margin-bottom:12px; }
+  .banner { border-radius:10px; padding:9px 14px; margin-bottom:6px; font-size:13px; border:1px solid; }
+  .banner.bad  { background:rgba(255,107,107,.12); border-color:var(--bad); color:#FFB4B4; }
+  .banner.warn { background:rgba(255,184,107,.12); border-color:var(--warn); color:#FFD9A8; }
+  /* ===== 第二层 动作层（蓝图 11.2：想动手时，点一下就行；Panic 永远可见） ===== */
+  .actbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:12px; }
+  .act-btn { background:var(--card2); color:var(--g2); border:1px solid var(--line); border-radius:10px; padding:10px 18px; font-size:13px; cursor:pointer; transition:.15s; }
+  .act-btn:hover:not(:disabled) { border-color:var(--g2); background:rgba(78,205,196,.08); transform:translateY(-1px); }
+  .act-btn.panic { color:#FF6B6B; border-color:var(--bad); background:rgba(255,107,107,.06); }
+  .act-btn.panic:hover { background:rgba(255,107,107,.14); }
+  .act-btn.scene { color:var(--txt); }
+  .act-note { font-size:11px; color:var(--dim); }
+  /* 状态播报（蓝图 11.4：调度动作转成一句话） */
+  .announce { margin-bottom:12px; font-size:13px; padding:9px 14px; border-radius:10px; background:var(--card); border:1px solid var(--line); color:var(--sub); display:flex; gap:8px; align-items:center; }
+  .announce b { color:var(--g2); font-weight:500; }
+  .announce .stt { color:var(--ok); font-size:12px; }
+  /* VRAM bar */
+  .vram-nums { display:flex; justify-content:space-between; margin-bottom:6px; font-size:13px; flex-wrap:wrap; gap:4px; }
+  .vram-nums b { font-size:17px; }
+  .used { color:var(--g2); } .free { color:var(--ok); } .total { color:var(--sub); }
+  .bar { height:24px; border-radius:8px; background:var(--card2); overflow:hidden; border:1px solid var(--line); position:relative; }
+  .bar-fill { height:100%; transition:width .4s ease; border-radius:8px 0 0 8px; }
+  .lv-safe { background:linear-gradient(90deg,#2E7D72,#4ECDC4); }
+  .lv-mid { background:linear-gradient(90deg,#8A5A1F,#FFB86B); }
+  .lv-high { background:linear-gradient(90deg,#8A2E2E,#FF6B6B); }
+  .bar-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+  .curline { margin-top:8px; font-size:12px; color:var(--g2); display:flex; gap:14px; flex-wrap:wrap; }
+  .curline span { display:inline-flex; align-items:center; gap:6px; }
+  .free-row { margin-top:10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .free-row button { background:var(--card2); color:var(--g2); border:1px solid var(--line); border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer; transition:.15s; }
+  .free-row button:hover:not(:disabled) { border-color:var(--g2); background:rgba(78,205,196,.08); }
+  .free-row button:disabled { opacity:.5; cursor:not-allowed; }
+  .free-row #freeRst { font-size:11px; color:var(--sub); }
+  .mini { background:var(--card2); color:#FF6B6B; border:1px solid var(--bad); border-radius:6px; padding:2px 8px; font-size:11px; cursor:pointer; transition:.15s; }
+  .mini:hover { background:rgba(255,107,107,.12); }
+  .budget-m { display:inline-flex; align-items:center; gap:4px; background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:3px 8px; font-size:11px; color:var(--sub); cursor:default; }
+  .budget-m.ok { border-color:var(--ok); color:var(--ok); }
+  .budget-m.warn { border-color:var(--warn); color:#FFD28A; }
+  .budget-m.bad { border-color:var(--bad); color:#FFB4B4; }
+  #qosBanner { margin-bottom:10px; }
+  #qosBanner .qos { padding:6px 12px; border-radius:8px; font-size:12px; margin-bottom:6px; }
+  #qosBanner .qos.red { background:rgba(255,107,107,.12); border:1px solid var(--bad); color:#FFB4B4; }
+  #qosBanner .qos.yellow { background:rgba(255,210,138,.1); border:1px solid var(--warn); color:#FFD28A; }
+  /* GPU 进程感知（Step 2：谁在占显存） */
+  .procs { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; font-size:11px; }
+  .procs .p { display:inline-flex; align-items:center; gap:5px; background:var(--card2); border:1px solid var(--line); border-radius:6px; padding:3px 8px; color:var(--sub); }
+  .procs .p.unknown { border-color:var(--bad); color:#FFB4B4; }
+  .procs .p .mb { color:var(--g2); font-family:Consolas,monospace; }
+  .procs .empty { color:var(--dim); font-size:11px; }
+  /* 门卫 gpu_guard */
+  .gbtn { background:var(--card2); color:var(--g2); border:1px solid var(--line); border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer; transition:.15s; }
+  .gbtn:hover:not(:disabled) { border-color:var(--g2); background:rgba(78,205,196,.08); }
+  .gbtn:disabled { opacity:.5; cursor:not-allowed; }
+  /* occupancy distribution */
+  #vSegs { display:flex; height:100%; }
+  #vSegs .seg { height:100%; transition:width .5s ease; }
+  #vSegs .seg.model { background:linear-gradient(90deg,#2E7D72,#4ECDC4); }
+  #vSegs .seg.fooocus { background:linear-gradient(90deg,#8A5A1F,#FFB86B); }
+  #vSegs .seg.comfy { background:linear-gradient(90deg,#8A2E2E,#FF6B6B); animation:pulse 1.2s infinite; }
+  #vSegs .seg.base { background:#4B5263; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  .dist-legend { display:flex; gap:10px 14px; flex-wrap:wrap; margin-top:8px; font-size:11px; color:var(--sub); }
+  .dist-legend .lg { display:inline-flex; align-items:center; gap:4px; }
+  .dist-legend .lg::before { content:""; width:8px; height:8px; border-radius:2px; display:inline-block; background:var(--dim); }
+  .dist-legend .lg.model::before { background:var(--ok); }
+  .dist-legend .lg.fooocus::before { background:var(--warn); }
+  .dist-legend .lg.comfy::before { background:var(--g1); }
+  .dist-legend .lg.base::before { background:#4B5263; }
+  .dist-legend .lg.free::before { background:var(--card2); border:1px solid var(--line); }
+  /* scenes: one-tap switch */
+  .scenes { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .scene { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 8px; cursor:pointer; text-align:center; transition:.15s; }
+  .scene:hover { border-color:var(--g2); transform:translateY(-1px); }
+  .scene.active { border-color:var(--g2); box-shadow:0 0 0 1px var(--g2), 0 4px 14px rgba(78,205,196,.15); }
+  .scene .ic { font-size:20px; }
+  .scene .nm { margin-top:5px; font-size:13px; font-weight:500; }
+  .scene .modes { margin-top:4px; font-size:10px; color:var(--warn); background:rgba(255,184,107,.10); border:1px solid rgba(255,184,107,.35); border-radius:10px; padding:1px 6px; display:inline-block; }
+  .scene .dsline { margin-top:4px; font-size:10px; color:var(--sub); line-height:1.4; padding:0 4px; }
+  .scene .vr { margin-top:4px; font-size:11px; color:var(--g2); }
+  .scene.busy { opacity:.5; pointer-events:none; }
+  /* budget table: authoritative occupancy ledger */
+  table.bt { width:100%; border-collapse:collapse; font-size:12px; }
+  table.bt th, table.bt td { border:1px solid var(--line); padding:6px 10px; text-align:left; white-space:nowrap; }
+  table.bt th { background:var(--card2); color:var(--sub); font-weight:500; font-size:11px; }
+  table.bt td.vram { color:var(--g2); font-family:Consolas,monospace; }
+  table.bt td.bad { color:var(--bad); }
+  table.bt td.st { font-family:Consolas,monospace; }
+  table.bt .on { color:var(--ok); } table.bt .off { color:var(--dim); }
+  table.bt tr.currow td { background:rgba(78,205,196,.06); }
+  table.bt tr.hoverrow td { background:rgba(255,184,107,.12); }
+  table.bt td.use { color:var(--sub); font-size:11px; white-space:normal; min-width:150px; }
+  /* combo chips */
+  .combo-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .combo { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:7px 14px; font-size:12px; cursor:pointer; transition:.15s; color:var(--sub); }
+  .combo:hover { border-color:var(--g2); color:var(--g2); }
+  .combo.active { border-color:var(--g2); color:var(--g2); background:rgba(78,205,196,.08); }
+  .combo.deny { cursor:not-allowed; opacity:.5; }
+  .combo.busy { opacity:.5; pointer-events:none; }
+  .combo .ctx { font-size:10px; color:var(--dim); margin-left:4px; }
+  /* log */
+  #log { max-height:150px; overflow-y:auto; font-family:Consolas,monospace; font-size:12px; color:var(--sub); background:var(--card2); border:1px solid var(--line); border-radius:8px; padding:8px 10px; white-space:pre-wrap; word-break:break-all; }
+  /* ===== 折叠区段（少即是多：平时极简单行，点开全面） ===== */
+  details.sec { background:var(--card); border:1px solid var(--line); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+  details.sec>summary { list-style:none; cursor:pointer; padding:11px 16px; display:flex; align-items:center; gap:10px; user-select:none; }
+  details.sec>summary::-webkit-details-marker { display:none; }
+  details.sec>summary:hover { background:rgba(78,205,196,.04); }
+  details.sec>summary .s-t { font-size:12px; color:var(--sub); font-weight:500; letter-spacing:.5px; }
+  details.sec>summary .s-sum { font-size:11px; color:var(--dim); flex:1; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  details.sec>summary .chev { color:var(--dim); font-size:10px; transition:transform .2s; }
+  details.sec[open]>summary .chev { transform:rotate(90deg); }
+  details.sec .sec-body { padding:0 16px 12px; }
+  /* ===== 模型登记台（模型名 Hover 全称 + 极短简介 + 点击详情抽屉） ===== */
+  .reg-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .reg-table th { text-align:left; color:var(--sub); font-weight:500; font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .reg-table td { padding:7px 8px; border-bottom:1px solid rgba(58,64,82,.45); vertical-align:middle; }
+  .reg-table tr:hover td { background:rgba(78,205,196,.05); }
+  .reg-table tr { cursor:pointer; }
+  .mname { font-weight:500; color:var(--txt); border-bottom:1px dashed var(--dim); cursor:help; }
+  .mname:hover { color:var(--g2); }
+  .m-desc { color:var(--sub); font-size:11px; }
+  .m-cat { font-size:10px; padding:1px 8px; border-radius:8px; background:var(--card2); border:1px solid var(--line); color:var(--sub); white-space:nowrap; }
+  .cat-llm { color:var(--g2); border-color:rgba(78,205,196,.4); }
+  .cat-video { color:#7EB3FF; border-color:rgba(126,179,255,.4); }
+  .cat-audio, .cat-music { color:#D39BFF; border-color:rgba(211,155,255,.4); }
+  .cat-image { color:#FFD28A; border-color:rgba(255,184,107,.4); }
+  .cat-embedding, .cat-reranker { color:#9AA0AE; }
+  .m-vram { font-family:Consolas,monospace; color:var(--g2); }
+  .m-vram.hot { color:var(--warn); }
+  .m-vram.max { color:var(--bad); }
+  /* ===== 模型详情抽屉 ===== */
+  .mmodal { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100; display:none; justify-content:flex-end; }
+  .mmodal.open { display:flex; }
+  .mdrawer { width:min(460px,92vw); height:100%; background:var(--card); border-left:1px solid var(--line); box-shadow:-8px 0 30px rgba(0,0,0,.4); overflow-y:auto; padding:20px 22px; animation:slidein .2s ease; }
+  @keyframes slidein { from{transform:translateX(30px);opacity:0} to{transform:none;opacity:1} }
+  .md-close { float:right; background:none; border:none; color:var(--dim); font-size:18px; cursor:pointer; }
+  .md-close:hover { color:var(--bad); }
+  .md-name { font-size:17px; font-weight:600; margin-bottom:2px; }
+  .md-full { font-size:12px; color:var(--sub); margin-bottom:10px; }
+  .md-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .md-tag { font-size:10px; padding:2px 10px; border-radius:10px; background:var(--card2); border:1px solid var(--line); color:var(--sub); }
+  .md-kv { display:grid; grid-template-columns:72px 1fr; gap:6px 12px; font-size:12px; margin-bottom:14px; }
+  .md-kv .k { color:var(--dim); }
+  .md-kv .v { color:var(--txt); }
+  .md-sec { font-size:11px; color:var(--sub); letter-spacing:.5px; margin:12px 0 6px; border-top:1px solid var(--line); padding-top:10px; }
+  .md-detail { font-size:12.5px; line-height:1.7; color:var(--txt); }
+  @media (max-width:720px){ .scenes { grid-template-columns:repeat(3,1fr); } table.bt td { white-space:normal; } .hmeta { gap:8px; } .hm-bar { width:90px; } }
+  /* ===== 预演模式弹窗（蓝图 11.2：先看谱再指挥） ===== */
+  .pmodal { position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:100; display:none; align-items:center; justify-content:center; }
+  .pmodal.open { display:flex; }
+  .pwin { width:min(520px,92vw); max-height:86vh; background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.5); overflow-y:auto; padding:20px 22px; animation:slidein .2s ease; }
+  .prow { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; border:1px solid transparent; font-size:12px; }
+  .prow:hover { background:var(--card2); border-color:var(--line); }
+  .prow .pvr { font-family:Consolas,monospace; color:var(--g2); margin-left:auto; }
+  .prow .ptag { font-size:10px; padding:1px 8px; border-radius:8px; white-space:nowrap; }
+  .ptag.ok { color:var(--ok); border:1px solid rgba(78,205,196,.4); }
+  .ptag.warn { color:var(--warn); border:1px solid rgba(255,184,107,.4); }
+  .ptag.bad { color:var(--bad); border:1px solid rgba(255,107,107,.4); }
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <h1>⚡ VRAM 调度指挥中心</h1>
+    <div class="hmeta">
+      <span class="hm-gpu" title="GPU 显存占用">
+        <span class="hm-num" id="hmUsed">--</span>/<span class="hm-num total" id="hmTotal">--</span>
+        <span class="hm-bar"><span class="hm-fill" id="hmFill"></span></span>
+      </span>
+      <span class="hm-scene" id="hmScene">--</span>
+      <span title="Ollama 状态"><span class="dot" id="hmOllama"></span> Ollama</span>
+      <span title="ComfyUI 状态"><span class="dot" id="hmComfy"></span> ComfyUI</span>
+      <span id="hmQueue" style="display:none"></span>
+    </div>
+    <div id="qosBanner" style="display:none"></div>
+    <div class="meta" id="meta">--</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="banners"></div>
+
+  <!-- 状态播报（蓝图 11.4：状态>数字，调度动作转一句话） -->
+  <div class="announce" id="announce"><span class="stt">●</span><span>正在读取系统状态…</span></div>
+
+  <!-- 第二层 动作层（蓝图 11.2：3-5 个大按钮，点一下就行；Panic 永远可见） -->
+  <div class="actbar">
+    <button class="act-btn" onclick="guardEvict()">⚡ 一键全释放</button>
+    <button class="act-btn scene" onclick="switchScene('comfy')">🎨 切到 ComfyUI</button>
+    <button class="act-btn scene" onclick="switchScene('dialogue')">💬 切到对话态</button>
+    <button class="act-btn" onclick="openPreview()">🔮 预演模式</button>
+    <button class="act-btn panic" onclick="guardEvict()">🚨 Panic</button>
+    <span class="act-note">先看谱再指挥 · 所有大动作都有确认</span>
+  </div>
+
+  <!-- 核心区：GPU 显存 + 进程账本（始终展开） -->
+  <div class="card">
+    <h2>GPU 显存 · RTX 4060 Ti 16GB <span class="hint">空载底噪 ~1.0G · 可给 AI ~15G · 打满=死机</span></h2>
+    <div class="vram-nums">
+      <span>已用 <b class="used" id="vUsed">--</b></span>
+      <span>空闲 <b class="free" id="vFree">--</b></span>
+      <span>总计 <b class="total" id="vTotal">--</b></span>
+    </div>
+    <div class="bar"><div class="bar-fill" id="vSegs"></div><div class="bar-label" id="vPct">--</div></div>
+    <div class="dist-legend" id="distLegend"></div>
+    <div class="curline" id="curline">--</div>
+    <div class="free-row">
+      <button id="btnFree" onclick="freeVram()">⚡ 释放 ComfyUI 显存</button>
+      <span id="freeRst"></span>
+    </div>
+    <div class="procs" id="procs"></div>
+  </div>
+
+  <!-- 核心区：场景切换 -->
+  <div class="card">
+    <h2>场景切换 <span class="hint">点击即切换 · 自动释放冲突占用</span></h2>
+    <div class="scenes" id="scenes"></div>
+  </div>
+
+  <!-- 核心区：模型登记台（短名 + Hover 全称 + 极短简介 + 点击详情） -->
+  <div class="card">
+    <h2>📋 模型登记台 <span class="hint">registry.json 唯一数据源 · 配置驱动 · 悬停看全称 · 点模型看详情</span></h2>
+    <div style="margin-bottom:6px">
+      <button class="act" onclick="scanModels()">🔍 扫描模型</button>
+      <span id="scanHint" style="font-size:11px;color:var(--dim);margin-left:8px"></span>
+    </div>
+    <div id="scanBody" style="margin-bottom:8px;display:none"></div>
+    <div id="regBody">加载中…</div>
+  </div>
+
+  <!-- 折叠区段（该多时全面） -->
+  <details class="sec" id="secBudget">
+    <summary><span class="s-t">🧮 预算引擎</span><span class="s-sum" id="budgetSum">加载中…</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="budgetBody">加载中…</div></div>
+  </details>
+
+  <details class="sec" id="secLedger">
+    <summary><span class="s-t">📊 显存占用总览</span><span class="s-sum">权威账本 · 场景联动高亮</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><table class="bt" id="bt">
+      <tr><th>服务</th><th>所需显存</th><th>允许状态</th><th>实时状态</th></tr>
+      <tr><td colspan="4" style="color:var(--dim);border:none;padding:2px">加载中…</td></tr>
+    </table></div>
+  </details>
+
+  <details class="sec" id="secQueue">
+    <summary><span class="s-t">🚦 任务队列</span><span class="s-sum" id="queueSum">--</span><span class="chev">▶</span></summary>
+    <div class="sec-body">
+      <div style="margin-bottom:6px;font-size:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <select id="qModel" style="padding:3px 6px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px"></select>
+        <input id="qPrompt" placeholder="prompt…（有模板的模型可入队）" style="flex:1;min-width:160px;padding:3px 6px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px">
+        <input id="qSeed" value="42" title="seed" style="width:60px;padding:3px 6px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px">
+        <button class="act" onclick="qSubmit()">▶ 入队</button>
+      </div>
+      <div id="qBody">加载中…</div>
+      <div id="cqBody" style="margin-top:8px">--</div>
+    </div>
+  </details>
+
+  <details class="sec" id="secGuard">
+    <summary><span class="s-t">🛡️ 门卫 gpu_guard</span><span class="s-sum" id="guardSum">--</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="guardBody">--</div></div>
+  </details>
+
+  <details class="sec" id="secLife">
+    <summary><span class="s-t">🕐 进程生命周期</span><span class="s-sum">何时开始 / 退出 / 首见显存 · 单进程可驱逐</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="lifeBody">--</div></div>
+  </details>
+
+  <details class="sec" id="secDesk">
+    <summary><span class="s-t">🖥️ Windows 桌面 GPU 进程</span><span class="s-sum" id="deskSum">--</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="deskBody">--</div></div>
+  </details>
+
+  <details class="sec" id="secAct">
+    <summary><span class="s-t">⏱️ 服务活跃度</span><span class="s-sum">忙碌 / 空闲时长</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="actBody">--</div></div>
+  </details>
+
+  <details class="sec" id="secEvt">
+    <summary><span class="s-t">📡 ComfyUI 实时事件</span><span class="s-sum">WebSocket 任务事件</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="evtBody">--</div></div>
+  </details>
+
+  <details class="sec" id="secCombo">
+    <summary><span class="s-t">💬 对话态 · 模型组合</span><span class="s-sum">组合切换</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div class="combo-row" id="combos"></div></div>
+  </details>
+
+  <details class="sec" id="secLog">
+    <summary><span class="s-t">📝 操作日志</span><span class="s-sum" id="logSum">--</span><span class="chev">▶</span></summary>
+    <div class="sec-body"><div id="log">等待操作…</div></div>
+  </details>
+</div>
+
+<!-- 模型详情抽屉 -->
+<div class="mmodal" id="mModal" onclick="if(event.target===this)closeModal()">
+  <div class="mdrawer" id="mDrawer"></div>
+</div>
+
+<!-- 预演模式弹窗（蓝图 11.2：先看谱再指挥） -->
+<div class="pmodal" id="pModal" onclick="if(event.target===this)closePreview()">
+  <div class="pwin" id="pWin"></div>
+</div>
+
+<script>
+/* ===== 场景定义 ===== */
+const SCENES = [
+  {id:"dialogue", ic:"💬", nm:"对话态", vr:"~7.6~9.7G",
+   tip:"停 Fooocus + 停 ComfyUI（回对话态=无文生图容器，释放 WSL RAM/稳态互斥）→ 9B 按需自动加载"},
+  {id:"comfy", ic:"🎨", nm:"ComfyUI", modes:"🎨画图 · 🎵写歌 · 🎬视频", vr:"6.5~14.5G",
+   tip:"ComfyUI 一个容器干三件事：画图（SDXL/Flux）、写歌（Music 3）、视频（Wan2.2），换活就换模型。流程：停 Fooocus → gpu_release（ollama stop 全部 + 显存<4G）→ 启 ComfyUI(--reserve-vram 2.5) → 等 :8188"},
+  {id:"fooocus", ic:"🖼️", nm:"Fooocus", ds:"零门槛画图 · 启动预加载 6.9G · 用毕必停", vr:"~6.9G",
+   tip:"停 ComfyUI → gpu_release（显存<4G）→ 启 Fooocus（预加载 1-2 分钟）→ 等 :7865；用毕必停"},
+  {id:"game", ic:"🎮", nm:"游戏态", vr:"2~4G",
+   tip:"停 ComfyUI/Fooocus → game-on.ps1（先切 OWUI 默认模型 off 再卸载大模型）"},
+];
+const SCENE_BUDGET = {
+  dialogue: "对话态账本：9B + 底噪 ≈7.6~9.7G · 余量充足 ✓",
+  comfy:    "ComfyUI 三合一账本：🎨 SDXL ≈9.6G ✓ / Flux 13G 顶格 / 🎵 Music 峰值 14.5G（08-24 实测，生成完自动卸载回底噪 ~1G）/ 🎬 Wan2.2 视频 ~10.9G（480p，氛围/意境类）",
+  music:    "（音乐态已并入 ComfyUI 卡，本行仅兼容旧 API）",
+  fooocus:  "Fooocus 账本：6.9G 预加载 · 用毕必须停容器（R6）",
+  game:     "游戏账本：2-4G + 底噪 ≈3-7G 宽松",
+};
+/* ===== 占用总览（权威账本 + 实时状态映射 + 场景联动） =====
+   scenes = 该行所属场景（用于与场景卡联动高亮）；use = 用途简介 */
+const ALL = ["dialogue","comfy","fooocus","game"];
+const BUDGET_ROWS = [
+  {svc:"🖥️ 系统底噪", vram:"空载 ~1.0G（实测 0.9~1.1G）", allow:"任意场景 · 固定", key:null, scenes:ALL, use:"桌面、浏览器等系统占用（Ollama 空载时实测 905~1062 MiB）"},
+  {svc:"💬 9B 对话模型（qwen3.5）", vram:"6.6~8.4G（16K）", allow:"仅对话态", key:"qwen3.5:9b", scenes:["dialogue"], use:"日常聊天、写作、知识库问答"},
+  {svc:"💬 9B Qwythos（q4km）", vram:"~6.5G（8K）", allow:"仅对话态", key:"qwythos-9b:q4km", scenes:["dialogue"], use:"写作/对话（q4km 量化，文件 5.7G）"},
+  {svc:"💬 8B Darkidol（q4km）", vram:"~5.5G（8K）", allow:"仅对话态", key:"darkidol-8b:q4km", scenes:["dialogue"], use:"角色/对话（q4km 量化，文件 4.9G）"},
+  {svc:"💬 0.6B 轻任务（qwen3）", vram:"~1.6G（16K）", allow:"仅对话态", key:"qwen3:0.6b", scenes:["dialogue"], use:"后台小任务（标题、改写）"},
+  {svc:"🎨 SDXL（ComfyUI）", vram:"~6.5G", allow:"仅 ComfyUI 场景", key:null, cont:"comfyui", model_id:"SDXL", scenes:["comfy"], use:"画图（标准质量）"},
+  {svc:"🎨 Flux Q5（ComfyUI）", vram:"~13G", allow:"仅 ComfyUI 场景 · 独占全卡（顶格）", key:null, cont:"comfyui", model_id:"Flux-Q5", scenes:["comfy"], use:"画图（高质量）"},
+  {svc:"🎵 Music 3（ComfyUI）", vram:"峰值 14.5G（08-24 实测）", allow:"仅 ComfyUI 场景 · 独占全卡", key:null, cont:"comfyui", model_id:"Music3", scenes:["comfy"], use:"AI 写歌（30s≈82s / 60s≈127s / 90s≈3-5 分钟，生成完自动卸载回底噪）"},
+  {svc:"🎬 Wan2.2 视频（ComfyUI）", vram:"峰值 10.9G（08-27 实测）", allow:"仅 ComfyUI 场景 · 独占全卡", key:null, cont:"comfyui", model_id:"Wan2.2-TI2V", scenes:["comfy"], use:"文生/图生视频（480p，氛围/意境类短片）"},
+  {svc:"🖼️ Fooocus（极简端）", vram:"~6.9G", allow:"仅 Fooocus 场景 · 用毕必停", key:null, cont:"fooocus", scenes:["fooocus"], use:"简单画图，零门槛"},
+  {svc:"🔍 rerank 桩（9997）", vram:"0（CPU）", allow:"任意场景", key:null, scenes:ALL, use:"搜资料时排先后（禁删）"},
+  {svc:"🎮 Sunshine（串流）", vram:"2~4G", allow:"仅游戏态", key:null, scenes:["game"], use:"打游戏串流用"},
+];
+/* ===== 组合 ===== */
+const COMBOS = [
+  {id:"9b",         nm:"9B 主力", ctx:"16K", rec:true,  heavy:false},
+  {id:"qwythos-9b", nm:"Qwythos 9B", ctx:"8K", rec:false, heavy:false},
+  {id:"darkidol-8b",nm:"Darkidol 8B", ctx:"8K", rec:false, heavy:false},
+  {id:"0.6b",       nm:"0.6B 轻量", ctx:"16K", rec:false, heavy:false},
+  {id:"none",       nm:"休眠",     ctx:"-",   rec:false, heavy:false},
+];
+const COMBO_TIP = {
+  "9b":"日常对话/写作/RAG 主力 · 16K 保长对话实用价值（较 8K 仅 +0.3G，勿降档）",
+  "qwythos-9b":"9B q4km 量化（文件 5.7G）· 写作/对话 · 与大模型互斥",
+  "darkidol-8b":"8B q4km 量化（文件 4.9G）· 角色/对话 · 与大模型互斥",
+  "0.6b":"仅 task 类轻活 · 日常请用 9B，过度降档失去实用价值",
+  "none":"卸载全部模型 · 夜间/空闲省显存",
+};
+/* 类别图标/样式映射 */
+const CAT_ICON = {llm:"💬",embedding:"📚",reranker:"🔍",image:"🎨",audio:"🎵",music:"🎵",video:"🎬",unknown:"📦"};
+const CAT_CLS = m=>"cat-"+(m.category||"unknown");
+
+let busy = false;
+let REG_MODELS = [];  // 缓存登记台模型（用于详情抽屉）
+
+/* ===== Token 认证 ===== */
+function getToken(){
+  let t = localStorage.getItem("gmae_token");
+  if(!t){
+    t = prompt("请输入调度中心访问令牌 (API Token)：");
+    if(t) localStorage.setItem("gmae_token", t.trim());
+  }
+  return t ? t.trim() : "";
+}
+function apiFetch(url, opts){
+  opts = opts || {};
+  const t = getToken();
+  opts.headers = Object.assign({}, opts.headers || {});
+  if(t) opts.headers["X-API-Key"] = t;
+  return fetch(url, opts).then(r=>{
+    if(r.status===401){
+      localStorage.removeItem("gmae_token");
+      throw new Error("未授权（令牌无效或未输入），请刷新后按提示重新输入令牌");
+    }
+    return r;
+  });
+}
+const $ = id => document.getElementById(id);
+function log(msg){
+  const el=$("log");
+  if(el.textContent==="等待操作…") el.textContent="";
+  const t="["+new Date().toLocaleTimeString()+"]";
+  el.textContent = el.textContent + (el.textContent?"\n":"") + t+" "+msg;
+  el.scrollTop=el.scrollHeight;
+  const sum=$("logSum"); if(sum) sum.textContent="最后: "+t;
+}
+function fmtMb(m){ return m>=1024 ? (m/1024).toFixed(1)+"G" : m+"M"; }
+
+/* ===== 渲染 ===== */
+function renderScenes(scene){
+  $("scenes").innerHTML = SCENES.map(s=>
+    `<div class="scene ${s.id===scene?"active":""}" onclick="switchScene('${s.id}')" title="${s.tip}"
+         onmouseenter="hoverScenes('${s.id}')" onmouseleave="hoverScenes('${scene}')">
+       <div class="ic">${s.ic}</div><div class="nm">${s.nm}</div>${s.modes?`<div class="modes">${s.modes}</div>`:(s.ds?`<div class="dsline">${s.ds}</div>`:"")}<div class="vr">${s.vr}</div>
+     </div>`).join("");
+}
+function renderCombos(curCombo, scene){
+  const inDialogue = scene==="dialogue";
+  $("combos").innerHTML = COMBOS.map(c=>{
+    const cls = (c.id===curCombo?"active":"") + (inDialogue?"":" deny");
+    return `<span class="combo ${cls}" title="${COMBO_TIP[c.id]}" onclick="${inDialogue?"switchCombo('"+c.id+"')":"denyCombo()"}">
+      ${c.nm}${c.rec?' <span style="color:var(--g2)">★</span>':""}<span class="ctx">${c.ctx}</span>
+    </span>`;
+  }).join("");
+}
+function renderBudget(d){
+  const names=(d.ollama.models||[]).map(m=>m.name);
+  const load = n => names.some(x=>x.includes(n)) ? '<span class="on">● 加载中</span>' : '<span class="off">○ 未加载</span>';
+  const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+  const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+  const comfyModelMap = {};
+  comfyModels.forEach(m=>{ comfyModelMap[m.id] = m; });
+  const comfyModelStatus = modelId => {
+    if(!d.containers.comfyui) return '<span class="off">○ 停止</span>';
+    const m = comfyModelMap[modelId];
+    if(m){
+      if(comfyLikelyLoaded){
+        return `<span class="on">● 加载中 ~${m.vram_gb}G</span>`;
+      } else {
+        return '<span class="off">○ 最近用过（已卸载）</span>';
+      }
+    }
+    return '<span class="off">○ 未使用</span>';
+  };
+  const cont = n => {
+    if(!d.containers[n]) return '<span class="off">○ 停止</span>';
+    if(n==="comfyui"){
+      if(comfyModels.length>0){
+        const modelNames = comfyModels.map(m=>m.name).join("+");
+        if(comfyLikelyLoaded){
+          return `<span class="on">● ${modelNames}（加载中）</span>`;
+        } else {
+          return `<span class="off">○ 最近：${modelNames}（已卸载）</span>`;
+        }
+      }
+      return '<span class="off">○ 模型未载 · 容器运行</span>';
+    }
+    return '<span class="warn">● 运行 · 预载 6.9G</span>';
+  };
+  const rows = BUDGET_ROWS.map(r=>{
+    let st;
+    if(r.key) st = load(r.key);
+    else if(r.model_id) st = comfyModelStatus(r.model_id);
+    else if(r.cont) st = cont(r.cont);
+    else if(r.svc.includes("底噪")) st = '<span class="off">恒在</span>';
+    else if(r.svc.includes("rerank")) st = '<span class="on">常驻（CPU）</span>';
+    else st = '<span class="off">—</span>';
+    const vramCls = (r.vram.includes("15")||r.vram.includes("13")) ? "bad" : "";
+    const cur = r.scenes.includes(d.scene) ? ' currow' : "";
+    return `<tr class="${cur.trim()}" data-scenes="${r.scenes.join(',')}">
+      <td>${r.svc}</td><td class="vram ${vramCls}">${r.vram}</td><td>${r.allow}</td><td class="st">${st}</td><td class="use">${r.use}</td></tr>`;
+  }).join("");
+  $("bt").innerHTML = `<tr><th>服务</th><th>所需显存</th><th>允许状态</th><th>实时状态</th><th>用途</th></tr>` + rows;
+}
+function hoverScenes(id){
+  const rows = document.querySelectorAll("#bt tr[data-scenes]");
+  rows.forEach(r=>{
+    const hit = r.dataset.scenes.split(",").includes(id);
+    r.classList.toggle("hoverrow", hit);
+  });
+}
+function renderDistribution(d){
+  if(!d.gpu || !d.gpu.ok){ $("vSegs").innerHTML=""; $("distLegend").innerHTML=""; return; }
+  const used=d.gpu.used_mb, free=d.gpu.free_mb;
+  const parts=[];
+  let known=0;
+  const BASELINE_MAX = 1536;
+  const comfyUp=d.containers.comfyui;
+  (d.ollama.models||[]).forEach(m=>{
+    const mb=Math.round(m.size_gb*1024);
+    known+=mb;
+  });
+  if(d.containers.fooocus){ known+=Math.round(6.9*1024); }
+  let rest=Math.max(0,used-known);
+  const base = comfyUp ? Math.min(rest, BASELINE_MAX) : rest;
+  parts.push({ic:"🖥️",name:"系统底噪",mb:base,cls:"base"});
+  const afterBase = Math.max(0, rest-base);
+  (d.ollama.models||[]).forEach(m=>{
+    const mb=Math.round(m.size_gb*1024);
+    if(mb>50) parts.push({ic:"💬",name:m.name,mb,cls:"model"});
+  });
+  if(d.containers.fooocus){ parts.push({ic:"🖼️",name:"Fooocus",mb:Math.round(6.9*1024),cls:"fooocus"}); }
+  if(comfyUp && afterBase>50){
+    const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+    const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+    const comfyLabel = (comfyLikelyLoaded && comfyModels.length>0)
+      ? "🎨 ComfyUI: " + comfyModels.map(m=>m.name).join("+")
+      : "🎨 ComfyUI 动态";
+    parts.push({ic:"🎨",name:comfyLabel,mb:afterBase,cls:"comfy"});
+  }
+  const shown=parts.filter(p=>p.mb>50);
+  const total=d.gpu.total_mb;
+  const pct=p=>total>0?(p.mb/total*100):0;
+  $("vSegs").innerHTML = shown.map(p=>`<span class="seg ${p.cls}" style="width:${Math.max(1.5,pct(p)).toFixed(1)}%"></span>`).join("");
+  const legend = shown.map(p=>`<span class="lg ${p.cls}">${p.ic} ${p.name} ${fmtMb(p.mb)}（${pct(p).toFixed(0)}%）</span>`).join("");
+  const dynNote = comfyUp && !shown.some(p=>p.cls==="comfy") ? '<span class="lg comfy">🎨 ComfyUI 运行中（调用时动态占用）</span>' : "";
+  $("distLegend").innerHTML = legend + dynNote + `<span class="lg free">⬜ 空闲 ${fmtMb(free)}（${(free/total*100).toFixed(0)}%）</span>`;
+}
+function renderBanners(d){
+  const b=[];
+  const g=d.gpu, o=d.ollama;
+  if(g.ok && g.used_mb > 14*1024) b.push(`<div class="banner bad">🔴 显存 ${fmtMb(g.used_mb)} 超 14G 警戒！立即查白占方（容器/进程），打满=死机</div>`);
+  else if(g.ok && g.used_mb > 12*1024) b.push(`<div class="banner warn">⚠️ 显存 ${fmtMb(g.used_mb)} 接近 12G，检查多余占用（如 Fooocus 常驻）</div>`);
+  if(!o.ok) b.push(`<div class="banner bad">⛔ Ollama 无响应 → 执行 docker restart ollama（容器化版）</div>`);
+  if(d.scene==="dialogue" && d.containers.fooocus) b.push(`<div class="banner warn">⚠️ Fooocus 在对话态运行 = 违规 R6（预加载 6.9G 白占）→ 点「Fooocus」卡停止或切场景</div>`);
+  const gp=d.gpu_processes;
+  if(gp && (gp.unknown_pids||[]).length>0){
+    b.push(`<div class="banner warn">⚠️ ${gp.unknown_pids.length} 个未登记 GPU 进程（PID ${gp.unknown_pids.join(",")}）——白占嫌疑，排查或登记</div>`);
+  } else if(gp && gp.unknown_mb > 2048){
+    b.push(`<div class="banner warn">⚠️ 显存差量 ${fmtMb(gp.unknown_mb)}（已减底噪与已知进程自报）——排查白占方</div>`);
+  }
+  $("banners").innerHTML = b.join("");
+}
+function fmtTs(ts){
+  if(!ts) return "--";
+  const d=new Date(ts*1000), p=n=>String(n).padStart(2,"0");
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+function renderComfyQueue(d){
+  const el=$("cqBody");
+  const q=d.comfy_queue;
+  if(!q){ el.innerHTML='<span class="empty">--</span>'; return; }
+  if(!q.ok){ el.innerHTML='<span class="empty">ComfyUI 未响应 /queue</span>'; return; }
+  if(q.running_count===0 && q.pending_count===0){ el.innerHTML='<span class="empty">队列空闲 · 无任务运行</span>'; return; }
+  const fmtT=arr=>arr.length? arr.map(t=>`${t.class_type||"?"}<small>(${String(t.id).slice(0,8)})</small>`).join("、") : "无";
+  el.innerHTML = `<div style="font-size:12px"><b style="color:var(--ok)">▶ 运行中 ${q.running_count}</b>：${fmtT(q.running)}<br><b style="color:var(--warn)">⏳ 排队 ${q.pending_count}</b>：${fmtT(q.pending)}</div>`;
+}
+const QST={queued:"⏳ 排队",precheck:"🔎 预检",freeing:"🧹 释放",running:"▶ 运行中",done:"✅ 完成",failed:"❌ 失败",canceled:"🚫 已取消"};
+function renderGMaeQueue(){
+  apiFetch("/api/queue",{cache:"no-store"}).then(r=>r.json()).then(q=>{
+    const el=$("qBody");
+    if(!q || !q.ok){ el.innerHTML='<span class="empty">--</span>'; return; }
+    const running=q.tasks.filter(t=>t.status==="running").length;
+    const waiting=q.tasks.filter(t=>["queued","precheck","freeing"].includes(t.status)).length;
+    $("queueSum").textContent = q.tasks.length
+      ? `worker ${q.worker_alive?"🟢":"⚪"} · 运行 ${running} · 排队 ${waiting} · 共 ${q.tasks.length}`
+      : "队列空闲";
+    if(!q.tasks.length){ el.innerHTML='<span class="empty">队列空闲 · 提交一个任务开始（16G 单卡串行）</span>'; return; }
+    let h = `<div style="font-size:11px;color:var(--dim);margin-bottom:4px">worker ${q.worker_alive?"🟢 运行中":"⚪ 空闲"} · 排队 ${q.queue.length} · 共 ${q.tasks.length} 任务</div>`;
+    q.tasks.slice(0,15).forEach(t=>{
+      const cancelBtn = ["queued","precheck","freeing","running"].includes(t.status)
+        ? ` <button class="mini" onclick="qCancel('${t.id}')">取消</button>` : "";
+      const age = (Date.now()/1000 - (t.created||0))/60;
+      let col = "var(--warn)";
+      if(t.status==="running") col="var(--ok)";
+      else if(t.status==="failed") col="var(--bad)";
+      else if(t.status==="done") col="var(--g2)";
+      else if(t.status==="canceled") col="var(--dim)";
+      h += `<div style="font-size:11px;margin:2px 0">
+        <span class="st">${t.model}</span>
+        <span style="color:${col}">${QST[t.status]||t.status}</span>
+        ${t.progress?`<span style="color:var(--dim)">· ${t.progress}</span>`:""}
+        ${t.error?`<span style="color:var(--bad)">· ${t.error.slice(0,90)}</span>`:""}
+        <small style="color:var(--dim)">#${t.id.slice(0,6)} ${age.toFixed(0)}min</small>${cancelBtn}
+      </div>`;
+    });
+    el.innerHTML = h;
+  }).catch(()=>{});
+}
+function qSubmit(){
+  const model=$("qModel").value, prompt=$("qPrompt").value.trim(), seed=$("qSeed").value||"42";
+  if(!model){ alert("请先选择有工作流模板的模型"); return; }
+  if(!prompt){ alert("请输入 prompt"); return; }
+  apiFetch("/api/queue",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model,params:{prompt,seed:parseInt(seed),width:480,height:480}})})
+    .then(r=>r.json()).then(d=>{
+      if(!d.ok){ alert("入队失败: "+d.error); return; }
+      $("qPrompt").value="";
+      renderGMaeQueue(); refresh();
+    }).catch(e=>alert("请求失败: "+e));
+}
+function qCancel(id){
+  apiFetch("/api/queue/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})})
+    .then(r=>r.json()).then(d=>{ renderGMaeQueue(); refresh(); }).catch(()=>{});
+}
+function renderActivity(d){
+  const el=$("actBody");
+  const a=d.activity;
+  if(!a || !a.ok){ el.innerHTML='<span class="empty">--</span>'; return; }
+  const s=a.services;
+  const fmtIdle=sec=> (sec==null||sec===0)? "—" : sec<60? sec+"s" : Math.floor(sec/60)+"m"+(sec%60)+"s";
+  const row=svc=>{
+    const x=s[svc];
+    if(!x) return "";
+    const busyHtml = x.busy? `<b style="color:var(--ok)">忙碌中</b>` : `<span style="color:var(--dim)">空闲</span>`;
+    const ic = svc==="ollama"?"💬":svc==="comfyui"?"🎨":"🖼️";
+    return `<div style="font-size:12px;margin:2px 0">${ic} ${svc}：${busyHtml} · 空闲 ${fmtIdle(x.idle_s)}</div>`;
+  };
+  el.innerHTML = row("ollama")+row("comfyui")+row("fooocus");
+}
+function renderQoS(s){
+  const el=$("qosBanner");
+  const q = s.qos||{};
+  let h = "";
+  if(q.degraded){ h = `<div class="qos red">${q.msg||"🔴 RED 水位，对话已降级为轻量模型"}</div>`; }
+  else if(q.level==="red"){ h = `<div class="qos red">🔴 RED 水位 ${q.used_gb}G：对话即将自动降级为 0.6B 轻量模型（保证对话不卡）</div>`; }
+  else if(q.level==="yellow"){ h = `<div class="qos yellow">🟡 YELLOW 水位 ${q.used_gb}G：空间趋紧，建议轻量模式</div>`; }
+  el.innerHTML = h;
+  el.style.display = h ? "block" : "none";
+}
+function renderDesktop(d){
+  const el=$("deskBody");
+  const gp=d.gpu_processes;
+  if(!gp || !gp.ok){ el.innerHTML='<span class="empty">--</span>'; return; }
+  if(d.helper_running){ return; }
+  renderDesktopSummary(gp);
+}
+function renderDesktopSummary(gp){
+  const el=$("deskBody");
+  const list=gp.desktop_processes||[];
+  const used=gp.desktop_used_mb||0;
+  const byName={};
+  list.forEach(p=>{ byName[p.name]=(byName[p.name]||0)+1; });
+  const names=Object.keys(byName).sort((a,b)=>byName[b]-byName[a]);
+  $("deskSum").textContent = list.length? `约 ${(used/1024).toFixed(2)}G · ${list.length} 进程` : "无";
+  let h = list.length?
+    `<div style="font-size:12px;margin-bottom:4px">桌面进程占用约 <b style="color:var(--warn)">${(used/1024).toFixed(2)}G</b>（${used} MiB）· 进程数 ${list.length}（仅汇总，WSL2 无逐进程明细）</div>` :
+    '<span class="empty">无桌面 GPU 进程</span>';
+  h += names.length? `<div style="font-size:11px;color:var(--dim)">${names.map(n=>`${n} ×${byName[n]}`).join(" · ")}</div>` : "";
+  h += `<div style="margin-top:6px"><button class="mini" style="color:var(--g2);border-color:var(--line)" onclick="toggleHelper(true)">🔍 启用 Helper 查看/管理桌面进程</button> <small style="color:var(--dim)">需管理员确认（UAC）</small></div>`;
+  el.innerHTML = h;
+}
+function renderDesktopVram(){
+  apiFetch("/api/desktop/helper/status",{cache:"no-store"}).then(r=>r.json()).then(s=>{
+    if(!s || !s.running){ return; }
+    apiFetch("/api/desktop_vram",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+      if(!d || !d.ok || !d.processes || !d.processes.length){ return; }
+      const rows = d.processes.slice(0,15).map(p=>{
+        const mb=p.MB||0, pid=p.Pid||p.pid, name=p.Name||p.name||"?";
+        return `<div style="font-size:12px;display:flex;justify-content:space-between;align-items:center;margin:2px 0">
+          <span>${name} <small style="color:var(--dim)">#${pid}</small></span>
+          <span><b style="color:${mb>500?'var(--warn)':'var(--ok)'}">${(mb/1024).toFixed(2)}G</b>
+            <button class="mini" style="margin-left:6px" onclick="killDesktop(${pid},'${name}')">结束</button></span>
+        </div>`;
+      }).join("");
+      const el=$("deskBody");
+      el.innerHTML = `<div style="font-size:11px;color:var(--ok);margin-bottom:4px">🛡️ Helper 已启用 · 逐进程显存明细</div>` + rows +
+        `<div style="margin-top:6px"><button class="mini" onclick="toggleHelper(false)">⏹ 停止 Helper</button> <small style="color:var(--dim)">共 ${d.count} 个进程（仅显示前 15）</small></div>`;
+    }).catch(()=>{});
+  }).catch(()=>{});
+}
+function toggleHelper(start){
+  apiFetch(start? "/api/desktop/helper/start":"/api/desktop/helper/stop",
+    {method:"POST",headers:{"Content-Type":"application/json"},body:"{}"})
+    .then(r=>r.json()).then(d=>{
+      if(start && d && d.msg){ alert(d.msg); setTimeout(()=>{ renderDesktopVram(); }, 3500); }
+      else { setTimeout(()=>{ renderDesktopVram(); refresh(); }, 1000); }
+    }).catch(e=>alert("请求失败: "+e));
+}
+function killDesktop(pid,name){
+  if(!confirm(`确定结束进程「${name}」(#${pid})？其 GPU 显存将被释放。`)) return;
+  apiFetch("/api/desktop/kill",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({pid})})
+    .then(r=>r.json()).then(d=>{
+      alert(d.ok? "已结束 "+name : ("失败: "+(d.error||d.output||"")));
+      setTimeout(()=>{ renderDesktopVram(); refresh(); }, 1500);
+    }).catch(e=>alert("请求失败: "+e));
+}
+function renderBudget(){
+  apiFetch("/api/budget",{cache:"no-store"}).then(r=>r.json()).then(b=>{
+    if(!b || !b.ok){ return; }
+    const el=$("budgetBody");
+    $("budgetSum").textContent = `可用 ${b.avail_gb}G · 已用 ${b.used_gb}G · 可释放 ${b.releasable_gb}G`;
+    let h = `<div style="font-size:12px;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:6px">
+      <span>上限线 <b style="color:var(--g2)">${b.safe_ceiling_gb}G</b> <small style="color:var(--dim)">(16−保留2.5)</small></span>
+      <span>可用 <b style="color:${b.avail_gb>4?'var(--ok)':'var(--warn)'}">${b.avail_gb}G</b></span>
+      <span>当前占用 ${b.used_gb}G</span>
+      <span>不可释放 ${b.unreleasable_gb}G <small style="color:var(--dim)">桌面+未知</small></span>
+      <span>可释放(L1/L2) ${b.releasable_gb}G</span>
+    </div>`;
+    h += `<div style="font-size:11px;display:flex;flex-wrap:wrap;gap:6px">`;
+    b.models.forEach(m=>{
+      const cls = m.decision==="ok" ? "ok" : (m.decision==="reject" ? "bad" : "warn");
+      let tag = m.decision;
+      if(m.need_free_gb) tag += ` 释放${m.need_free_gb}G`;
+      if(m.gap_gb) tag += ` 差${m.gap_gb}G`;
+      if(m.loaded) tag = "已加载";
+      h += `<span class="budget-m ${cls}" title="${m.note}">${m.id} ${m.vram_gb}G → ${tag}</span>`;
+    });
+    h += `</div>`;
+    el.innerHTML = h;
+  }).catch(()=>{});
+}
+function renderComfyEvents(){
+  const el=$("evtBody");
+  apiFetch("/api/comfy_events",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    if(!d || !d.ok){ el.innerHTML='<span class="empty">--</span>'; return; }
+    if(!d.events || !d.events.length){ el.innerHTML='<span class="empty">暂无事件 · 等待 ComfyUI 任务</span>'; return; }
+    const evs = d.events.slice().reverse().slice(0,20);
+    const fmtTs = ts => new Date(ts*1000).toLocaleTimeString();
+    const cls = t => t==="executing"?"var(--ok)": t==="executed"?"var(--warn)":"var(--dim)";
+    el.innerHTML = evs.map(e=>{
+      let extra="";
+      if(e.progress) extra += ` · <span style="color:var(--warn)">${e.progress}</span>`;
+      if(e.prompt_id) extra += ` <small>#${e.prompt_id}</small>`;
+      if(e.state==="done") extra += " · <b style='color:var(--ok)'>完成</b>";
+      return `<div style="font-size:12px;margin:1px 0">[${fmtTs(e.ts)}] <span style="color:${cls(e.type)}">${e.type}</span>${extra}</div>`;
+    }).join("");
+  }).catch(()=>{ el.innerHTML='<span class="empty">--</span>'; });
+}
+function renderProcesses(d){
+  const el=$("procs");
+  const g=d.gpu_processes;
+  if(!g || !g.ok){ el.innerHTML='<span class="empty">进程感知不可用</span>'; return; }
+  const ps=g.processes||[];
+  const upids=g.unknown_pids||[];
+  if(ps.length===0 && upids.length===0 && g.unknown_mb<=1024){ el.innerHTML='<span class="empty">无 GPU 计算进程</span>'; return; }
+  const icon = a => a==="ollama"?"💬 ollama":a==="comfyui"?"🎨 comfyui":a==="fooocus"?"🖼️ fooocus":a;
+  let html = ps.map(p=>`<span class="p" title="PID ${p.pid} · ${p.app}容器 · 首见 ${fmtTs(p.first_seen)} 首见占用 ${fmtMb(p.first_used_mb)} · 当前自报">${icon(p.app)} ${p.name} · PID ${p.pid} <span class="mb">${fmtMb(p.used_mb)}</span><small style="color:var(--sub)"> ↑${fmtTs(p.first_seen)}</small> <button style="cursor:pointer;border:none;background:var(--bad);color:#fff;border-radius:4px;font-size:10px;padding:1px 5px" onclick="kickProcess('${p.pid}','${String(p.name).replace(/'/g,"")}')">⚔️驱逐</button></span>`).join("");
+  if(upids.length) html += `<span class="p unknown" title="GPU 进程未归属任何受管容器">⚠️ 未登记 PID ${upids.join(",")}</span>`;
+  if(upids.length===0 && g.unknown_mb > 1024) html += `<span class="p unknown" title="实际占用 - 底噪 - 已知进程自报">⚠️ 显存差量 <span class="mb">${fmtMb(g.unknown_mb)}</span></span>`;
+  el.innerHTML = html;
+}
+function kickProcess(pid, name){
+  if(busy) return;
+  if(!confirm(`⚠️ L2 强制驱逐 PID ${pid} (${name})？\n将 docker exec 内 kill -9。\n确认该进程可安全重启/丢弃（protect 系统进程会自动拒绝）`)) return;
+  busy=true;
+  apiFetch("/api/guard",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"kick",pid})})
+    .then(r=>r.json()).then(d=>{
+      if(d.ok){ log("⚔️ "+d.message); alert("已强制驱逐："+d.message); }
+      else { log("✘ 驱逐失败: "+(d.error||"")); alert("驱逐失败："+(d.error||"未知")); }
+      refresh();
+    }).catch(e=>{ log("✘ 驱逐请求失败: "+e); })
+    .finally(()=>{ busy=false; });
+}
+function renderLifecycle(d){
+  const el=$("lifeBody");
+  const g=d.gpu_processes;
+  if(!g){ el.innerHTML='<span class="empty">--</span>'; return; }
+  const evs=(g.events||[]).slice(0,14);
+  if(!evs.length){ el.innerHTML='<span class="empty">暂无进程生命周期事件（首个进程出现/退出时开始记录）</span>'; return; }
+  const evIcon=e=>e.event==="up"?"<b style='color:var(--ok)'>▲ 出现</b>":e.event==="down"?"<b style='color:var(--dim)'>▼ 退出</b>":"<b style='color:var(--bad)'>✖ 强制驱逐</b>";
+  let html = evs.map(e=>`<div style="font-size:12px;margin:2px 0">${fmtTs(e.ts)} ${evIcon(e)} ${e.app} · PID ${e.pid} (${e.name}) <span class="mb">${fmtMb(e.used_mb)}</span>${e.alive_s?` · 存活 ${e.alive_s}s`:""}</div>`).join("");
+  el.innerHTML = html;
+}
+function renderGuard(d){
+  const el=$("guardBody");
+  const g=d.guard;
+  if(!g){ el.innerHTML='<span class="empty">门卫不可用</span>'; return; }
+  const lvTxt = g.level==="critical"?"🔴 危急":g.level==="warning"?"🟠 警告":"🟢 正常";
+  const lvCls = g.level==="critical"?"color:var(--bad)":g.level==="warning"?"color:var(--warn)":"color:var(--ok)";
+  $("guardSum").textContent = g.level==="critical"?"🔴 危急":g.level==="warning"?"🟠 警告":"🟢 正常";
+  let html = `<div style="margin-bottom:6px;font-size:13px">门卫状态：<b style="${lvCls}">${lvTxt}</b></div>`;
+  if(g.alerts && g.alerts.length){
+    html += g.alerts.map(a=>`<div class="banner ${g.level==="critical"?"bad":"warn"}" style="margin-bottom:4px">${a}</div>`).join("");
+  } else {
+    html += '<span class="empty">无告警 · 登记簿正常</span>';
+  }
+  if(g.suggest && g.suggest.length){
+    html += `<div style="margin-top:6px;font-size:11px;color:var(--sub)">建议驱逐：${g.suggest.map(s=>`${s.target}（${s.evict}）`).join("、")}</div>`;
+  }
+  html += `<div style="margin-top:8px"><button class="gbtn" id="btnEvict" onclick="guardEvict()">⚔️ 驱逐低优先级占用</button> <span id="guardRst" style="font-size:11px;color:var(--sub)"></span></div>`;
+  el.innerHTML = html;
+}
+function guardEvict(){
+  if(busy) return;
+  if(!confirm("执行门卫驱逐？\n依次：停 ollama 模型 → ComfyUI /free → 停 Fooocus 容器\n（仅对登记簿可安全重启的服务；若正在用 Fooocus 跑图请勿操作）")) return;
+  busy=true;
+  const rst=$("guardRst");
+  rst.textContent="驱逐中…";
+  apiFetch("/api/guard",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({evict:true})})
+    .then(r=>r.json()).then(d=>{
+      if(d.actions){
+        d.actions.forEach(a=>log(`  ${a.rc===0?"✔":"✘"} ${a.step} → rc=${a.rc}`));
+        rst.textContent=`完成：空闲 ${fmtMb(d.free_before)} → ${fmtMb(d.free_after)}`;
+      } else { rst.textContent="无动作"; }
+      refresh();
+    }).catch(e=>{ log("✘ 驱逐请求失败: "+e); rst.textContent="✘ 失败"; })
+    .finally(()=>{ busy=false; });
+}
+
+/* ===== 操作 ===== */
+function switchScene(id){
+  if(busy) return;
+  const s = SCENES.find(x=>x.id===id); if(!s) return;
+  busy=true; log("▶ 切换: "+id+"（"+s.nm+" · "+s.vr+"）");
+  document.querySelectorAll(".scene").forEach(e=>e.classList.add("busy"));
+  apiFetch("/api/scene",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scene:id})})
+    .then(r=>r.json()).then(d=>{
+      if(d.actions) d.actions.forEach(a=>{
+        const star=a.rc===0?"✔":"✘";
+        log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
+      });
+      log(d.ok?"✅ 完成：当前 "+s.nm:"❌ 异常: "+id);
+      refresh();
+    }).catch(e=>log("✘ 请求失败: "+e))
+    .finally(()=>{ busy=false; document.querySelectorAll(".scene").forEach(e=>e.classList.remove("busy")); });
+}
+function switchCombo(id){
+  if(busy) return;
+  const c = COMBOS.find(x=>x.id===id); if(!c) return;
+  if(c.heavy && !confirm("切换为「"+c.nm+"」？\n将先卸载 9B/0.6B（27B 独占全卡）· ctx "+c.ctx+"\n"+COMBO_TIP[id])) return;
+  busy=true; log("▶ 组合: "+id+"（"+c.nm+" @ "+c.ctx+"）");
+  document.querySelectorAll(".combo").forEach(e=>e.classList.add("busy"));
+  apiFetch("/api/combo",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({combo:id})})
+    .then(r=>r.json()).then(d=>{
+      if(d.actions) d.actions.forEach(a=>{
+        const star=a.rc===0?"✔":"✘";
+        log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
+      });
+      log(d.ok?"✅ 组合完成："+c.nm:"❌ 组合异常");
+      refresh();
+    }).catch(e=>log("✘ 请求失败: "+e))
+    .finally(()=>{ busy=false; document.querySelectorAll(".combo").forEach(e=>e.classList.remove("busy")); });
+}
+function denyCombo(){ alert("当前非对话态，组合切换已禁用——先切回「对话态」再换模型组合。"); }
+function freeVram(){
+  if(busy) return;
+  busy=true;
+  const btn=$("btnFree"), rst=$("freeRst");
+  btn.disabled=true; btn.textContent="释放中…"; rst.textContent="";
+  apiFetch("/api/free",{method:"POST",headers:{"Content-Type":"application/json"}})
+    .then(r=>r.json()).then(d=>{
+      if(d.ok){
+        log(`✅ ComfyUI /free 完成：空闲 ${fmtMb(d.free_mb_before)} → ${fmtMb(d.free_mb_after)}（释放 ${fmtMb(d.freed_mb)}）`);
+        rst.textContent=`释放 ${fmtMb(d.freed_mb)}`;
+        refresh();
+      } else {
+        log(`❌ /free: ${d.error||"失败"}`);
+        rst.textContent=`⚠️ ${d.error||"失败"}`;
+      }
+    }).catch(e=>{ log("✘ /free 请求失败: "+e); rst.textContent="✘ 请求失败"; })
+    .finally(()=>{ busy=false; btn.disabled=false; btn.textContent="⚡ 释放 ComfyUI 显存"; });
+}
+
+/* ===== 刷新 ===== */
+/* 模型登记台：短名 + Hover 全称 + 极短简介 + 点击详情抽屉 */
+function loadRegistry(){
+  apiFetch("/api/registry",{cache:"no-store"})
+    .then(r=>r.json()).then(d=>{
+      if(!d.ok){ $("regBody").innerHTML='<span class="empty">登记台加载失败</span>'; return; }
+      const oms=d.ollama_models||[], cms=d.comfyui_models||[];
+      REG_MODELS = oms.concat(cms);
+      const badge = m => m.auto
+        ? '<span class="on" style="font-size:10px">✚ 自动发现</span>'
+        : (m.installed ? '<span class="on" style="font-size:10px">✓ 已装</span>' : '<span class="off" style="font-size:10px">○ 未装</span>');
+      const fullT = m => `${m.full_name||m.name||m.id}${m.vendor?' · '+m.vendor:''}${m.release?' · '+m.release:''}`;
+      const mRow = m => `<tr onclick="showModelDetail('${m.id}')" title="点击查看详情">
+        <td><span class="mname" title="${fullT(m)}">${CAT_ICON[m.category]||"📦"} ${m.name||m.id}</span>
+            <div class="m-desc">${m.desc||""}</div></td>
+        <td class="m-vram ${(m.vram_gb||0)>=13?"max":((m.vram_gb||0)>=8?"hot":"")}">${m.vram_gb||0}G</td>
+        <td><span class="m-cat ${CAT_CLS(m)}">${m.category||"unknown"}</span></td>
+        <td>${badge(m)}</td>
+      </tr>`;
+      let h = `<div style="font-size:11px;color:var(--dim);margin-bottom:6px">registry v${d.version||""} · 更新于 ${d.last_updated||""} · ${d.sync?"🔄 已与实际环境自动同步（装/删模型自动登记）":"（手动）"}</div>`;
+      if(oms.length){
+        h += `<table class="reg-table" style="margin-bottom:12px"><tr><th style="width:34%">Ollama 模型</th><th>显存</th><th>类别</th><th>状态</th></tr>`;
+        h += oms.map(mRow).join("");
+        h += `</table>`;
+      }
+      if(cms.length){
+        h += `<table class="reg-table"><tr><th style="width:34%">ComfyUI 模型</th><th>显存</th><th>类别</th><th>状态</th></tr>`;
+        h += cms.map(mRow).join("");
+        h += `</table>`;
+      }
+      if(!oms.length && !cms.length) h += '<span class="empty">registry 无模型登记</span>';
+      $("regBody").innerHTML = h;
+      const qm=$("qModel");
+      const usable = cms.filter(m=>m.workflow);
+      qm.innerHTML = usable.length
+        ? usable.map(m=>`<option value="${m.id}">${m.name||m.id} (${m.vram_gb}G)</option>`).join("")
+        : '<option value="">无可用模板</option>';
+    }).catch(e=>{ $("regBody").innerHTML='<span class="empty">登记台加载失败: '+e+'</span>'; });
+}
+/* 模型详情抽屉 */
+function showModelDetail(id){
+  const m = REG_MODELS.find(x=>x.id===id);
+  if(!m) return;
+  const vramCls = (m.vram_gb||0)>=13?"max":((m.vram_gb||0)>=8?"hot":"");
+  const tag = (label,val)=> val ? `<span class="md-tag">${label} ${val}</span>` : "";
+  $("mDrawer").innerHTML = `
+    <button class="md-close" onclick="closeModal()">✕</button>
+    <div class="md-name">${CAT_ICON[m.category]||"📦"} ${m.name||m.id}</div>
+    <div class="md-full">${m.full_name||""}</div>
+    <div class="md-tags">
+      ${tag("",CAT_ICON[m.category]||"")}
+      ${tag("类别",m.category||"")}
+      ${tag("显存",(m.vram_gb||0)+"G")}
+      ${m.exclusive?`<span class="md-tag">独占全卡</span>`:""}
+      ${m.workflow?`<span class="md-tag">📋 有工作流模板</span>`:""}
+      ${m.installed?'<span class="md-tag" style="color:var(--ok)">✓ 已装</span>':'<span class="md-tag">○ 未装</span>'}
+    </div>
+    <div class="md-kv">
+      <span class="k">出品方</span><span class="v">${m.vendor||"—"}</span>
+      <span class="k">发布时间</span><span class="v">${m.release||"—"}</span>
+      <span class="k">显存估算</span><span class="v">${m.vram_gb||0}G ${m.vram_gb_note?`<small style="color:var(--dim)">（${m.vram_gb_note}）</small>`:""}</span>
+      ${m.ctx?`<span class="k">上下文</span><span class="v">${m.ctx}</span>`:""}
+      ${m.keep_alive?`<span class="k">驻留</span><span class="v">${m.keep_alive}</span>`:""}
+      ${m.device?`<span class="k">设备</span><span class="v">${m.device}</span>`:""}
+      ${m.combo?`<span class="k">组合</span><span class="v">${m.combo}</span>`:""}
+    </div>
+    <div class="md-sec">介绍</div>
+    <div class="md-detail">${m.desc||""}<br><br>${m.detail||""}</div>
+    <div style="margin-top:14px;font-size:10px;color:var(--dim)">registry id：<code>${m.id}</code></div>`;
+  $("mModal").classList.add("open");
+}
+function closeModal(){ $("mModal").classList.remove("open"); }
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ closeModal(); closePreview(); } });
+
+/* ===== 预演模式（蓝图 11.2/11.4：先看谱再指挥，状态播报） ===== */
+function openPreview(){
+  apiFetch("/api/budget",{cache:"no-store"}).then(r=>r.json()).then(b=>{
+    if(!b||!b.ok){ alert("预算引擎不可用"); return; }
+    const rows = b.models.map(m=>{
+      const cls = m.decision==="ok"?"ok":(m.decision==="reject"?"bad":"warn");
+      let tag = m.decision==="ok"?"✅ 可跑":(m.decision==="reject"?`⛔ 差${m.gap_gb}G`: m.decision+(m.need_free_gb?` 释放${m.need_free_gb}G`:""));
+      if(m.loaded) tag = "已加载";
+      return `<div class="prow" onclick="previewPick('${m.id}')">
+        <span>${m.id}</span><span class="pvr">${m.vram_gb}G</span><span class="ptag ${cls}">${tag}</span></div>`;
+    }).join("");
+    $("pWin").innerHTML = `
+      <button class="md-close" onclick="closePreview()">✕</button>
+      <div style="font-size:15px;font-weight:600;margin-bottom:4px">🔮 预演模式</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px">选一个目标 → 看"要释放什么、差多少" → 确认才动手</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:6px">当前可用 <b style="color:var(--ok)">${b.avail_gb}G</b> · 上限 ${b.safe_ceiling_gb}G · 占用 ${b.used_gb}G · 可释放 ${b.releasable_gb}G</div>
+      <div style="max-height:300px;overflow-y:auto">${rows}</div>
+      <div id="previewPlan" style="margin-top:10px;font-size:12px;color:var(--sub)"></div>`;
+    $("pModal").classList.add("open");
+  }).catch(()=>alert("预演失败"));
+}
+function previewPick(id){
+  apiFetch("/api/budget",{cache:"no-store"}).then(r=>r.json()).then(b=>{
+    const m = b.models.find(x=>x.id===id); if(!m) return;
+    const plan = [];
+    if(m.decision==="ok") plan.push(`<span style="color:var(--ok)">✅ 现在就能跑 ${id}（${m.vram_gb}G ≤ 可用 ${b.avail_gb}G），无需释放。</span>`);
+    else if(m.decision==="reject") plan.push(`<span style="color:var(--bad)">⛔ ${id} 需 ${m.vram_gb}G，超上限 ${b.safe_ceiling_gb}G（差 ${m.gap_gb}G）——16G 卡跑不了。</span>`);
+    else {
+      plan.push(`<span>${id}（${m.vram_gb}G）需释放 <b style="color:var(--warn)">${m.need_free_gb}G</b> 才可跑：</span>`);
+      plan.push(`<span style="color:var(--dim)">将执行：停 Ollama 模型 → ComfyUI /free →（必要时停 Fooocus）</span>`);
+      plan.push(`<span style="margin-top:8px"><button class="act-btn" style="padding:6px 14px" onclick="confirmPreview()">✅ 确认释放后即可跑</button></span>`);
+    }
+    $("previewPlan").innerHTML = plan.join('<br>');
+  }).catch(()=>{});
+}
+function confirmPreview(){
+  if(!confirm("确认执行释放（停 Ollama → ComfyUI /free → 必要时停 Fooocus）？")) return;
+  guardEvict(); closePreview();
+}
+function closePreview(){ $("pModal").classList.remove("open"); }
+
+function scanModels(){
+  const btn=$("scanHint"); btn.textContent="扫描中…";
+  apiFetch("/api/scan",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    if(!d.ok){ btn.textContent="扫描失败"; return; }
+    btn.textContent="";
+    const sb=$("scanBody"); sb.style.display="block";
+    const sources=d.sources||{};
+    const keys=Object.keys(sources);
+    let h = "";
+    if(!keys.length){ h = '<div style="font-size:11px;color:var(--warn)">⚠️ registry.scanner.targets 未配置扫描目标</div>'; }
+    let totalActual=0, totalNew=0;
+    keys.forEach(src=>{
+      const s=sources[src];
+      totalActual += (s.actual||[]).length;
+      totalNew += (s.new||[]).length;
+      const ns=s.new||[], ms=s.missing||[];
+      if(!ns.length && !ms.length){
+        h += `<div style="font-size:11px;color:var(--ok);margin:3px 0">✅ ${src}：实际 ${(s.actual||[]).length} 个模型，与登记一致</div>`;
+      }
+      if(ms.length){
+        h += `<div style="font-size:11px;color:var(--bad);margin:3px 0">🗑️ ${src} 已删但登记未清：${ms.join("、")}</div>`;
+      }
+      ns.forEach(m=>{
+        h += `<div style="font-size:11px;margin:2px 0">🆕 ${src} 新模型 <b>${m.file}</b> <span style="color:var(--dim)">[${m.category}]</span>
+          <button class="mini" style="border-color:var(--ok);color:var(--ok)" onclick="registerScanned('${src}','${m.file}','${m.category}')">一键登记</button></div>`;
+      });
+    });
+    if(keys.length && !totalNew && !totalActual){ h = `<div style="font-size:11px;color:var(--ok)">✅ 全部源与登记一致</div>`; }
+    sb.innerHTML = h;
+  }).catch(e=>{ btn.textContent="扫描失败: "+e; });
+}
+function registerScanned(source,name,category){
+  if(!confirm(`确定登记模型「${name}」(${category})？将按家族估算显存写入 registry（写前自动备份）。`)) return;
+  apiFetch("/api/scan/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({source,name,category})})
+    .then(r=>r.json()).then(d=>{
+      alert(d.ok? "已登记 "+d.registered+"（显存 "+d.vram_gb+"G，备份 "+d.backup+"）" : ("登记失败: "+(d.error||"")));
+      loadRegistry(); renderBudget();
+      setTimeout(scanModels, 800);
+    }).catch(e=>alert("请求失败: "+e));
+}
+function refresh(){
+  apiFetch("/api/status",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    const g=d.gpu;
+    if(g.ok){
+      const pct=Math.round(g.used_mb/g.total_mb*100);
+      $("vUsed").textContent=fmtMb(g.used_mb); $("vFree").textContent=fmtMb(g.free_mb); $("vTotal").textContent=fmtMb(g.total_mb);
+      $("vPct").textContent=pct+"% 已用";
+      /* header 主指标 */
+      $("hmUsed").textContent=fmtMb(g.used_mb);
+      $("hmTotal").textContent=fmtMb(g.total_mb);
+      const fill=$("hmFill");
+      fill.style.width=pct+"%";
+      fill.className="hm-fill"+(pct>85?" danger":(pct>65?" hot":""));
+    } else { $("vPct").textContent="nvidia-smi 不可用"; }
+    const sc = SCENES.find(s=>s.id===d.scene);
+    $("hmScene").textContent = (sc?sc.ic+" "+sc.nm:d.scene)||"--";
+    $("hmOllama").className="dot "+(d.ollama.ok?"ok":"bad");
+    $("hmComfy").className="dot "+(d.containers.comfyui?"ok":"bad");
+    $("meta").textContent = "更新 "+new Date(d.ts*1000).toLocaleTimeString()+" · Ollama "+(d.ollama.ok?"正常":"异常");
+    const comfyModels = (d.comfyui_models && d.comfyui_models.models) || [];
+    const comfyLikelyLoaded = d.comfyui_models && d.comfyui_models.likely_loaded;
+    let comfyInfo = "";
+    if(comfyModels.length>0){
+      const names = comfyModels.map(m=>m.name+"("+m.vram_gb+"G)").join("+");
+      comfyInfo = comfyLikelyLoaded
+        ? ` · ComfyUI 加载中：${names}`
+        : ` · ComfyUI 最近：${names}（已卸载）`;
+    } else if(d.containers.comfyui){
+      comfyInfo = " · ComfyUI 容器运行（模型未载）";
+    }
+    $("curline").innerHTML =
+      `<span><span class="dot ok"></span> 当前场景：<b>${sc?sc.ic+" "+sc.nm:d.scene}</b></span>
+       <span>${SCENE_BUDGET[d.scene]||""}</span>
+       <span>Ollama 已加载 ${(d.ollama.models||[]).length} 个 · ${d.ollama.ok?"正常":"无响应"}${comfyInfo}</span>`;
+    /* 状态播报（蓝图 11.4：调度动作转一句话，状态>数字） */
+    let ann="🟢 系统正常 · 空闲 "+fmtMb(g.free_mb);
+    if(g.ok && g.used_mb>14*1024) ann=`🔴 显存告急 ${fmtMb(g.used_mb)} · 正在排查白占方，打满=死机！`;
+    else if(g.ok && g.used_mb>12*1024) ann=`🟠 显存 ${fmtMb(g.used_mb)} 趋紧 · 建议释放多余占用`;
+    else if(!d.ollama.ok) ann=`⛔ Ollama 无响应 · 需重启 ollama 容器`;
+    else if(comfyLikelyLoaded && comfyModels.length) ann=`🎨 正在为 ${comfyModels.map(m=>m.name).join("+")} 加载显存（约 ${comfyModels.map(m=>m.vram_gb+"G").join("+")}）…`;
+    else if(d.containers.fooocus && d.scene!=="fooocus") ann=`🖼️ Fooocus 在 ${sc?sc.nm:d.scene} 态运行（R6 违规）· 建议切换或停止`;
+    else ann = `🟢 ${sc?sc.ic+" "+sc.nm:d.scene} · ${d.ollama.ok?"Ollama 正常":"Ollama 异常"} · 空闲 ${fmtMb(g.free_mb)}`;
+    $("announce").innerHTML = `<span class="stt">●</span><span>${ann}</span>`;
+    renderScenes(d.scene);
+    renderCombos(inferCombo(d.ollama.models), d.scene);
+    renderBudget(d);
+    renderDistribution(d);
+    renderBanners(d);
+    renderProcesses(d);
+    renderGuard(d);
+    renderLifecycle(d);
+    renderDesktop(d);
+    renderComfyQueue(d);
+    renderActivity(d);
+    renderComfyEvents();
+    renderQoS(d);
+    renderGMaeQueue();
+  }).catch(e=>{ $("meta").textContent="状态获取失败: "+e; });
+}
+function inferCombo(models){
+  const names=(models||[]).map(m=>m.name);
+  if(names.some(n=>n.includes("qwythos-9b")))  return "qwythos-9b";
+  if(names.some(n=>n.includes("darkidol-8b"))) return "darkidol-8b";
+  if(names.some(n=>n.includes("qwen3.5:9b"))) return "9b";
+  if(names.some(n=>n.includes("qwen3:0.6b"))) return "0.6b";
+  return "none";
+}
+refresh();
+loadRegistry();
+renderDesktopVram();
+renderBudget();
+setInterval(()=>{ if(!busy) refresh(); }, 3000);
+setInterval(()=>{ renderDesktopVram(); }, 15000);
+setInterval(()=>{ renderBudget(); }, 10000);
+</script>
+</body>
+</html>
