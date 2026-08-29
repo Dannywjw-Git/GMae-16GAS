@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # GMae 项目 .gitignore
 # 排除日志（可能很大）
 *.log
@@ -20,10 +21,18 @@ __pycache__/
 *.pem
 
 # 编辑器/IDE
+=======
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+>>>>>>> b3a909c3830f7fc34f5cdeecc3a3dce10b7f63db
 .vscode/
 .idea/
 *.swp
 *.swo
+<<<<<<< HEAD
 *~
 
 # 操作系统
@@ -80,3 +89,37 @@ volumes/
 *.bak*
 *.bak_*
 
+=======
+
+# Logs
+*.log
+logs/
+
+# Temp
+_tmp/
+_temp/
+*.tmp
+*.bak
+
+# Output (generated files)
+outputs/
+examples/output-samples/*
+!examples/output-samples/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Env
+.env
+.env.local
+*.key
+*.pem
+>>>>>>> b3a909c3830f7fc34f5cdeecc3a3dce10b7f63db
