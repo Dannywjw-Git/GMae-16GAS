@@ -742,7 +742,7 @@ const SCENE_BUDGET = {
   game:     "游戏账本：2-4G + 底噪 ≈3-7G 宽松",
 };
 const ALL = ["dialogue","comfy","fooocus","game"];
-const BUDGET_ROWS = [
+let BUDGET_ROWS = [
   {svc:"🖥️ 系统底噪", vram:"空载 ~1.0G（实测 0.9~1.1G）", allow:"任意场景 · 固定", key:null, scenes:ALL, use:"桌面、浏览器等系统占用（Ollama 空载时实测 905~1062 MiB）"},
   {svc:"💬 9B 对话模型（qwen3.5）", vram:"6.6~8.4G（16K）", allow:"仅对话态", key:"qwen3.5:9b", scenes:["dialogue"], use:"日常聊天、写作、知识库问答"},
   {svc:"💬 9B Qwythos（q4km）", vram:"~6.5G（8K）", allow:"仅对话态", key:"qwythos-9b:q4km", scenes:["dialogue"], use:"写作/对话（q4km 量化，文件 5.7G）"},
