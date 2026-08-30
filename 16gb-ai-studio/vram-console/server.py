@@ -2151,34 +2151,50 @@ def scene_switch(scene):
         results.append(("stop comfyui (回对话态停文生图容器, 释放 WSL RAM)", docker_action("comfyui", "stop")))
     elif scene == "comfy":
         results.append(("stop ollama models (free VRAM for image gen)", ollama_stop_all()))
-        results.append(("start comfyui", docker_action("comfyui", "start")))
+        start_rc, start_out = docker_action("comfyui", "start")
+        results.append(("start comfyui", (start_rc, start_out)))
         results.append(("stop fooocus", docker_action("fooocus", "stop")))
         results.append(("release VRAM (gpu_release.ps1)", run_ps1(GPU_RELEASE_PS1)))
-        ok, w = wait_ready(8188)
-        results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        if start_rc == 0:
+            ok, w = wait_ready(8188)
+            results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        else:
+            results.append(("wait comfyui ready (:8188)", (-2, "skipped: start failed")))
     elif scene == "h3":
         # 视频场景（原 MiniMax H3，2026-08-28 已删模型，现可用 Wan2.2）：走 ComfyUI，独占全卡，需桌面程序尽量关
         results.append(("stop ollama models (H3 needs full VRAM)", ollama_stop_all()))
-        results.append(("start comfyui", docker_action("comfyui", "start")))
+        start_rc, start_out = docker_action("comfyui", "start")
+        results.append(("start comfyui", (start_rc, start_out)))
         results.append(("stop fooocus (防叠加)", docker_action("fooocus", "stop")))
         results.append(("release VRAM (gpu_release.ps1)", run_ps1(GPU_RELEASE_PS1)))
-        ok, w = wait_ready(8188)
-        results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        if start_rc == 0:
+            ok, w = wait_ready(8188)
+            results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        else:
+            results.append(("wait comfyui ready (:8188)", (-2, "skipped: start failed")))
     elif scene == "fooocus":
         results.append(("stop ollama models (free VRAM for Flux)", ollama_stop_all()))
-        results.append(("start fooocus", docker_action("fooocus", "start")))
+        start_rc, start_out = docker_action("fooocus", "start")
+        results.append(("start fooocus", (start_rc, start_out)))
         results.append(("stop comfyui (防 SDXL 驻留叠加)", docker_action("comfyui", "stop")))
         results.append(("release VRAM (gpu_release.ps1)", run_ps1(GPU_RELEASE_PS1)))
-        ok, w = wait_ready(7865)
-        results.append(("wait fooocus ready (:7865)", (0 if ok else -1, "waited {}s".format(w))))
+        if start_rc == 0:
+            ok, w = wait_ready(7865)
+            results.append(("wait fooocus ready (:7865)", (0 if ok else -1, "waited {}s".format(w))))
+        else:
+            results.append(("wait fooocus ready (:7865)", (-2, "skipped: start failed")))
     elif scene == "music":
         # MiniMax Music 3 音乐生成: 走 ComfyUI, 文本编码器巨大需独占显存
         results.append(("stop ollama models (Music3 needs full VRAM)", ollama_stop_all()))
-        results.append(("start comfyui", docker_action("comfyui", "start")))
+        start_rc, start_out = docker_action("comfyui", "start")
+        results.append(("start comfyui", (start_rc, start_out)))
         results.append(("stop fooocus", docker_action("fooocus", "stop")))
         results.append(("release VRAM (gpu_release.ps1)", run_ps1(GPU_RELEASE_PS1)))
-        ok, w = wait_ready(8188)
-        results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        if start_rc == 0:
+            ok, w = wait_ready(8188)
+            results.append(("wait comfyui ready (:8188)", (0 if ok else -1, "waited {}s".format(w))))
+        else:
+            results.append(("wait comfyui ready (:8188)", (-2, "skipped: start failed")))
     elif scene == "game":
         results.append(("stop comfyui", docker_action("comfyui", "stop")))
         results.append(("stop fooocus", docker_action("fooocus", "stop")))
