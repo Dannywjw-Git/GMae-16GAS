@@ -10,6 +10,7 @@ import os
 import sys
 import datetime
 import urllib.request
+import json
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SERVER_SCRIPT = os.path.join(BASE_DIR, "server.py")
@@ -33,13 +34,41 @@ def log(msg):
     except Exception:
         pass
 
-def _port_up():
-    """探测 8787 健康端点：端口在 = 服务活着（无论 admin/非 admin server）。"""
+def _port_open():
+    """探测1：端口连通性（TCP 连接，检测端口是否在监听）"""
+    import socket
     try:
-        with urllib.request.urlopen("http://127.0.0.1:{}/api/health".format(PORT), timeout=2) as r:
-            return r.status == 200
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(2)
+        result = s.connect_ex(("127.0.0.1", PORT))
+        s.close()
+        return result == 0
     except Exception:
         return False
+
+
+def _health_ok():
+    """探测2：/api/health 内容校验（检测服务内部是否正常，防半死状态）"""
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:{}/api/health".format(PORT), timeout=3) as r:
+            if r.status != 200:
+                return False
+            data = json.loads(r.read().decode("utf-8"))
+            # 校验：ok=true 且 services 存在（说明 health_check 正常执行，非僵死）
+            return data.get("ok") is True and "services" in data
+    except Exception:
+        return False
+
+
+def _server_alive():
+    """双探测：端口通 + health 正常 = 服务活着；端口通但 health 异常 = 半死，需重启"""
+    port_up = _port_open()
+    if not port_up:
+        return False
+    health_ok = _health_ok()
+    if not health_ok:
+        log("WARNING: port open but /api/health failed (half-dead), will restart")
+    return health_ok
 
 
 def _start_server():
@@ -68,9 +97,9 @@ def main():
             continue
 
         # 端口在 → 只监控不重复启动（server 可能已自提权为 admin，原进程退出不影响）
-        if _port_up():
+        if _server_alive():
             log("Port :{} up, monitoring only".format(PORT))
-            while _port_up():
+            while _server_alive():
                 time.sleep(5)
             log("Port :{} went down".format(PORT))
             restart_times.append(time.time())
@@ -83,9 +112,9 @@ def main():
             proc = _start_server()
             log("Server started, PID: {}".format(proc.pid))
             deadline = time.time() + 90
-            while time.time() < deadline and not _port_up():
+            while time.time() < deadline and not _server_alive():
                 time.sleep(2)
-            if _port_up():
+            if _server_alive():
                 log("Server up on :{}".format(PORT))
             else:
                 log("Server failed to come up within 90s (may be UAC pending)")

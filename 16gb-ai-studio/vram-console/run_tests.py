@@ -19,7 +19,27 @@ TEST_MODULES = [
     "tests.test_registry",
     "tests.test_auth",
     "tests.test_api_contract",
+    "tests.test_budget",
+    "tests.test_security",
 ]
+
+# 自动发现 tests 目录下所有 test_*.py（避免遗漏新增模块）
+def _discover_test_modules():
+    """自动扫描 tests/ 目录下所有 test_*.py，返回模块名列表。"""
+    import glob
+    test_dir = os.path.join(BASE_DIR, "tests")
+    pattern = os.path.join(test_dir, "test_*.py")
+    modules = []
+    for f in sorted(glob.glob(pattern)):
+        name = os.path.splitext(os.path.basename(f))[0]
+        modules.append("tests." + name)
+    return modules
+
+# 优先使用自动发现（保证不遗漏），回退到手动列表
+try:
+    TEST_MODULES = _discover_test_modules()
+except Exception:
+    pass
 
 
 def run_all(verbosity=2):

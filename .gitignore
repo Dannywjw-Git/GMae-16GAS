@@ -1,46 +1,54 @@
-<<<<<<< HEAD
 # GMae 项目 .gitignore
-# 排除日志（可能很大）
+
+# === 日志 ===
 *.log
 logs/
 
-# 临时文件（下划线开头）
+# === 临时文件 ===
 _*
+_tmp/
+_temp/
+*.tmp
+*.bak
+*.bak*
+*.bak_*
+*.backup
+*.old
+*~
 
-# Python 缓存
+# === Python 缓存 ===
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
+*.egg-info/
+.venv/
+venv/
 
-# 环境变量与密钥
+# === Node ===
+node_modules/
+
+# === 环境变量与密钥 ===
 .env
 .env.local
 *.key
 *.pem
+.api_token
+*.token
 
-# 编辑器/IDE
-=======
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor
->>>>>>> b3a909c3830f7fc34f5cdeecc3a3dce10b7f63db
+# === 编辑器/IDE ===
 .vscode/
 .idea/
 *.swp
 *.swo
-<<<<<<< HEAD
-*~
 
-# 操作系统
+# === 操作系统 ===
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# 模型文件（大文件，不入库）
+# === 模型文件（大文件，不入库） ===
 models/
 *.safetensors
 *.gguf
@@ -49,7 +57,7 @@ models/
 *.pth
 *.ckpt
 
-# 输出产物（图/视频/音频，不入库）
+# === 输出产物（图/视频/音频，不入库） ===
 outputs/
 *.png
 *.jpg
@@ -62,67 +70,20 @@ outputs/
 *.mp3
 *.flac
 
-# 安装包/备份
+# === 安装包/备份 ===
 _installers/
 *.zip
 *.tar.gz
 *.7z
 *.rar
 
-# Docker 数据（如果有）
+# === Docker 数据 ===
 docker-data/
 volumes/
 
-# 备份文件
-*.bak
-*.backup
-*.old
-
-# 进程/PID 文件
+# === 进程/PID 文件 ===
 *.pid
 
-# 敏感文件
-.api_token
-*.token
-
-# 备份文件
-*.bak*
-*.bak_*
-
-=======
-
-# Logs
-*.log
-logs/
-
-# Temp
-_tmp/
-_temp/
-*.tmp
-*.bak
-
-# Output (generated files)
-outputs/
-examples/output-samples/*
-!examples/output-samples/.gitkeep
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-.venv/
-venv/
-
-# Node
-node_modules/
-
-# Env
-.env
-.env.local
-*.key
-*.pem
->>>>>>> b3a909c3830f7fc34f5cdeecc3a3dce10b7f63db
-
-# 用户数据（密码哈希，不入库）
+# === 用户数据（密码哈希，不入库） ===
 users.json
+config.json

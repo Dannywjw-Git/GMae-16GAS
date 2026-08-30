@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GPU Maestro-显存指挥家 调度中心 - 后端 (Python 标准库, 零依赖)
@@ -59,6 +59,38 @@ def log_error(event_type, error, **kwargs):
     entry = {"ts": datetime.datetime.now().isoformat(), "event": event_type, "error": str(error)}
     entry.update(kwargs)
     logger.error(json.dumps(entry, ensure_ascii=False))
+
+
+# === 桌面 toast 通知（蓝图 Step 0，三路通知：UI banner + 日志 + 桌面 toast）===
+_toast_enabled = True
+_toast_cooldown = {}
+_TOAST_PS_B64 = "CgBbAFcAaQBuAGQAbwB3AHMALgBVAEkALgBOAG8AdABpAGYAaQBjAGEAdABpAG8AbgBzAC4AVABvAGEAcwB0AE4AbwB0AGkAZgBpAGMAYQB0AGkAbwBuAE0AYQBuAGEAZwBlAHIALAAgAFcAaQBuAGQAbwB3AHMALgBVAEkALgBOAG8AdABpAGYAaQBjAGEAdABpAG8AbgBzACwAIABDAG8AbgB0AGUAbgB0AFQAeQBwAGUAIAA9ACAAVwBpAG4AZABvAHcAcwBSAHUAbgB0AGkAbQBlAF0AIAB8ACAATwB1AHQALQBOAHUAbABsAAoAWwBXAGkAbgBkAG8AdwBzAC4ARABhAHQAYQAuAFgAbQBsAC4ARABvAG0ALgBYAG0AbABEAG8AYwB1AG0AZQBuAHQALAAgAFcAaQBuAGQAbwB3AHMALgBEAGEAdABhAC4AWABtAGwALgBEAG8AbQAuAFgAbQBsAEQAbwBjAHUAbQBlAG4AdAAsACAAQwBvAG4AdABlAG4AdABUAHkAcABlACAAPQAgAFcAaQBuAGQAbwB3AHMAUgB1AG4AdABpAG0AZQBdACAAfAAgAE8AdQB0AC0ATgB1AGwAbAAKACQAdABpAHQAbABlACAAPQAgACQAYQByAGcAcwBbADAAXQAKACQAbQBzAGcAIAA9ACAAJABhAHIAZwBzAFsAMQBdAAoAJAB0AGUAbQBwAGwAYQB0AGUAIAA9ACAAIgA8AHQAbwBhAHMAdAAgAGQAdQByAGEAdABpAG8AbgA9ACcAcwBoAG8AcgB0ACcAPgA8AHYAaQBzAHUAYQBsAD4APABiAGkAbgBkAGkAbgBnACAAdABlAG0AcABsAGEAdABlAD0AJwBUAG8AYQBzAHQARwBlAG4AZQByAGkAYwAnAD4APAB0AGUAeAB0AD4AJAB0AGkAdABsAGUAPAAvAHQAZQB4AHQAPgA8AHQAZQB4AHQAPgAkAG0AcwBnADwALwB0AGUAeAB0AD4APAAvAGIAaQBuAGQAaQBuAGcAPgA8AC8AdgBpAHMAdQBhAGwAPgA8AC8AdABvAGEAcwB0AD4AIgAKACQAeABtAGwAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgAFcAaQBuAGQAbwB3AHMALgBEAGEAdABhAC4AWABtAGwALgBEAG8AbQAuAFgAbQBsAEQAbwBjAHUAbQBlAG4AdAAKACQAeABtAGwALgBMAG8AYQBkAFgAbQBsACgAJAB0AGUAbQBwAGwAYQB0AGUAKQAKACQAdABvAGEAcwB0ACAAPQAgAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABXAGkAbgBkAG8AdwBzAC4AVQBJAC4ATgBvAHQAaQBmAGkAYwBhAHQAaQBvAG4AcwAuAFQAbwBhAHMAdABOAG8AdABpAGYAaQBjAGEAdABpAG8AbgAgACQAeABtAGwACgBbAFcAaQBuAGQAbwB3AHMALgBVAEkALgBOAG8AdABpAGYAaQBjAGEAdABpAG8AbgBzAC4AVABvAGEAcwB0AE4AbwB0AGkAZgBpAGMAYQB0AGkAbwBuAE0AYQBuAGEAZwBlAHIAXQA6ADoAQwByAGUAYQB0AGUAVABvAGEAcwB0AE4AbwB0AGkAZgBpAGUAcgAoACIARwBNAGEAZQAiACkALgBTAGgAbwB3ACgAJAB0AG8AYQBzAHQAKQAKAA=="
+
+
+def toast_notify(title, message, event_type="general", cooldown_s=30):
+    """发送 Windows 桌面 toast 通知（零依赖，PowerShell Windows.UI.Notifications）。
+    三路通知：UI banner + 日志 + 桌面 toast。同类型事件 cooldown_s 秒内只弹一次。"""
+    if not _toast_enabled:
+        return False
+    now = time.time()
+    last = _toast_cooldown.get(event_type, 0)
+    if now - last < cooldown_s:
+        return False
+    _toast_cooldown[event_type] = now
+    try:
+        import base64 as _b64
+        ps = _b64.b64decode(_TOAST_PS_B64).decode('utf-16-le')
+        subprocess.run(
+            ["powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps,
+             str(title), str(message)],
+            capture_output=True, timeout=10, check=False
+        )
+        log_event("toast_sent", title=title, message=message, event_type=event_type)
+        return True
+    except Exception as e:
+        log_error("toast_failed", error=e, title=title)
+        return False
+
 
 PORT = int(os.environ.get("VRAM_CONSOLE_PORT", "8787"))
 HOST = os.environ.get("VRAM_CONSOLE_HOST", "0.0.0.0")
@@ -527,6 +559,8 @@ def gpu_guard_kick(pid):
         _proc_events.appendleft({"ts": int(time.time()), "event": "kick", "pid": pid,
                                  "name": comm, "app": cont, "used_mb": 0})
         log_event("guard_kick", pid=pid, container=cont, comm=comm)
+        toast_notify("GMae 门卫驱逐", "已强制驱逐进程 %s (PID %s) 于容器 %s" % (comm, pid, cont),
+                     event_type="guard_kick", cooldown_s=60)
         return {"ok": True, "message": "已强制驱逐 PID %s (%s) 于容器 %s" % (pid, comm, cont),
                 "pid": pid, "container": cont, "comm": comm}
     return {"ok": False, "error": "驱逐失败 rc=%s %s" % (rc, out[-200:])}
@@ -710,6 +744,181 @@ def _idle_reaper_loop():
 
 def start_idle_reaper():
     t = threading.Thread(target=_idle_reaper_loop, daemon=True, name="idle-reaper")
+    t.start()
+    return t
+
+
+# === Step 5 QoS 服务等级引擎（蓝图 §5，2026-08-30 主公确认：分级降级）===
+# 紧急（空闲<2GB）：直接停最低优先级模型 + 简洁通知
+# 非紧急（空闲<4GB）：给降级建议 + 用户确认后执行
+QOS_CFG = {
+    "emergency_threshold_mb": 2048,
+    "warning_threshold_mb": 4096,
+    "check_interval_s": 10,
+    "enabled": True,
+    "cooldown_s": 60,
+}
+_qos_state = {
+    "level": "ok",
+    "last_emergency_ts": 0,
+    "last_action": None,
+    "suggestions": [],
+    "history": deque(maxlen=50),
+}
+
+
+def qos_check():
+    if not QOS_CFG["enabled"]:
+        return {"level": "disabled"}
+    gpu = gpu_status()
+    if not gpu.get("ok"):
+        return {"level": "unknown", "error": "nvidia-smi unavailable"}
+    free_mb = gpu.get("free_mb", 99999)
+    now = time.time()
+    if free_mb < QOS_CFG["emergency_threshold_mb"]:
+        if now - _qos_state["last_emergency_ts"] > QOS_CFG["cooldown_s"]:
+            result = _qos_emergency_downgrade(free_mb)
+            _qos_state["last_emergency_ts"] = now
+            _qos_state["level"] = "emergency"
+            _qos_state["last_action"] = result
+            _qos_state["history"].append({"ts": now, "level": "emergency", "free_mb": free_mb})
+            return result
+        else:
+            return {"level": "emergency", "cooldown": True}
+    elif free_mb < QOS_CFG["warning_threshold_mb"]:
+        suggestions = _qos_build_suggestions(free_mb)
+        _qos_state["level"] = "warning"
+        _qos_state["suggestions"] = suggestions
+        return {"level": "warning", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
+                "suggestions": suggestions,
+                "message": "显存紧张（%.1fGB 空闲），建议释放以下资源：" % (free_mb / 1024)}
+    else:
+        _qos_state["level"] = "ok"
+        _qos_state["suggestions"] = []
+        return {"level": "ok", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1)}
+
+
+def _qos_emergency_downgrade(free_mb):
+    actions = []
+    freed_mb = 0
+    try:
+        if "comfyui" in docker_containers():
+            result = comfy_free()
+            if result.get("ok"):
+                actions.append("已释放 ComfyUI 显存")
+                freed_mb += 2000
+    except Exception as e:
+        log_error("qos_emergency_comfy_free_error", error=str(e))
+    try:
+        ollama_loaded = ollama_ps().get("models", [])
+        if len(ollama_loaded) > 1:
+            to_stop = [m.get("model") for m in ollama_loaded[1:] if m.get("model")]
+            if to_stop:
+                ollama_stop(to_stop)
+                actions.append("已停止 Ollama 模型: %s" % ", ".join(to_stop))
+    except Exception as e:
+        log_error("qos_emergency_ollama_stop_error", error=str(e))
+    try:
+        if freed_mb < 2048 and "fooocus" in docker_containers():
+            docker_action("fooocus", "stop")
+            actions.append("已停止 Fooocus 容器")
+    except Exception as e:
+        log_error("qos_emergency_fooocus_stop_error", error=str(e))
+    message = "紧急：显存仅 %.1fGB，已自动释放。建议：关闭非必要应用。" % (free_mb / 1024)
+    log_event("qos_emergency_downgrade", free_mb=free_mb, actions=actions)
+    toast_notify("GMae 紧急显存释放", message, event_type="qos_emergency", cooldown_s=120)
+    return {"level": "emergency", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
+            "actions": actions, "message": message,
+            "next_step": "显存释放后可恢复正常使用；如持续紧张，请关闭非必要 GPU 应用。"}
+
+
+def _qos_build_suggestions(free_mb):
+    suggestions = []
+    try:
+        ollama_loaded = ollama_ps().get("models", [])
+        for m in ollama_loaded:
+            model_name = m.get("model", "")
+            size_gb = float(m.get("size_gb", 0))
+            suggestions.append({
+                "id": "ollama_stop_%s" % model_name,
+                "type": "ollama_stop",
+                "model": model_name,
+                "vram_gb": round(size_gb, 1),
+                "action": "停止 %s（释放 %.1fGB）" % (model_name, size_gb),
+                "priority": "medium",
+            })
+    except Exception:
+        pass
+    try:
+        if "comfyui" in docker_containers():
+            suggestions.append({
+                "id": "comfy_free", "type": "comfy_free",
+                "action": "ComfyUI /free（释放生成模型显存，约 2-6GB）",
+                "priority": "low",
+            })
+    except Exception:
+        pass
+    try:
+        if "fooocus" in docker_containers():
+            suggestions.append({
+                "id": "fooocus_stop", "type": "fooocus_stop",
+                "action": "停止 Fooocus 容器（释放约 7GB）",
+                "priority": "high",
+            })
+    except Exception:
+        pass
+    priority_order = {"high": 0, "medium": 1, "low": 2}
+    suggestions.sort(key=lambda x: priority_order.get(x.get("priority", "low"), 2))
+    return suggestions
+
+
+def qos_execute_suggestion(suggestion_id):
+    suggestions = _qos_state.get("suggestions", [])
+    target = next((s for s in suggestions if s["id"] == suggestion_id), None)
+    if not target:
+        return {"ok": False, "error": "suggestion not found: %s" % suggestion_id}
+    try:
+        if target["type"] == "ollama_stop":
+            ollama_stop([target["model"]])
+            msg = "已停止 %s" % target["model"]
+        elif target["type"] == "comfy_free":
+            comfy_free()
+            msg = "已释放 ComfyUI 显存"
+        elif target["type"] == "fooocus_stop":
+            docker_action("fooocus", "stop")
+            msg = "已停止 Fooocus 容器"
+        else:
+            return {"ok": False, "error": "unknown type"}
+        log_event("qos_user_downgrade", suggestion_id=suggestion_id, message=msg)
+        new_state = qos_check()
+        return {"ok": True, "message": msg, "new_state": new_state}
+    except Exception as e:
+        log_error("qos_execute_error", error=str(e))
+        return {"ok": False, "error": str(e)}
+
+
+def qos_status():
+    return {
+        "level": _qos_state["level"],
+        "last_action": _qos_state["last_action"],
+        "suggestions": _qos_state["suggestions"],
+        "config": QOS_CFG,
+        "history": list(_qos_state["history"])[-10:],
+    }
+
+
+def _qos_loop():
+    log_event("qos_loop_start", enabled=QOS_CFG["enabled"])
+    while True:
+        try:
+            qos_check()
+        except Exception as e:
+            log_error("qos_loop_error", error=str(e))
+        time.sleep(QOS_CFG["check_interval_s"])
+
+
+def start_qos():
+    t = threading.Thread(target=_qos_loop, daemon=True, name="qos-engine")
     t.start()
     return t
 
@@ -1395,95 +1604,6 @@ def budget_engine(context_overrides=None):
     }
 
 
-# === Step 5 QoS 服务等级引擎（蓝图§7：水位状态机 + 用户知情；指挥家第一个主动动作） ===
-_qos = {"level": "green", "degraded": False, "degrade_ts": 0, "restore_ts": 0,
-        "used_gb": 0, "msg": ""}
-
-
-def qos_check():
-    """P1-5 水位判定（显存+利用率双维度）：
-    基础水位按显存：GREEN<8G / YELLOW 8~12G / RED>12G。
-    利用率修正：显存高但利用率<30%（大模型空闲）→ 降级一级；显存中等但利用率>90%（计算密集）→ 升级一级。"""
-    gpu = gpu_status()
-    if not gpu.get("ok"):
-        return {"ok": False, "level": "unknown"}
-    used = gpu.get("used_mb", 0)
-    util = gpu.get("utilization", 0)
-    # 基础水位（按显存）
-    if used < 8 * 1024:
-        base = "green"
-    elif used < 12 * 1024:
-        base = "yellow"
-    else:
-        base = "red"
-    # 利用率修正
-    level = base
-    adjust_note = ""
-    if base == "red" and util < 30:
-        level = "yellow"
-        adjust_note = "RED 但利用率 %d%%（大模型空闲），降级为 YELLOW" % util
-    elif base == "yellow" and util > 90:
-        level = "red"
-        adjust_note = "YELLOW 但利用率 %d%%（计算密集），升级为 RED" % util
-    elif base == "yellow" and util < 20:
-        level = "green"
-        adjust_note = "YELLOW 但利用率 %d%%（空闲），降级为 GREEN" % util
-    return {"ok": True, "level": level, "base_level": base, "used_gb": round(used / 1024, 1),
-            "utilization": util, "adjust_note": adjust_note}
-
-
-def _dialogue_model():
-    """当前 ollama 对话模型（排除 embedding/reranker）。"""
-    for m in ollama_ps().get("models", []):
-        name = (m.get("model") or m.get("name") or "")
-        if name and "bge" not in name and "reranker" not in name:
-            return name
-    return None
-
-
-def qos_enforce():
-    """QoS 引擎一次执行（15s 节拍）：
-    仅做显存水位监控 + 利用率修正 + 告警提示，不自动切换模型。
-    RED 水位时设置告警 msg（建议用户手动降级/释放），GREEN 时清除告警。
-    绝不自动调用 combo_switch / load_model —— 模型切换由用户手动触发。"""
-    global _qos
-    q = qos_check()
-    if not q.get("ok"):
-        return _qos
-    level = q["level"]
-    used_gb = q["used_gb"]
-    now = time.time()
-    cur = _dialogue_model()
-    # RED 水位：设置告警（不自动切换）
-    if level == "red" and not _qos["degraded"]:
-        _qos.update({"degraded": True, "degrade_ts": now, "used_gb": used_gb,
-                     "msg": "🔴 RED 水位 %.1fG：建议手动释放模型或切换轻量模型（QoS 不自动切换）" % used_gb})
-        log_event("qos_alert", level="red", used_gb=used_gb, current_model=cur,
-                  note="RED水位告警，建议手动处理，QoS不自动切换")
-    # GREEN 水位：清除告警
-    elif level == "green" and _qos["degraded"]:
-        _qos.update({"degraded": False, "restore_ts": now, "used_gb": used_gb,
-                     "msg": ""})
-        log_event("qos_alert_clear", level="green", used_gb=used_gb, note="水位回落，告警清除")
-    _qos["level"] = level
-    _qos["used_gb"] = used_gb
-    _qos["utilization"] = q.get("utilization", 0)
-    _qos["base_level"] = q.get("base_level", level)
-    _qos["adjust_note"] = q.get("adjust_note", "")
-    return _qos
-
-
-def start_qos():
-    """QoS 后台节拍线程（daemon，15s 一次）。"""
-    def _loop():
-        while True:
-            try:
-                qos_enforce()
-            except Exception as e:
-                log_error("qos_loop_error", error=e)
-            time.sleep(15)
-    threading.Thread(target=_loop, daemon=True).start()
-
 
 # === Step 10.3 模型扫描器（蓝图§10.3：扫描实际模型 vs registry 比对，提示新模型/缺失模型） ===
 # ComfyUI 登记模型 → 实际文件关键词映射（用于 known/missing 判定）
@@ -1600,17 +1720,37 @@ def scan_register(source, name, vram_gb=None, category="image"):
     """用户确认后把扫描到的新模型写入 registry（蓝图10.3 一键登记）。
     source 为 registry 顶层键（comfyui/ollama/fooocus…），动态适配。写前备份 registry.json，可回滚。"""
     global REGISTRY
-    src = source if source in REGISTRY else "comfyui"
+    # 修复：未知 source 直接报错，不默认 comfyui（避免错误登记）
+    if source not in REGISTRY:
+        return {"ok": False, "error": "unknown source: " + source + "（请先在 registry.json 中添加该 source 配置）"}
+    src = source
     if "models" not in REGISTRY.get(src, {}):
-        return {"ok": False, "error": "unknown source: " + source}
+        return {"ok": False, "error": "source has no models list: " + source}
     models = REGISTRY.get(src, {}).get("models", [])
-    if any(m["id"] == name for m in models):
+    # 修复：用 m.get("id") 避免 KeyError
+    if any(m.get("id") == name for m in models):
         return {"ok": False, "error": "already registered: " + name}
-    # 显存估算：用户未给则按家族给默认建议
+    # 显存估算：ollama 用实际文件大小估算，其他按家族默认
     if vram_gb is None:
-        vram_gb = {"video": 10.0, "music": 6.0, "image": 6.5}.get(category, 6.5)
-    entry = {"id": name, "name": name, "vram_gb": float(vram_gb),
-             "exclusive": category in ("video", "music"), "category": category}
+        if src == "ollama":
+            vram_gb = _estimate_ollama_vram(name)
+        else:
+            vram_gb = {"video": 10.0, "music": 6.0, "image": 6.5, "llm": 8.0}.get(category, 6.5)
+    # 补全 entry 字段（与 registry 现有模型结构一致）
+    entry = {
+        "id": name, "name": name, "vram_gb": float(vram_gb),
+        "ctx": 8192 if category == "llm" else 0,
+        "exclusive": category in ("video", "music"),
+        "category": category,
+        "full_name": name,
+        "vendor": "手动登记",
+        "release": "2026",
+        "desc": "一键登记，显存为" + ("估算值" if src == "ollama" else "默认值") + "，待实测验证",
+        "detail": "由扫描器发现并手动登记",
+        "auto_registered": False,
+        "vram_verified": False,
+        "context_vram": {},
+    }
     # 备份原 registry
     reg_path = os.path.join(BASE_DIR, "resources", "registry.json")
     bak = reg_path + ".bak_scan"
@@ -1624,7 +1764,7 @@ def scan_register(source, name, vram_gb=None, category="image"):
     # 回读生效
     REGISTRY = load_registry()
     log_event("scan_register", source=src, model=name, vram_gb=vram_gb, backup=bak)
-    return {"ok": True, "registered": name, "vram_gb": vram_gb, "backup": bak}
+    return {"ok": True, "registered": name, "vram_gb": vram_gb, "backup": bak, "source": src}
 
 
 # === P0-3 自动扫描器（事件驱动+定时兜底：ollama 新模型自动登记，标记待验证）===
@@ -2180,6 +2320,12 @@ def model_action(name, action):
     if not ok:
         return {"ok": False, "error": checked}
     if action == "load":
+        # B2 修复：显存快满时拒绝加载，只告警不动作（防止 OOM 死机）
+        gpu = gpu_status()
+        if gpu.get("ok") and gpu.get("free_mb", 99999) < 4096:
+            log_event("model_load_rejected", model=checked, reason="free_vram<4GB", free_mb=gpu.get("free_mb"))
+            return {"ok": False, "name": checked, "action": action,
+                    "error": "显存不足（空闲 %.1fGB < 4GB），已拒绝加载以防止 OOM。请先释放显存或切换场景。" % (gpu.get("free_mb", 0)/1024)}
         rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "run", checked, "--keepalive", "30s"], 300)
     else:  # stop
         rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "stop", checked], 30)
@@ -2520,6 +2666,12 @@ class Handler(BaseHTTPRequestHandler):
                 self._json(gpu_guard_kick(data.get("pid", "")))
             else:
                 self._json(gpu_guard_evict() if data.get("evict") else gpu_guard_check())
+        elif self.path == "/api/qos/status":
+            self._json(qos_status())
+        elif self.path == "/api/qos/check":
+            self._json(qos_check())
+        elif self.path == "/api/qos/execute":
+            self._json(qos_execute_suggestion(data.get("suggestion_id", "")))
         elif self.path == "/api/service":
             self._json(service_action(data.get("name", ""), data.get("action", "")))
         elif self.path == "/api/model":
@@ -2579,3 +2731,4 @@ if __name__ == "__main__":
     except Exception as e:
         log_error("server_crash", error=e)
         raise
+

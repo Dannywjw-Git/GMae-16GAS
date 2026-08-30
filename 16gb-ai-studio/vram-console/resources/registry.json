@@ -1,7 +1,7 @@
 {
   "version": "1.1",
-  "description": "GPU Maestro 资源注册表 - 所有模型/容器/场景的唯一数据源",
-  "last_updated": "2026-08-28",
+  "description": "GPU Maestro 资源注册表 - 所有模型/容器/场景的唯一数据源（模型详细信息已整合自档案库）",
+  "last_updated": "2026-08-30",
   "ollama": {
     "container": "ollama",
     "port": 11434,
@@ -17,9 +17,9 @@
         "keep_alive": "30m",
         "full_name": "Qwen3.5 9B Instruct",
         "vendor": "阿里巴巴 通义千问",
-        "release": "2025",
-        "desc": "日常对话 / 写作 / RAG 主力，16K 长上下文",
-        "detail": "Qwen 系列旗舰 9B 量级对话模型，本地对话态默认主力。写作、翻译、知识库问答稳定，16K 上下文保长对话实用价值（较 8K 仅多占 ~0.3G，勿轻易降档）。",
+        "release": "2026-03-02",
+        "desc": "16GB卡主力多模态，128K上下文，GPQA 81.7分",
+        "detail": "阿里巴巴 Qwen3.5-9B 官方多模态版，Gated DeltaNet 线性注意力，早期多模态融合。'9B干翻120B'：GPQA Diamond 81.7分。262K架构上限，128K选定（9.9G），196K极限安全（11G）。日常对话/写作/RAG主力，OCR 100%准确。",
         "default_ctx": 131072,
         "vram_verified": true,
         "context_vram": {
@@ -48,8 +48,8 @@
         "full_name": "Qwen3 0.6B Instruct",
         "vendor": "阿里巴巴 通义千问",
         "release": "2025",
-        "desc": "超轻量模型，后台小任务（标题、改写）",
-        "detail": "0.6B 微型对话模型，仅用于 task 类轻后台任务（标题生成、文本改写）。日常对话请用 9B，过度降档会失去实用价值。",
+        "desc": "超轻量模型（待替换，已被qwen3.5:0.8b取代）",
+        "detail": "Qwen3 家族最小档，旧架构，40K上下文上限，纯文本无视觉。已被 Qwen3.5-0.8B 全面取代（262K上下文+视觉能力），等待卸载释放空间。",
         "default_ctx": 40960,
         "vram_verified": true,
         "context_vram": {
@@ -73,11 +73,11 @@
         "category": "llm",
         "combo": "qwythos-9b",
         "keep_alive": "30m",
-        "full_name": "Qwythos 9B Q4KM",
-        "vendor": "社区量化",
-        "release": "2025",
-        "desc": "9B 写作/对话，q4km 量化省显存",
-        "detail": "9B 量级对话模型，q4km 量化（文件 5.7G，显存约 6.5G）。与 9B 主力互斥，按需切换。",
+        "full_name": "Qwythos-9B-Claude-Mythos-5-1M (Q4_K_M)",
+        "vendor": "Empero AI / mradermacher 量化",
+        "release": "2026-06-23",
+        "desc": "无审查角色扮演，Qwen3.5基座，1M上下文，显存性价比最高",
+        "detail": "Empero AI 出品，基于去审查 Qwen3.5-9B，用 5 亿+ Claude Mythos 推理轨迹做 SFT 后训练。无审查定位（研究/红队/创作），1M 上下文（YaRN factor 4）。三个 RP 模型里显存性价比最高（64K 仅 7.5G），极限上下文最高（192K=12.5G）。",
         "default_ctx": 65536,
         "vram_verified": true,
         "context_vram": {
@@ -104,11 +104,11 @@
         "category": "llm",
         "combo": "darkidol-8b",
         "keep_alive": "30m",
-        "full_name": "Darkidol 8B Q4KM",
-        "vendor": "社区量化",
-        "release": "2025",
-        "desc": "8B 角色/对话，q4km 量化省显存",
-        "detail": "8B 量级对话模型，q4km 量化（文件 4.9G，显存约 5.5G）。偏角色扮演与风格化对话，与主力模型互斥。",
+        "full_name": "llama3-8B-DarkIdol-2.2-Uncensored-1048K (Q4_K_M)",
+        "vendor": "社区 (mradermacher 量化) / 基座 Meta Llama 3",
+        "release": "待核 (2025-2026)",
+        "desc": "无审查角色扮演，Llama3基座，KV大户，16K选定",
+        "detail": "基于 Meta Llama 3 8B 的无审查角色扮演微调。⚠️ KV cache 大户（llama 架构），16K=7.0G、64K=13G 超预算。日常只能小窗口，建议 16K，极限 56K=12.8G（60K加载失败）。生成速度快（47.4 tok/s）。",
         "default_ctx": 16384,
         "vram_verified": true,
         "context_vram": {
@@ -191,7 +191,12 @@
         "multimodal": false,
         "notes": "无审查RP，DavidAU出品，Qwen3.5架构",
         "modality": "text",
-        "ctx": 65536
+        "ctx": 65536,
+        "full_name": "Qwen3.5-9B-The-Defiant-Fable-Uncensored-Heretic (DavidAU)",
+        "vendor": "DavidAU (社区) / mradermacher 量化",
+        "release": "2026",
+        "desc": "无审查角色扮演，Qwen3.5基座，DavidAU Heretic系列",
+        "detail": "DavidAU Heretic（异端）系列无审查角色扮演模型，基于 Qwen3.5-9B 通过 abliteration（权重消融去除拒绝方向）去除安全对齐。命名元素：Defiant Fable（对抗式叙事）、Heretic、NEO-IMATRIX、MAX-MTP。适合开放式角色扮演与创作。"
       },
       {
         "id": "gemma-4-12b-it:q4km",
@@ -212,7 +217,12 @@
         "multimodal": false,
         "notes": "旧GGUF纯文本版（无vision/audio张量），think:false必需",
         "modality": "text",
-        "ctx": 131072
+        "ctx": 131072,
+        "full_name": "Gemma 4 12B IT (Q4_K_M GGUF 纯文本版)",
+        "vendor": "Google DeepMind",
+        "release": "2026-06-03",
+        "desc": "Google 12B 多模态，旧GGUF纯文本版（无vision/audio）",
+        "detail": "Google DeepMind Gemma 4 12B 指令调优版，encoder-free 统一多模态架构（无视觉/音频编码器，线性层直投）。此为旧 GGUF 纯文本版（无 vision/audio 张量），需 think:false 否则回复异常。混合注意力（局部滑动窗口+全局），256K官方上下文。"
       },
       {
         "id": "gemma-4-12b-it:q8_0",
@@ -232,7 +242,12 @@
         "multimodal": true,
         "notes": "Q8权重11.8G+KV，16G卡全档超13G，仅适合20G+机器，不推荐日常",
         "modality": "multimodal",
-        "ctx": 65536
+        "ctx": 65536,
+        "full_name": "Gemma 4 12B IT (Q8_0 GGUF)",
+        "vendor": "Google DeepMind",
+        "release": "2026-06-03",
+        "desc": "Google 12B 多模态，Q8高质量版（16G卡不推荐日常）",
+        "detail": "Gemma 4 12B IT Q8_0 量化版，权重 11.8G + KV cache。16G 卡全档超 13G 预算（64K=14.4G），仅适合 20G+ 显存机器。高质量量化，适合对精度要求高的场景。"
       },
       {
         "id": "gemma4:12b-it-q4_K_M",
@@ -253,7 +268,12 @@
         "multimodal": true,
         "notes": "官方多模态版（vision+audio完整），64K选定，think:false必需",
         "modality": "multimodal",
-        "ctx": 65536
+        "ctx": 65536,
+        "full_name": "Gemma 4 12B IT (官方多模态 Q4_K_M)",
+        "vendor": "Google DeepMind",
+        "release": "2026-06-03",
+        "desc": "Google 12B 官方多模态（vision+audio完整），64K选定",
+        "detail": "Gemma 4 12B IT 官方多模态版，含完整 vision+audio 张量（支持图片+30秒音频输入）。encoder-free 架构，单次前向处理所有模态，降低多模态延迟。混合注意力，内置 thinking 模式。需 think:false，64K 选定（10.4G），128K=11.0G。"
       },
       {
         "id": "minicpm5-1b:q4km",
@@ -274,7 +294,12 @@
         "multimodal": true,
         "notes": "小模型极省，生成快，纯文本（官方text-only）",
         "modality": "multimodal",
-        "ctx": 131072
+        "ctx": 131072,
+        "full_name": "MiniCPM5-1B (Q4_K_M)",
+        "vendor": "面壁智能 (OpenBMB) + 清华大学",
+        "release": "2026-05-19",
+        "desc": "1B小钢炮，2B以下全球最强，128K上下文，仅0.66GB",
+        "detail": "面壁智能 MiniCPM5-1B，AA-Index V4.0 2B 以下全球第一（17.9分），超越 Qwen3.5-2B（16.3分）。全球首例用 AI 生产训练框架（ForgeTrain）完成训练。INT4 Q4_K_M 仅 ~656MB，手机/浏览器/纯CPU可跑。128K上下文，支持 thinking/tools，代码数学工具调用全面领先同尺寸。HF 86.1万下载、1089 likes。"
       },
       {
         "id": "qwen3.5:0.8b",
@@ -296,7 +321,12 @@
         "multimodal": true,
         "notes": "官方多模态，256K选定，三档全稳，替换qwen3:0.6b",
         "modality": "multimodal",
-        "ctx": 262144
+        "ctx": 262144,
+        "full_name": "Qwen3.5-0.8B Instruct (多模态)",
+        "vendor": "阿里巴巴 通义千问",
+        "release": "2026-03-02",
+        "desc": "0.8B超轻量多模态，262K上下文，替换qwen3:0.6b",
+        "detail": "Qwen3.5 家族最小档，Gated DeltaNet 线性注意力（解码速度远快于传统注意力小模型），早期多模态融合。262K 上下文架构上限，带视觉能力（image-text-to-text）。与 397B 旗舰同架构，智能密度高。相比 Qwen3-0.6B：上下文 40K→262K、新增视觉、能力+2.5分。201语言支持。"
       },
       {
         "id": "minicpm5-fable5:q8",
@@ -317,7 +347,12 @@
         "multimodal": true,
         "notes": "Q8档仍省，RP模型，纯文本",
         "modality": "multimodal",
-        "ctx": 131072
+        "ctx": 131072,
+        "full_name": "MiniCPM5-1B-Claude-Opus-Fable5-V2-Thinking (Q8)",
+        "vendor": "GnLOLot (社区微调) / 基座 面壁智能",
+        "release": "2026-07-13",
+        "desc": "Claude Fable5 风格 1B 思考模型，Q8档，非无审查",
+        "detail": "基于 MiniCPM5-1B，用 Claude Fable 5 推理轨迹做 SFT 后训练（非经典蒸馏，只学行为/推理模式）。V2 版改进：更强工具调用、编码、指令遵循。保留 MiniCPM5 原生 thinking 模板 + 思维链输出。128K上下文。⚠️ 本模型不是无审查版（老师 Claude Fable 5 本身带安全护栏），无审查变体为 heretic 版。HF 26.9万下载。"
       }
     ],
     "combos": {
@@ -420,7 +455,7 @@
         "detail": "通义万相 Wan2.2 TI2V 5B 文生视频模型（9.3GB FP16，峰值 ~10.9G）。16GB 卡实测只能做氛围/意境类短片（风景、慢镜头、单一主体）；人物复杂动作必翻车。必须配 wan2.2_vae.safetensors（48 通道）。"
       },
       {
-        "id": "ace_step_1.5_turbo_aio.safetensors",
+        "id": "ACE-Step-1.5",
         "name": "ACE-Step 1.5",
         "vram_gb": 6.0,
         "exclusive": true,
@@ -432,7 +467,7 @@
         "detail": "ACE-Step 1.5 Turbo 文生音乐模型（AI-All-in-One 单文件）。轻量写歌，评测 7.5 分，有轻微断音；Music3 表现更优，本模型作备选。"
       },
       {
-        "id": "LTX-2.5-Distilled-Q4_K_S.gguf",
+        "id": "LTX-2.5-Q4",
         "name": "LTX-2.5 Distilled",
         "vram_gb": 10.0,
         "exclusive": true,
@@ -444,7 +479,7 @@
         "detail": "LTX-2.5 Distilled 文生视频模型，Q4_K_S 量化（GGUF）。蒸馏版轻量快速，适合低显存跑短视频。已登记，工作流模板待导出。"
       },
       {
-        "id": "hunyuanvideo1.5_480p_t2v_cfg_distilled_fp8_scaled.safetensors",
+        "id": "HunyuanVideo-1.5",
         "name": "HunyuanVideo 1.5",
         "vram_gb": 10.0,
         "exclusive": true,
