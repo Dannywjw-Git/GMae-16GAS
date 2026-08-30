@@ -37,6 +37,14 @@ LOG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 LOG_FILE = os.path.join(LOG_DIR, "vram-console.log")
 
+# === 前端版本控制 ===
+# FRONTEND_VERSION=v2 → 新版前端（web/ 目录，模块化重写）
+# FRONTEND_VERSION=v1 → 旧版前端（index.html，归档可工作版本）
+# 默认 v2，出问题时设为 v1 可快速回滚
+FRONTEND_VERSION = os.environ.get("FRONTEND_VERSION", "v2").lower()
+WEB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "web")
+LEGACY_HTML = os.path.join(os.path.dirname(os.path.abspath(__file__)), "legacy", "v1-index.html")
+
 logger = logging.getLogger("gmae")
 logger.setLevel(logging.INFO)
 # 文件日志：按天轮转，保留 30 天
@@ -2226,6 +2234,56 @@ def scene_switch(scene):
     }
 
 
+# MIME 类型映射
+MIME_TYPES = {
+    ".html": "text/html; charset=utf-8",
+    ".css": "text/css; charset=utf-8",
+    ".js": "application/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".map": "application/json",
+}
+
+
+def serve_static_file(self, path):
+    """服务 web/ 目录下的静态文件（CSS/JS/图片/字体）
+    路径格式：/web/css/main.css → web/css/main.css
+    防止目录穿越：只允许 web/ 目录下的文件
+    """
+    # 去掉 /web/ 前缀
+    rel_path = path[5:] if path.startswith("/web/") else path
+    # 防止目录穿越
+    rel_path = rel_path.replace("..", "").lstrip("/")
+    full_path = os.path.join(WEB_DIR, rel_path)
+
+    if not os.path.isfile(full_path):
+        self._json({"ok": False, "error": "file not found"}, 404)
+        return
+
+    ext = os.path.splitext(full_path)[1].lower()
+    content_type = MIME_TYPES.get(ext, "application/octet-stream")
+
+    try:
+        with open(full_path, "rb") as f:
+            data = f.read()
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self.wfile.write(data)
+    except Exception as e:
+        self._json({"ok": False, "error": str(e)}, 500)
+
+
 def health_check():
     """健康检查：各服务连通性 + 显存状态"""
     result = {"ok": True, "ts": time.time(), "services": {}}
@@ -2463,12 +2521,24 @@ def registry_view():
 
 
 def read_html():
-    path = os.path.join(BASE_DIR, "index.html")
+    """根据 FRONTEND_VERSION 返回对应版本的前端 HTML
+    v2 → web/index.html（新版模块化前端）
+    v1 → legacy/v1-index.html（旧版归档，可工作的历史版本）
+    """
+    if FRONTEND_VERSION == "v1":
+        path = LEGACY_HTML
+    else:
+        path = os.path.join(WEB_DIR, "index.html")
     try:
         with open(path, "rb") as f:
             return f.read()
     except Exception:
-        return b"index.html not found"
+        # v2 前端不存在时回退到旧版
+        try:
+            with open(LEGACY_HTML, "rb") as f:
+                return f.read()
+        except Exception:
+            return b"index.html not found"
 
 
 def read_login_html():
@@ -2571,6 +2641,10 @@ class Handler(BaseHTTPRequestHandler):
         self._send(code, json.dumps(obj, ensure_ascii=False).encode("utf-8"))
 
     def do_GET(self):
+        # 静态文件服务（新版前端的 CSS/JS/图片）
+        if self.path.startswith("/web/"):
+            serve_static_file(self, self.path)
+            return
         if self.path == "/" or self.path == "/index.html":
             # 未设置管理员或未登录 → 返回登录页；已登录 → 返回主应用
             if not auth_mod.has_admin() or not self._current_user():
