@@ -1322,16 +1322,25 @@ function switchScene(id){
   const oldAnn = annEl ? annEl.innerHTML : "";
   if(annEl) annEl.innerHTML = `<span class="stt">●</span><span>⏳ 正在切换到「${s.nm}」…（停止/启动容器，约 15-60 秒）</span>`;
   document.querySelectorAll(".scene-card").forEach(e=>e.classList.add("busy"));
+  // 超时保护：120秒后强制重置 busy，防止 API 挂起导致无法再次切换
+  const timeoutId = setTimeout(()=>{
+    busy=false;
+    document.querySelectorAll(".scene-card").forEach(e=>e.classList.remove("busy"));
+    if(annEl) annEl.innerHTML = oldAnn;
+    log("✘ 切换超时（>120秒），已重置状态，可重试");
+  }, 120000);
   apiFetch("/api/scene",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scene:id})})
     .then(r=>r.json()).then(d=>{
+      clearTimeout(timeoutId);
       if(d.actions) d.actions.forEach(a=>{
         const star=a.rc===0?"✔":"✘";
         log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
       });
       log(d.ok?"✅ 完成：当前 "+s.nm:"❌ 异常: "+id);
       if(annEl && d.ok) annEl.innerHTML = `<span class="stt">●</span><span>✅ 已切换到「${s.nm}」</span>`;
+      else if(annEl) annEl.innerHTML = oldAnn;
       refresh();
-    }).catch(e=>{ log("✘ 请求失败: "+e); if(annEl) annEl.innerHTML = oldAnn; })
+    }).catch(e=>{ clearTimeout(timeoutId); log("✘ 请求失败: "+e); if(annEl) annEl.innerHTML = oldAnn; })
     .finally(()=>{ busy=false; document.querySelectorAll(".scene-card").forEach(e=>e.classList.remove("busy")); });
 }
 function switchCombo(id){
