@@ -1307,8 +1307,20 @@ function guardEvict(){
 /* ===== 操作 ===== */
 function switchScene(id){
   if(busy) return;
-  const s = SCENES.find(x=>x.id===id); if(!s) return;
+  // C2: 优先从 registry.scenes 动态查找，fallback 到硬编码 SCENES
+  let s = null;
+  if(REGISTRY_DATA && REGISTRY_DATA.scenes && REGISTRY_DATA.scenes[id]){
+    const rs = REGISTRY_DATA.scenes[id];
+    s = {id:id, nm:rs.label||id, vr:"~"+(rs.vram_budget_gb||"?")+"G", ic:SCENE_ICONS[id]||"📦"};
+  } else {
+    s = SCENES.find(x=>x.id===id);
+  }
+  if(!s) return;
   busy=true; log("▶ 切换: "+id+"（"+s.nm+" · "+s.vr+"）");
+  // 显示切换中状态
+  const annEl = $("announce");
+  const oldAnn = annEl ? annEl.innerHTML : "";
+  if(annEl) annEl.innerHTML = `<span class="stt">●</span><span>⏳ 正在切换到「${s.nm}」…（停止/启动容器，约 15-60 秒）</span>`;
   document.querySelectorAll(".scene-card").forEach(e=>e.classList.add("busy"));
   apiFetch("/api/scene",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({scene:id})})
     .then(r=>r.json()).then(d=>{
@@ -1317,8 +1329,9 @@ function switchScene(id){
         log("  "+star+" "+a.step+" → rc="+a.rc+(a.output?(" "+a.output.split("\n").pop()):""));
       });
       log(d.ok?"✅ 完成：当前 "+s.nm:"❌ 异常: "+id);
+      if(annEl && d.ok) annEl.innerHTML = `<span class="stt">●</span><span>✅ 已切换到「${s.nm}」</span>`;
       refresh();
-    }).catch(e=>log("✘ 请求失败: "+e))
+    }).catch(e=>{ log("✘ 请求失败: "+e); if(annEl) annEl.innerHTML = oldAnn; })
     .finally(()=>{ busy=false; document.querySelectorAll(".scene-card").forEach(e=>e.classList.remove("busy")); });
 }
 function switchCombo(id){
