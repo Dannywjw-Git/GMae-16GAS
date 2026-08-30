@@ -2189,11 +2189,25 @@ def scene_switch(scene):
     LAST_SCENE["scene"] = scene
     duration_ms = int((time.time() - start_time) * 1000)
     gpu_after = gpu_status()
+    # 关键步骤检查：启动容器/等待就绪/预释放显存 失败则整体失败
+    # 非关键步骤（stop容器/stop模型/可选释放）失败不影响整体成功
+    CRITICAL_PREFIXES = ("start ", "wait ", "pre-release ")
+    failed_critical = []
+    for name, (rc, out) in results:
+        if any(name.startswith(p) for p in CRITICAL_PREFIXES) and rc != 0:
+            failed_critical.append(name)
+    overall_ok = len(failed_critical) == 0
     log_event("scene_switch_done", scene=scene, duration_ms=duration_ms,
-              vram_free_after=gpu_after.get("free_mb"), actions_count=len(results))
-    return {"ok": True, "scene": scene, "actions": [
-        {"step": name, "rc": rc, "output": out[-300:]} for name, (rc, out) in results
-    ]}
+              vram_free_after=gpu_after.get("free_mb"), actions_count=len(results),
+              ok=overall_ok, failed_critical=failed_critical)
+    return {
+        "ok": overall_ok,
+        "scene": scene,
+        "error": "关键步骤失败: " + ", ".join(failed_critical) if failed_critical else None,
+        "actions": [
+            {"step": name, "rc": rc, "output": out[-300:]} for name, (rc, out) in results
+        ]
+    }
 
 
 def health_check():
