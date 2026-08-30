@@ -1796,8 +1796,6 @@ function refresh(){
       $("vramPct").textContent=pct+"%";
       const ring=$("vramRing");
       ring.style.background = `conic-gradient(from -90deg, #0d9488 0%, #14b8a6 ${Math.max(pct*0.5,1)}%, #2dd4bf ${pct}%, var(--card-hover) ${pct}%)`;
-      $("hmUsed").textContent=fmtMb(g.used_mb);
-      $("hmTotal").textContent=fmtMb(g.total_mb);
     } else { $("vPct").textContent="nvidia-smi 不可用"; }
     const sc = SCENES.find(s=>s.id===d.scene);
     $("hmScene").textContent = (sc?sc.ic+" "+sc.nm:d.scene)||"--";
