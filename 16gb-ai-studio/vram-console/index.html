@@ -1603,6 +1603,46 @@ function loadRegistry(){
       REGISTRY_DATA = d;  // C2: 保存完整 registry 数据（scenes/combos/models）
       const oms=d.ollama_models||[], cms=d.comfyui_models||[];
       REG_MODELS = oms.concat(cms);
+      /* G5: 从 registry 动态生成 BUDGET_ROWS（覆盖硬编码），实现配置驱动 */
+      const sceneMap = {llm:["dialogue"], image:["comfy"], audio:["comfy"], music:["comfy"], video:["comfy"], embedding:["dialogue"], reranker:["dialogue"]};
+      const dynRows = [];
+      // 系统底噪（固定行）
+      dynRows.push({svc:"🖥️ 系统底噪", vram:"空载 ~1.0G（实测 0.9~1.1G）", allow:"任意场景 · 固定", key:null, scenes:["dialogue","comfy","fooocus","game"], use:"桌面、浏览器等系统占用（Ollama 空载时实测 905~1062 MiB）"});
+      // Ollama 模型动态行
+      oms.forEach(m=>{
+        const cat = m.category||"llm";
+        const scenes = sceneMap[cat] || ["dialogue"];
+        const exclusive = m.exclusive ? " · 独占全卡" : "";
+        dynRows.push({
+          svc: (CAT_ICON[cat]||"💬")+" "+(m.name||m.id),
+          vram: "~"+(m.vram_gb||0)+"G"+(m.ctx?"（"+Math.round(m.ctx/1024)+"K）":""),
+          allow: "仅对话态"+exclusive,
+          key: m.id, cont:null, model_id:null,
+          scenes: scenes,
+          use: m.description||(m.full_name||"")
+        });
+      });
+      // ComfyUI 模型动态行
+      cms.forEach(m=>{
+        const cat = m.category||"image";
+        const scenes = sceneMap[cat] || ["comfy"];
+        const exclusive = m.exclusive ? " · 独占全卡" : "";
+        dynRows.push({
+          svc: (CAT_ICON[cat]||"🎨")+" "+(m.name||m.id)+"（ComfyUI）",
+          vram: "~"+(m.vram_gb||0)+"G",
+          allow: "仅 ComfyUI 场景"+exclusive,
+          key:null, cont:"comfyui", model_id:m.id,
+          scenes: scenes,
+          use: m.description||(m.full_name||"")
+        });
+      });
+      // Fooocus（固定行）
+      dynRows.push({svc:"🖼️ Fooocus（极简端）", vram:"~6.9G", allow:"仅 Fooocus 场景 · 用毕必停", key:null, cont:"fooocus", model_id:null, scenes:["fooocus"], use:"简单画图，零门槛"});
+      // rerank（固定行）
+      dynRows.push({svc:"🔍 rerank 桩（9997）", vram:"0（CPU）", allow:"任意场景", key:null, scenes:["dialogue","comfy","fooocus","game"], use:"搜资料时排先后（禁删）"});
+      // Sunshine（固定行）
+      dynRows.push({svc:"🎮 Sunshine（串流）", vram:"2~4G", allow:"仅游戏态", key:null, scenes:["game"], use:"打游戏串流用"});
+      BUDGET_ROWS = dynRows;  // 覆盖硬编码
       renderModelCards();
       renderScenes();  // C2: 从 registry 动态渲染场景
       renderCombos();  // C2: 从 registry 动态渲染组合
