@@ -1,0 +1,24 @@
+/**
+ * GMae 指挥家 - pages/guard.css
+ * 门卫页：状态横幅 + 进程明细表
+ */
+
+.guard-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.guard-suggest {
+  margin-top: 2px;
+}
+
+/* 进程表 */
+.table td {
+  vertical-align: middle;
+}
+
+/* 强制结束按钮最小化 */
+.btn--sm {
+  padding: 4px 10px;
+  font-size: var(--text-xs);
+}

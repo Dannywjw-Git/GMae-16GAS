@@ -1,40 +1,111 @@
 /**
- * GMae 指挥家 v2.0 - 应用入口
- * 模块化前端重写版本
+ * GMae 指挥家 v2.0 - 应用入口（main.js）
+ * 职责：装配核心模块 → 构建布局（sidebar+header+content）→ 注册页面 → 启动路由
+ * 技术规范：ES Modules，无全局变量，零构建工具
  */
 
-const APP_VERSION = 'v2.0.0-alpha';
-const APP_NAME = 'GMae 指挥家';
+import { store } from './core/state.js';
+import { events } from './core/events.js';
+import router, { register, setContainer } from './core/router.js';
+import { authApi } from './core/api.js';
+import toast from './components/toast.js';
+import sidebar from './components/sidebar.js';
+import header from './components/header.js';
 
-function init() {
+export const APP_VERSION = 'v2.0.0-alpha';
+export const APP_NAME = 'GMae 指挥家';
+
+/* ========== 布局构建 ========== */
+
+function buildLayout() {
   const app = document.getElementById('app');
-  if (!app) return;
-
   app.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#121212;color:#e0e0e0;font-family:sans-serif;">
-      <div style="font-size:48px;margin-bottom:16px;">🎼</div>
-      <h1 style="font-size:24px;margin-bottom:8px;color:#5c6bc0;">${APP_NAME}</h1>
-      <div style="font-size:14px;color:#9e9e9e;margin-bottom:32px;">版本 ${APP_VERSION}</div>
-      <div style="background:#1e1e1e;padding:24px 32px;border-radius:12px;border:1px solid #333;max-width:500px;text-align:center;">
-        <div style="font-size:16px;margin-bottom:12px;color:#e0e0e0;">🚧 前端模块化重写进行中</div>
-        <div style="font-size:13px;color:#9e9e9e;line-height:1.8;">
-          新前端采用 ES Modules 模块化架构<br>
-          核心层 / 组件层 / 页面层 三级隔离<br>
-          预计分 5 个阶段完成全部功能迁移
-        </div>
-      </div>
-      <div style="margin-top:32px;font-size:12px;color:#616161;">
-        如需使用旧版，请设置环境变量 FRONTEND_VERSION=v1 后重启服务
+    <div class="app">
+      <div data-slot="sidebar"></div>
+      <div class="app-main">
+        <div data-slot="header"></div>
+        <main class="app-content" id="app-content"></main>
       </div>
     </div>
   `;
-
-  console.log(`[GMae] ${APP_NAME} ${APP_VERSION} 已启动`);
+  app.querySelector('[data-slot="sidebar"]').appendChild(sidebar.render());
+  app.querySelector('[data-slot="header"]').appendChild(header.render());
+  // 页面渲染到 content 区
+  setContainer('#app-content');
 }
 
-// DOM 就绪后初始化
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
+/* ========== 全局事件接线 ========== */
+
+function wireGlobalEvents() {
+  // 认证失效 → 跳回登录页
+  events.on('auth:unauthorized', () => {
+    window.location.href = '/login';
+  });
+
+  // API 错误 → 统一打印（Toast 组件会展示）
+  events.on('api:error', ({ message }) => {
+    if (message) console.warn(`[api] ${message}`);
+  });
+
+  // 路由变化 → 同步 store.ui.activePage + 更新顶栏标题
+  events.on('route:change', ({ name, found, title }) => {
+    if (found) store.update('ui', { activePage: name });
+  });
 }
+
+/* ========== 页面注册 ========== */
+
+async function registerPages() {
+  // 阶段 1：总览
+  const { default: dashboard } = await import('./pages/dashboard.js');
+  register('dashboard', dashboard);
+
+  // v0.3.1：C-Eng 指挥家对话页
+  const { default: chat } = await import('./pages/chat.js');
+  register('chat', chat);
+
+  // 阶段 2：模型登记台 + 显存账本
+  const { default: models } = await import('./pages/models.js');
+  register('models', models);
+  const { default: vram } = await import('./pages/vram.js');
+  register('vram', vram);
+
+  // 阶段 3：场景切换 + 任务队列
+  const { default: scenes } = await import('./pages/scenes.js');
+  register('scenes', scenes);
+  const { default: queue } = await import('./pages/queue.js');
+  register('queue', queue);
+
+  // 阶段 4：门卫 + 日志 + 设置
+  const { default: guard } = await import('./pages/guard.js');
+  register('guard', guard);
+  const { default: logs } = await import('./pages/logs.js');
+  register('logs', logs);
+  const { default: settings } = await import('./pages/settings.js');
+  register('settings', settings);
+}
+
+/* ========== 启动 ========== */
+
+async function bootstrap() {
+  store.update('ui', { version: APP_VERSION });
+  toast.init();
+  wireGlobalEvents();
+  buildLayout();
+
+  // 认证状态初始化
+  try {
+    const auth = await authApi.status();
+    store.set('auth', auth);
+    header.setTitle('总览');
+  } catch (e) {
+    store.set('auth', { status: 'unknown', error: String(e.message || e) });
+  }
+
+  await registerPages();
+  router.start();
+
+  console.log(`[GMae] ${APP_NAME} ${APP_VERSION} 已启动，页面：${router.list().join(', ')}`);
+}
+
+bootstrap();

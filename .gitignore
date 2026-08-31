@@ -50,12 +50,14 @@ desktop.ini
 
 # === 模型文件（大文件，不入库） ===
 models/
+model_parts/
 *.safetensors
 *.gguf
 *.bin
 *.pt
 *.pth
 *.ckpt
+fooocus_expansion.bin
 
 # === 输出产物（图/视频/音频，不入库） ===
 outputs/

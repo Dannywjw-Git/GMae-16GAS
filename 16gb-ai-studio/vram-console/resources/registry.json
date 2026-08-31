@@ -592,16 +592,40 @@
     ],
     "protect": [
       {
-        "name": "open-webui",
-        "note": "Web 前端，永不驱逐"
+        "name": "open-webui-open-webui-1",
+        "note": "OWUI 前端，永不驱逐"
       },
       {
-        "name": "immich",
-        "note": "照片库服务，永不驱逐"
+        "name": "immich-server",
+        "note": "Immich 照片库服务，永不驱逐"
+      },
+      {
+        "name": "immich-database",
+        "note": "Immich 数据库，永不驱逐"
+      },
+      {
+        "name": "immich-redis",
+        "note": "Immich Redis，永不驱逐"
+      },
+      {
+        "name": "immich-machine-learning",
+        "note": "Immich ML 加速服务，不停止"
       },
       {
         "name": "ollama",
-        "note": "服务本体（仅驱逐其加载的模型，不杀容器）"
+        "note": "Ollama 服务本体（仅驱逐其加载的模型，不杀容器）"
+      },
+      {
+        "name": "caddy",
+        "note": "反向代理，永不驱逐"
+      },
+      {
+        "name": "searxng",
+        "note": "搜索引擎，永不驱逐"
+      },
+      {
+        "name": "n8n-n8n-1",
+        "note": "工作流自动化，永不驱逐"
       }
     ],
     "unknown_policy": "warn",
@@ -613,7 +637,9 @@
     "vram_reserve_gb": 2.5,
     "m1_threshold_mb": 4096,
     "watchdog_restart_delay_s": 5,
-    "watchdog_max_restarts_per_hour": 10
+    "watchdog_max_restarts_per_hour": 10,
+    "gpu_container_scan": true,
+    "gpu_container_scan_note": "一键释放时自动扫描未在 gpu_guard.managed/protect 中登记但挂载了 GPU 的运行容器并停止"
   },
   "scanner": {
     "description": "模型扫描器扫描目标（蓝图§10.3，配置驱动）：type=docker_dir 扫容器内目录；type=api 拉HTTP模型列表。换容器名/目录/API，或加其他容器（fooocus 等），只改这里，不碰代码。",

@@ -1,4 +1,4 @@
-# GMae_Amanda 工作区（GMae 独立推进舱）
+﻿# GMae_Amanda 工作区（GMae 独立推进舱）
 
 > **定位**：本文件夹是 **GMae 指挥家**（GMae-16GAS 开源大赛参赛项目）的**独立推进工作区**，与 `D:\Users\Danny\Documents\家庭智能中枢` **完全切割**（2026-08-28 主公指示，最高优先）。
 > **用法**：所有 GMae 相关的开发/规划/材料/**全部输出**一律在本工作区推进与落盘；**不回写主仓库、不读取主仓库**（历史遗留文件除外，按需可读作参考）。
@@ -52,6 +52,7 @@
 | 3 | **看门狗登记册** | `16gb-ai-studio\vram-console\WATCHDOGS.md` | 操作约束 | 所有自启动/看门狗的唯一登记处，**禁止重复创建** |
 | 4 | **16GAS 项目记忆** | `16gb-ai-studio\AGENTS.md` | 子项目权威 | 详细服务清单、操作约束、当前状态 |
 | 5 | **显存管理最高指南** | `docs\显存管理最高指南.md` | 技术权威 | 16GB 单卡调度的最高规则，**违反会死机** |
+| 5.1 | **代码工程最高指南** | `docs\代码工程最高指南.md` | 工程权威 | 代码分层/状态/可测试性/并发安全的最高规则，**违反会代码腐烂**（与显存指南并列双最高指南） |
 | 6 | **调度中心架构与交互设计** | `16gb-ai-studio\docs\调度中心架构与交互设计.md` | 子项目权威 | 16GAS 的设计框架（架构+机制+交互），实施前必读 |
 | 7 | **进度跟踪** | `16gb-ai-studio\docs\项目进度跟踪.md` | 状态 | 当前任务状态，避免重复工作 |
 | 8 | **开发日志** | `16gb-ai-studio\docs\开发日志.md` | 历史 | 踩坑记录，避免重蹈覆辙 |
@@ -108,6 +109,27 @@
 | 全局脚本 | `scripts_global\` |
 | 产出物（图/视频/音频） | `outputs\`（images/、videos/、audio/ 子目录） |
 
+## 🧩 Skill 资产（2026-08-31 登记，6 个项目级 Skill 已整合）
+
+| 资产 | 位置 | 说明 |
+|------|------|------|
+| 系统技能库 | `.skills`（约 100 个） | 平台预装标准 Skill，全部可直接调用（data-analysis / lark-doc / visualization 等） |
+| **项目级用户技能库** | `.user_skills/` | **本工作区自建 Skill，6 个（见下方清单），所有 GMae 相关任务优先使用** |
+| 模型评测方法论 | `docs/models/` | model-benchmark-suite 的方法论文档体系：模型评测台帐.md（10 分制）、模型测试计划_三层评测_v1.0.md、模型评测报告_多模态全栈、README（档案索引+建档模板）、9 个单模型档案 |
+| 协作工作契约 | `docs/与主公协作沟通要求.md` | 与主公协同的工作守则（称呼/风格/方式/汇报/安全/记忆），接手必读 |
+
+### 项目级 Skill 清单（`.user_skills/`）
+
+| Skill | 定位 | 核心能力 |
+|-------|------|---------|
+| **gmae-vram-governance** | 显存管理铁律（最高权威） | 16GB 单卡显存预算、四大稳态切换、8 条红线、10 条必须条款、新服务准入流程、大模型显存评估清单 |
+| **gmae-runtime-ops** | 运行时操作工具箱 | 显存释放脚本（gpu_release/vram_cleanup）、游戏态切换（game-on）、ComfyUI 工作流运行器（run_comfy.js）、6 个已验证工作流（SDXL/Flux/H3/Music3） |
+| **model-benchmark-suite** | 模型综合评估套件 | 跨模态批量评估脚本（comfyui/ollama/vram_monitor）、31 条标准 Prompt、A/B 盲评 Elo 方法论、16GB 显存可行性判定、量化损失曲线 |
+| **aria2-multithread-download** | 智能路由下载 | HF 自动走 hf-mirror、国内厂商走 ModelScope、国外源回退 VPS、16 线程断点续传、完整性验证 |
+| **vps-download-relay** | VPS 中转下载 | HTTP 文件中转 + Docker Registry 中转两种模式、大文件下载回退通道（ai-registry-jp 东京 52G） |
+| **creation-log** | 创作日志 | 记录每次生成的环境/参数/时长/显存/SageAttention/用户评分，JSONL 格式，支持统计和 SageAttention 性能对比 |
+
+> **使用优先级**：涉及显存 → 先过 gmae-vram-governance；生成任务 → gmae-runtime-ops；模型评测 → model-benchmark-suite；下载模型 → aria2-multithread-download（回退 vps-download-relay）；生成完成 → creation-log 记录。
 ---
 
 ## 🌐 基础设施与 VPS
@@ -157,9 +179,9 @@
 
 1. 先查 `docs/开发日志.md` — 可能已有踩坑记录和解决方案
 2. 再查 `docs/显存管理最高指南.md` — 显存相关问题的最高权威
-3. 查 `16gb-ai-studio/AGENTS.md` — 服务详情和操作约束
-4. 查 `vram-console/WATCHDOGS.md` — 自启动/看门狗相关问题
-
+3. 查 `docs/代码工程最高指南.md` — 代码结构/分层/重构相关问题的最高权威
+4. 查 `16gb-ai-studio/AGENTS.md` — 服务详情和操作约束
+5. 查 `vram-console/WATCHDOGS.md` — 自启动/看门狗相关问题
 ---
 
 *本文件是项目总入口，任何 Agent 接手必须先读。更新此文件需同步更新相关文档。*

@@ -1,0 +1,121 @@
+/**
+ * GMae 指挥家 - components/button.css
+ * 按钮体系：主/次/危险/幽灵 + 尺寸 + 图标按钮
+ * BEM：.btn .btn--primary .btn--sm .btn--icon
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--txt);
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast),
+    transform var(--transition-fast), opacity var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  background: var(--card-hover);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 主按钮（主题色） */
+.btn--primary {
+  background: var(--primary);
+  color: var(--txt-inverse);
+}
+.btn--primary:hover {
+  background: var(--primary-light);
+}
+
+/* 成功/正向操作 */
+.btn--ok {
+  background: var(--ok);
+  color: var(--txt-inverse);
+}
+.btn--ok:hover {
+  filter: brightness(1.1);
+}
+
+/* 危险/破坏性操作 */
+.btn--danger {
+  background: var(--bad);
+  color: var(--txt-inverse);
+}
+.btn--danger:hover {
+  filter: brightness(1.1);
+}
+
+/* 幽灵按钮（透明底+边框） */
+.btn--ghost {
+  background: transparent;
+  border-color: var(--line);
+  color: var(--txt-secondary);
+}
+.btn--ghost:hover {
+  background: var(--bg-tertiary);
+  color: var(--txt);
+}
+
+/* 大按钮（动作层主操作） */
+.btn--lg {
+  padding: 12px 24px;
+  font-size: var(--text-lg);
+  border-radius: var(--radius-lg);
+}
+
+/* 小按钮 */
+.btn--sm {
+  padding: 4px 10px;
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+}
+
+/* 图标按钮（方形容器） */
+.btn--icon {
+  padding: 8px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--txt-secondary);
+}
+.btn--icon:hover {
+  background: var(--bg-tertiary);
+  color: var(--txt);
+}
+
+/* Panic 大按钮：极端时刻永远可见、红色、大 */
+.btn--panic {
+  position: fixed;
+  left: var(--space-md);
+  bottom: var(--space-md);
+  z-index: var(--z-sticky);
+  padding: 12px 20px;
+  background: var(--bad);
+  color: #fff;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.btn--panic:hover {
+  filter: brightness(1.15);
+}

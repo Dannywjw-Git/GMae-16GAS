@@ -1,0 +1,49 @@
+/**
+ * GMae 指挥家 - pages/settings.css
+ * 设置页：信息卡 + 键值行
+ */
+
+.settings-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.settings-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--line-dark);
+  font-size: var(--text-sm);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row span:first-child {
+  color: var(--txt-secondary);
+  flex-shrink: 0;
+}
+
+.settings-input {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  color: var(--txt);
+  padding: 8px 10px;
+  font-size: var(--text-sm);
+  font-family: inherit;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}

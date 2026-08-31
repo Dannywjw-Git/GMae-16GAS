@@ -1,0 +1,36 @@
+/**
+ * GMae 指挥家 - components/table.css
+ * 数据表格（显存账本/进程明细等）
+ * 【骨架】组件阶段完善
+ */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--txt-secondary);
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line-dark);
+  color: var(--txt);
+  vertical-align: middle;
+}
+
+.table tr:hover td {
+  background: var(--bg-tertiary);
+}
+
+.table .num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

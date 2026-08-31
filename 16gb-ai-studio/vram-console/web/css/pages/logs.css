@@ -1,0 +1,59 @@
+/**
+ * GMae 指挥家 - pages/logs.css
+ * 日志页：事件流
+ */
+
+.logs-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  font-size: var(--text-xs);
+}
+
+.log-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.log-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.log-item--err {
+  background: rgba(229, 57, 53, 0.06);
+}
+
+.log-item__time {
+  color: var(--txt-tertiary);
+  flex-shrink: 0;
+  font-size: 11px;
+}
+
+.log-item__level {
+  flex-shrink: 0;
+}
+
+.log-item__label {
+  color: var(--txt);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.log-item__extra {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

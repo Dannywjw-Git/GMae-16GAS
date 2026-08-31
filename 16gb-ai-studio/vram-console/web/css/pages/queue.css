@@ -1,0 +1,86 @@
+/**
+ * GMae 指挥家 - pages/queue.css
+ * 队列页：提交表单 + 任务列表
+ */
+
+.queue-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+/* 提交表单 */
+.q-submit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+
+.q-submit__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.q-submit__label {
+  color: var(--txt-tertiary);
+}
+
+.q-submit select,
+.q-submit input,
+.q-submit textarea {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-sm);
+  color: var(--txt);
+  padding: 8px 10px;
+  font-size: var(--text-sm);
+  font-family: inherit;
+}
+
+.q-submit select:focus,
+.q-submit input:focus,
+.q-submit textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* 任务列表 */
+.q-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.q-item {
+  position: relative;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  padding-right: 70px;
+}
+
+.q-item__model {
+  font-weight: 600;
+  color: var(--txt);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.q-item__meta {
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.q-item__cancel {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}

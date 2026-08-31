@@ -1,0 +1,25 @@
+/**
+ * GMae 指挥家 - components/chart.css
+ * 图表组件（显存趋势折线图、饼图、柱状图）
+ * 【骨架】组件阶段完善
+ */
+
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chart__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  color: var(--txt-tertiary);
+  font-size: var(--text-sm);
+}

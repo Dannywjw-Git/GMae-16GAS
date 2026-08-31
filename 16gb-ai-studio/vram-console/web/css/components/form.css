@@ -1,0 +1,80 @@
+/**
+ * GMae 指挥家 - components/form.css
+ * 表单控件（输入框/选择/开关）
+ * 【骨架】组件阶段完善
+ */
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--txt);
+  font-size: var(--text-base);
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary-light);
+}
+
+.field {
+  margin-bottom: var(--space-md);
+}
+
+.field__label {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--txt-secondary);
+  margin-bottom: var(--space-xs);
+}
+
+/* 开关（设置页列表项） */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch__slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+  cursor: pointer;
+}
+
+.switch__slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  top: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+}
+
+.switch input:checked + .switch__slider {
+  background: var(--primary);
+}
+
+.switch input:checked + .switch__slider::before {
+  transform: translateX(18px);
+}

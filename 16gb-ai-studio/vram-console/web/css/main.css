@@ -13,6 +13,16 @@
 @import './components/table.css';
 @import './components/form.css';
 @import './components/chart.css';
+@import './components/demo.css';
+@import './pages/dashboard.css';
+@import './pages/chat.css';
+@import './pages/models.css';
+@import './pages/vram.css';
+@import './pages/scenes.css';
+@import './pages/queue.css';
+@import './pages/guard.css';
+@import './pages/logs.css';
+@import './pages/settings.css';
 
 body {
   font-family: var(--font-sans);
@@ -42,16 +52,12 @@ body {
   padding: var(--space-lg);
 }
 
-/* 页面容器 */
+/* 页面容器（新架构：路由每次只渲染一个页面到 content，无需 display:none 切换） */
 .page {
-  display: none;
+  display: block;
   max-width: var(--content-max-width);
   margin: 0 auto;
   animation: fadeIn 0.3s ease;
-}
-
-.page.active {
-  display: block;
 }
 
 @keyframes fadeIn {
@@ -68,6 +74,137 @@ body {
 /* 页面标题 */
 .page-header {
   margin-bottom: var(--space-lg);
+}
+
+/* 顶部栏（header 组件） */
+.topbar {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0 var(--space-lg);
+  background: var(--header);
+  border-bottom: 1px solid var(--line-dark);
+  flex-shrink: 0;
+}
+
+.topbar__left {
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar__title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--txt);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topbar__actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.topbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+.topbar__version {
+  font-size: var(--text-xs);
+  color: var(--txt-tertiary);
+  font-family: var(--font-mono);
+}
+
+.topbar__user {
+  font-size: var(--text-sm);
+  color: var(--txt-secondary);
+}
+
+/* Spinner（loading 组件） */
+.spinner {
+  display: inline-block;
+  border: 2px solid var(--line);
+  border-top-color: var(--primary-light);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 全屏/区块加载层 */
+.loading-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2xl);
+}
+
+.loading-overlay__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  color: var(--txt-secondary);
+}
+
+/* 骨架屏 */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-md);
+}
+
+.skeleton-card {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--card-hover) 50%, var(--bg-tertiary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius: var(--radius-sm);
+  height: 12px;
+}
+
+.skeleton--title {
+  height: 18px;
+}
+
+.skeleton--line {
+  height: 10px;
+}
+
+@keyframes shimmer {
+  to { background-position: -200% 0; }
+}
+
+/* 图表标签 */
+.chart__label {
+  fill: var(--txt-tertiary);
+  font-size: 10px;
+  font-family: var(--font-sans);
+}
+
+/* 模态确认框文字 */
+.modal-confirm {
+  color: var(--txt);
+  font-size: var(--text-base);
+  line-height: 1.6;
 }
 
 .page-title {
@@ -203,3 +340,11 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+
+/* 显存危险等级闪烁动画 */
+@keyframes dangerBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+

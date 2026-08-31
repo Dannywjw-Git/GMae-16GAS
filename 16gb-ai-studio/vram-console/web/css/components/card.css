@@ -1,0 +1,78 @@
+/**
+ * GMae 指挥家 - components/card.css
+ * 卡片体系：圆角 12px + 柔和阴影 + Hover 上浮（蓝图 11.4）
+ */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: var(--space-md);
+  transition: box-shadow var(--transition-base), transform var(--transition-base),
+    border-color var(--transition-base);
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* 卡片头部 */
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.card__title {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--txt);
+}
+
+.card__subtitle {
+  font-size: var(--text-xs);
+  color: var(--txt-tertiary);
+  margin-top: 2px;
+}
+
+.card__body {
+  color: var(--txt);
+}
+
+/* 统计卡片 */
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.stat-card__label {
+  font-size: var(--text-xs);
+  color: var(--txt-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.stat-card__value {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--txt);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card__hint {
+  font-size: var(--text-xs);
+  color: var(--txt-tertiary);
+  margin-top: var(--space-xs);
+}

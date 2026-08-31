@@ -1,0 +1,157 @@
+/**
+ * GMae 指挥家 - pages/scenes.css
+ * 场景页：卡片网格 + 组合 pills + 切换日志
+ */
+
+.scenes-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+/* 场景卡片网格（蓝图 11.4：卡片式 + Hover 上浮） */
+.scene-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-md);
+}
+
+.scene-card {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow var(--transition-base), transform var(--transition-base),
+    border-color var(--transition-base), opacity var(--transition-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  font-family: inherit;
+}
+
+.scene-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  border-color: var(--line-light);
+}
+
+.scene-card--active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.scene-card.is-busy {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.scene-card__icon {
+  font-size: 26px;
+}
+
+.scene-card__name {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--txt);
+}
+
+.scene-card__modes {
+  font-size: var(--text-xs);
+  color: var(--txt-secondary);
+  line-height: 1.5;
+}
+
+.scene-card__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+
+.scene-card__vram {
+  font-size: var(--text-xs);
+  color: var(--txt-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* 组合 pills（仅对话态显示） */
+.scene-combos {
+  display: flex;
+  flex-direction: column;
+}
+
+.scene-combos.hidden {
+  display: none;
+}
+
+.combo-pills {
+  flex-wrap: wrap;
+}
+
+.combo-pill {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: var(--text-sm);
+  color: var(--txt-secondary);
+  cursor: pointer;
+  transition: border-color var(--transition-base), color var(--transition-base);
+  font-family: inherit;
+}
+
+.combo-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary-light);
+}
+
+.combo-pill--active {
+  border-color: var(--primary);
+  color: var(--primary-light);
+  background: var(--bg-primary);
+}
+
+.combo-pill__ctx {
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--txt-tertiary);
+  font-family: var(--font-mono);
+}
+
+/* 切换日志 */
+.scene-log {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm);
+  max-height: 220px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.scene-log__item {
+  padding: 3px 0;
+  color: var(--txt-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scene-log__item.is-err {
+  color: var(--bad);
+}
+
+.scene-log__mark {
+  margin-right: 6px;
+  color: var(--ok);
+}
+
+.scene-log__item.is-err .scene-log__mark {
+  color: var(--bad);
+}
+
+.scene-log__step {
+  margin-right: 8px;
+}

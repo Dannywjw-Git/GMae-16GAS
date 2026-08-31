@@ -48,14 +48,20 @@ def _port_open():
 
 
 def _health_ok():
-    """探测2：/api/health 内容校验（检测服务内部是否正常，防半死状态）"""
+    """探测2：/api/health 内容校验（检测服务内部是否正常，防半死状态）。
+
+    注意：health 返回的 ok 字段反映的是下游服务（ollama/comfyui 等）连通状态，
+    不代表调度中心 server 本身是否存活。server 健康时若下游容器未运行，ok 也会是
+    false。若看门狗用 ok==True 作为存活标准，会在下游容器未启动时误判 server
+    半死而疯狂重启，堆积大量重复实例（2026-08-31 事故根因）。
+    因此这里只校验：HTTP 200 且返回结构包含 services（说明 health_check 正常执行）。
+    """
     try:
-        with urllib.request.urlopen("http://127.0.0.1:{}/api/health".format(PORT), timeout=3) as r:
+        with urllib.request.urlopen("http://127.0.0.1:{}/api/health".format(PORT), timeout=15) as r:  # timeout=15：health 会对未运行容器端口做 HTTP 探测等待数秒，3s 会误判半死
             if r.status != 200:
                 return False
             data = json.loads(r.read().decode("utf-8"))
-            # 校验：ok=true 且 services 存在（说明 health_check 正常执行，非僵死）
-            return data.get("ok") is True and "services" in data
+            return "services" in data
     except Exception:
         return False
 

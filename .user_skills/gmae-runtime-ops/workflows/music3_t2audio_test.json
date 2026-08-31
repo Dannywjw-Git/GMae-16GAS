@@ -1,0 +1,70 @@
+{
+  "1": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "minimax_music3_text_encoder_pruned_int8_convrot.safetensors",
+      "type": "minimax"
+    }
+  },
+  "2": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "minimax_music3_dit_fp16.safetensors",
+      "weight_dtype": "fp8_e4m3fn"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_music3_dav.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "MiniMaxMusic3TextEncode",
+    "inputs": {
+      "clip": ["1", 0],
+      "caption": "A relaxing lo-fi hip hop beat with warm piano chords, smooth vinyl crackle, and a mellow drum groove. Perfect for late night study sessions.",
+      "lyrics": "",
+      "seed": 42,
+      "max_duration": 5.0,
+      "cfg_scale": 1.5,
+      "top_k": 50
+    }
+  },
+  "5": {
+    "class_type": "EmptyMiniMaxMusic3LatentAudio",
+    "inputs": {
+      "seconds": 5.0,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["2", 0],
+      "seed": 42,
+      "steps": 10,
+      "cfg": 1.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "positive": ["4", 0],
+      "negative": ["4", 0],
+      "latent_image": ["5", 0],
+      "denoise": 1.0
+    }
+  },
+  "7": {
+    "class_type": "VAEDecodeAudio",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["3", 0]
+    }
+  },
+  "8": {
+    "class_type": "SaveAudio",
+    "inputs": {
+      "audio": ["7", 0],
+      "filename_prefix": "music3/GMae-test"
+    }
+  }
+}

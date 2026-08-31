@@ -26,7 +26,32 @@ USERS_FILE = os.path.join(BASE_DIR, "users.json")
 SESSION_COOKIE_NAME = "gmae_session"
 SESSION_DEFAULT_TTL = 7 * 24 * 3600       # 7 天
 SESSION_REMEMBER_TTL = 30 * 24 * 3600      # 30 天（记住我）
-SESSIONS = {}  # session_id -> {user_email, expires_at, created_at}
+SESSIONS_FILE = os.path.join(BASE_DIR, "sessions.json")
+SESSIONS = {}  # session_id -> {user_email, expires_at, created_at, remember}
+
+def _load_sessions():
+    """启动时从 sessions.json 加载持久化 session（重启不丢登录态）。"""
+    global SESSIONS
+    try:
+        if os.path.exists(SESSIONS_FILE):
+            with open(SESSIONS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            now = int(time.time())
+            SESSIONS = {k: v for k, v in data.items() if v.get("expires_at", 0) > now}
+            if len(SESSIONS) < len(data):
+                _save_sessions()  # 清理过期后回写
+    except Exception:
+        SESSIONS = {}
+
+def _save_sessions():
+    """持久化 session 到 sessions.json。"""
+    try:
+        with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(SESSIONS, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+_load_sessions()  # 模块加载时恢复 session
 
 # 验证码配置
 RESET_CODES = {}  # email -> {code, expires_at, attempts}
@@ -183,6 +208,7 @@ def create_session(email, remember=False):
         "created_at": int(time.time()),
         "remember": remember,
     }
+    _save_sessions()
     return session_id
 
 
@@ -202,6 +228,7 @@ def get_session(session_id):
 def destroy_session(session_id):
     """销毁 Session（登出）"""
     SESSIONS.pop(session_id, None)
+    _save_sessions()
 
 
 def _clear_user_sessions(email):

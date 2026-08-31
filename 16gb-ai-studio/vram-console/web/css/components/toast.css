@@ -1,0 +1,52 @@
+/**
+ * GMae 指挥家 - components/toast.css
+ * Toast 通知（操作成功/失败提示，蓝图 11.4 平滑交互）
+ * 【骨架】组件阶段完善
+ */
+
+.toast-container {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 240px;
+  max-width: 360px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  color: var(--txt);
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  animation: toastIn 0.25s ease;
+  pointer-events: auto;
+}
+
+.toast--success { border-left: 3px solid var(--ok); }
+.toast--error { border-left: 3px solid var(--bad); }
+.toast--info { border-left: 3px solid var(--info); }
+.toast--warn { border-left: 3px solid var(--warn); }
+
+.toast--leave {
+  animation: toastOut 0.25s ease forwards;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(24px); }
+}
