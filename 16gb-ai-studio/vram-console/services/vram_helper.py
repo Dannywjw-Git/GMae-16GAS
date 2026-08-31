@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 vram-helper.py — 最小提权 Helper（方案A，2026-08-28）
@@ -23,7 +23,7 @@ PORT = 8788
 HOST = "127.0.0.1"
 
 
-def _read_idle_timeout():
+def _read_idle_timeout() -> int:
     """空闲超时（秒）：无任何请求超过该时长 → 自动退出（安全增强，提权进程用完即走）。
     优先级：命令行 --idle-timeout > config.json helper_idle_timeout > 默认 300s。"""
     try:
@@ -43,12 +43,12 @@ IDLE_TIMEOUT = _read_idle_timeout()
 _last_activity = time.time()
 
 
-def _touch():
+def _touch() -> None:
     global _last_activity
     _last_activity = time.time()
 
 
-def _idle_monitor():
+def _idle_monitor() -> None:
     """后台监控：空闲超时自动退出（记录日志）。"""
     while True:
         time.sleep(10)
@@ -62,7 +62,7 @@ def _idle_monitor():
             return
 
 
-def _log(msg):
+def _log(msg: str) -> None:
     """helper 生命周期日志（诊断意外退出用，如"3 分钟自动关闭"）。"""
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = "{} | pid={} | {}".format(ts, os.getpid(), msg)
@@ -74,7 +74,7 @@ def _log(msg):
         pass
 
 
-def _read_token():
+def _read_token() -> str:
     # 优先级：命令行 --token > config.json
     try:
         i = sys.argv.index("--token")
@@ -92,7 +92,7 @@ def _read_token():
 TOKEN = _read_token()
 
 
-def _is_admin():
+def _is_admin() -> bool:
     try:
         import ctypes
         return bool(ctypes.windll.shell32.IsUserAnAdmin())
@@ -100,7 +100,7 @@ def _is_admin():
         return False
 
 
-def desktop_vram():
+def desktop_vram() -> dict:
     """读性能计数器 GPU Process Memory\\Dedicated Usage → 逐进程 GPU 显存（需管理员）。
     - 多实例计数器必须用 (*) 通配语法
     - 实例名格式 pid_<pid>_luid_...（多 GPU 引擎），需提取 pid 并映射进程名
@@ -134,7 +134,7 @@ def desktop_vram():
 PROTECT = {"explorer", "dwm", "csrss", "winlogon", "services", "lsass", "wininit", "taskhostw"}
 
 
-def desktop_kill(pid):
+def desktop_kill(pid: int) -> dict:
     """结束桌面进程：taskkill /F，保护系统关键进程 + 低 PID。"""
     try:
         pid = int(pid)
@@ -206,7 +206,7 @@ class H(BaseHTTPRequestHandler):
         return self._json({"ok": False, "error": "not found"}, 404)
 
 
-def main():
+def main() -> None:
     _log("vram-helper starting (admin={}, idle_timeout={}s)".format(_is_admin(), IDLE_TIMEOUT))
     threading.Thread(target=_idle_monitor, daemon=True).start()
     try:

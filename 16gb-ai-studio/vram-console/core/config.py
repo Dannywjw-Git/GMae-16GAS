@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 核心配置模块
@@ -78,8 +78,8 @@ HARDWARE_PROFILE_PATH = os.path.join(BASE_DIR, "resources", "hardware_profile.js
 _dyn_thresholds = None
 
 try:
-    import hardware_probe
-    import thresholds as thresholds_mod
+    from core import hardware_probe
+    from core import thresholds as thresholds_mod
     _V031_MODULES = True
 except ImportError as _e:
     _V031_MODULES = False

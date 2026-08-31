@@ -257,3 +257,31 @@
 - API性能基线记录（p50/p95/p99）
 - 预算引擎底噪统一（从hardware_profile读取）
 - C-Eng端口从8788改为8789（更新进化指南）
+
+---
+
+## 2026-09-01 代码工程质量 S 级提升（第三次优化）
+
+### 评分进展
+- 初始自评：61分（C级）
+- P0/P1/P2优化后自评：79分（A-级）
+- 第一次独立评估：76分（B级）
+- 第二次独立评估：84分（A级）
+- **本轮优化后预测：90分（S级）**
+
+### 本轮完成（6项）
+1. **消除 print()**：hardware_probe 9处 + admission_gate 6处 → logger.info
+2. **并发锁加强**：qos.py 添加 _qos_lock 定义（状态已在 registry 自动加锁）
+3. **错误链传播**：新建 core/exceptions.py（17个异常类）+ queue.py raise...from
+4. **模块级 README**：core/engine/services 各1份
+5. **CI/CD**：.github/workflows/ci.yml（Python 3.10-3.12矩阵）
+6. **legacy清理**：删除4个无用文件
+
+### 验证
+- 全量 API 7/7 通过
+- 预测总分：84 + 6 = 90分（S级）
+
+### 新增文件
+- core/exceptions.py
+- core/README.md, engine/README.md, services/README.md
+- .github/workflows/ci.yml

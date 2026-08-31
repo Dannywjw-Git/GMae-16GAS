@@ -10,7 +10,7 @@ from core.logger import log_error
 from core.utils import run_args
 
 
-def list_running_containers():
+def list_running_containers() -> set:
     """列出所有运行中的容器名称。
 
     Returns:
@@ -22,7 +22,7 @@ def list_running_containers():
     return {line.strip() for line in out.splitlines() if line.strip()}
 
 
-def container_exists(container_name):
+def container_exists(container_name: str) -> bool:
     """检查容器是否存在（运行中或已停止）。
 
     Args:
@@ -38,7 +38,7 @@ def container_exists(container_name):
     return rc == 0 and container_name in out
 
 
-def is_running(container_name):
+def is_running(container_name: str) -> bool:
     """检查容器是否正在运行。
 
     Args:
@@ -50,7 +50,7 @@ def is_running(container_name):
     return container_name in list_running_containers()
 
 
-def exec_command(container_name, command, timeout=60):
+def exec_command(container_name: str, command: list, timeout: int = 60) -> tuple:
     """在容器内执行命令。
 
     Args:
@@ -64,7 +64,7 @@ def exec_command(container_name, command, timeout=60):
     return run_args(["docker", "exec", container_name] + command, timeout)
 
 
-def stop_container(container_name, timeout=30):
+def stop_container(container_name: str, timeout: int = 30) -> tuple:
     """停止指定容器。
 
     Args:
@@ -80,7 +80,7 @@ def stop_container(container_name, timeout=30):
     return True, "stopped"
 
 
-def start_container(container_name, timeout=30):
+def start_container(container_name: str, timeout: int = 30) -> tuple:
     """启动指定容器。
 
     Args:
@@ -96,7 +96,7 @@ def start_container(container_name, timeout=30):
     return True, "started"
 
 
-def kill_process_in_container(container_name, pid, timeout=10):
+def kill_process_in_container(container_name: str, pid: int, timeout: int = 10) -> tuple:
     """在容器内 kill 指定 PID 的进程。
 
     Args:
@@ -113,7 +113,7 @@ def kill_process_in_container(container_name, pid, timeout=10):
     return True, "killed"
 
 
-def inspect_container(container_name, format_str, timeout=10):
+def inspect_container(container_name: str, format_str: str, timeout: int = 10) -> tuple:
     """docker inspect 容器，返回原始输出。
 
     Args:
@@ -127,7 +127,7 @@ def inspect_container(container_name, format_str, timeout=10):
     return run_args(["docker", "inspect", "--format", format_str, container_name], timeout)
 
 
-def container_action(container_name, action, timeout=60):
+def container_action(container_name: str, action: str, timeout: int = 60) -> tuple:
     """对容器执行 start/stop/restart 操作。
 
     Args:

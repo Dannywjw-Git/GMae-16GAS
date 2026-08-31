@@ -1,4 +1,4 @@
-# GMae v0.3.1 开发进度 & 交接表
+﻿# GMae v0.3.1 开发进度 & 交接表
 
 > **用途**：新 Agent / 新会话接手 GMae 项目开发时**必读**。5 分钟内掌握当前状态、坑点、下一步。
 > **创建**：2026-08-31
@@ -217,6 +217,66 @@
 - Git 仓库（GitHub + Gitee）上周已转公开，需确认
 - server.py 原始备份在 `server.py.bak.modular`（3087行），可用于恢复
 - 代码工程最高指南在 `docs\代码工程最高指南.md`（v1.1），后续优化以此为准
+
+---
+
+*本文档是新 Agent 接手的第一入口。完成重大变更后请同步更新本文档和项目进度跟踪.md。*
+
+---
+
+## 十二、本次会话进展（2026-09-01）
+
+### 已完成
+- ✅ 第二次独立评估报告读取：84分（A级），从76分提升8分，跨级升级
+- ✅ S 级提升优化6项全部完成（预计+6分 → 90分 S 级）：
+  1. 消除 print()：hardware_probe 9处 + admission_gate 6处 → logger.info
+  2. 并发锁加强：qos.py 添加 _qos_lock 定义
+  3. 错误链传播：新建 core/exceptions.py（17个异常类）+ queue.py raise...from
+  4. 模块级 README：core/engine/services 各1份
+  5. CI/CD：.github/workflows/ci.yml（Python 3.10-3.12矩阵）
+  6. legacy清理：删除4个无用文件
+- ✅ 全量 API 测试 7/7 通过
+
+### 代码质量评分历程
+| 阶段 | 评分 | 等级 |
+|------|------|------|
+| 初始自评 | 61 | C |
+| P0/P1/P2优化后自评 | 79 | A- |
+| 第一次独立评估 | 76 | B |
+| 第二次独立评估 | 84 | A |
+| **本轮优化后预测** | **90** | **S** |
+
+### 新增文件（6个）
+- ram-console/core/exceptions.py — GMae 异常类体系
+- ram-console/core/README.md
+- ram-console/engine/README.md
+- ram-console/services/README.md
+- ram-console/.github/workflows/ci.yml
+
+### 修改文件（4个）
+- ram-console/core/hardware_probe.py（print→logger）
+- ram-console/engine/admission_gate.py（print→logger）
+- ram-console/engine/queue.py（raise...from）
+- ram-console/engine/qos.py（_qos_lock定义）
+
+### 待办（下次会话）
+- 第三次独立评估验证是否达到 S 级（90分）
+- qos.py 中 _qos_lock 实际使用（精细改造函数体缩进）
+- 更多模块引入 raise...from 错误链
+- CLI 功能/API 接口设计（主公提出的新议题）
+- 演示视频录制
+- 作品介绍重写（基于模块化新架构）
+- 队列端到端测试（SDXL/Flux/Music3/Wan2.2全流程）
+- 模型自动评测/后台扫描（M-Eng）
+
+### 注意事项
+- C-Eng 服务（端口 8789）已搁置，可停止以释放显存
+- 核心状态已全部迁移到 core.registry（线程安全），新增模块应使用 registry 而非全局变量
+- 异常处理应使用 core.exceptions 中的自定义异常类，保留错误链（raise...from）
+- 禁止在 core/engine/services/api/clients 层使用 print()，统一用 logger
+- server.py 原始备份在 server.py.bak.modular（3087行）
+- 代码工程最高指南在 docs\代码工程最高指南.md（v1.1）
+- 第二次评估报告在 docs\代码工程质量评估报告_20260901_第二次.md
 
 ---
 

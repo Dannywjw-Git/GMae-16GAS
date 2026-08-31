@@ -11,8 +11,8 @@ import os
 import sys
 import unittest
 
-# 确保 vram-console 目录在 path 中
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 确保 vram-console 根目录在 path 中（run_tests.py 在 tests/ 下，父目录是 vram-console）
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 
 TEST_MODULES = [

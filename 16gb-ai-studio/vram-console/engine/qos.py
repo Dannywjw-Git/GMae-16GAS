@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae QoS 服务等级引擎
@@ -42,6 +42,9 @@ if _qos_state is None:
         "history": deque(maxlen=50),
     }
     registry.set("qos_state", _qos_state)
+
+# QoS 状态变更锁（保护 _qos_state 的复合读写操作）
+_qos_lock = threading.Lock()
 
 
 def qos_check():

@@ -1,0 +1,19 @@
+{
+  "gpus": [
+    {
+      "index": 0,
+      "name": "NVIDIA GeForce RTX 4060 Ti",
+      "vram_total_mb": 16380,
+      "driver_version": "591.86",
+      "cuda_version": ""
+    }
+  ],
+  "primary_gpu_index": 0,
+  "base_noise_mb": 3565,
+  "base_noise_confidence": "high",
+  "ram_total_mb": 0,
+  "os_type": "windows",
+  "docker_available": true,
+  "detected_at": 1788160414,
+  "profile_version": "1.0"
+}

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 任务队列模块
@@ -16,7 +16,9 @@ from core.logger import log_event, log_error
 from core.config import REGISTRY, BASE_DIR
 from core.registry import registry
 from engine.budget import budget_engine
-from engine.guard import gpu_guard_evict
+from core.exceptions import ConfigError
+from engine.gen_stats import load_gen_stats, save_gen_stats, update_gen_stats
+from engine.eviction_guard import gpu_guard_evict
 
 # 队列状态 — 已迁移到 registry（状态包装）
 _QUEUE_CLIENT_ID = str(uuid.uuid4())
@@ -35,7 +37,6 @@ _task_queue = _queue_state["task_queue"]
 _task_lock = threading.Lock()
 
 # 生成时间统计
-_GEN_STATS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "resources", "generation_stats.json")
 
 
 def _load_workflow(workflow_name):
@@ -46,8 +47,8 @@ def _load_workflow(workflow_name):
     try:
         with open(p, "r", encoding="utf-8-sig") as f:
             return json.load(f)
-    except Exception:
-        return None
+    except Exception as e:
+        raise ConfigError("工作流模板解析失败: %s" % workflow_name, detail={"file": p}) from e
 
 
 def _apply_params(wf, params):
@@ -74,38 +75,6 @@ def _apply_params(wf, params):
         if "filename_prefix" in params and "filename_prefix" in ins:
             ins["filename_prefix"] = params["filename_prefix"]
     return wf
-
-
-def _load_gen_stats() -> dict:
-    """读取生成时间统计 {model_id: {count, total_seconds, avg_seconds}}。"""
-    try:
-        with open(_GEN_STATS_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
-
-
-def _save_gen_stats(stats: dict) -> None:
-    """保存生成时间统计。"""
-    try:
-        os.makedirs(os.path.dirname(_GEN_STATS_PATH), exist_ok=True)
-        with open(_GEN_STATS_PATH, "w", encoding="utf-8") as f:
-            json.dump(stats, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        log_error("gen_stats_save_error", error=e)
-
-
-def _update_gen_stats(model_id: str, seconds: float) -> None:
-    """任务完成后更新该模型的生成时间统计。"""
-    if not model_id or seconds <= 0 or seconds > 3600:
-        return
-    stats = _load_gen_stats()
-    s = stats.get(model_id, {"count": 0, "total_seconds": 0, "avg_seconds": 0})
-    s["count"] += 1
-    s["total_seconds"] = round(s["total_seconds"] + seconds, 1)
-    s["avg_seconds"] = round(s["total_seconds"] / s["count"], 1)
-    stats[model_id] = s
-    _save_gen_stats(stats)
 
 
 def queue_enqueue(model: str, params: dict) -> dict:
@@ -201,7 +170,12 @@ def _run_task(task):
                 task["progress"] = "释放 L1/L2 显存…"
                 gpu_guard_evict()
                 time.sleep(2)
-        wf = _load_workflow(task["workflow"])
+        try:
+            wf = _load_workflow(task["workflow"])
+        except ConfigError as e:
+            task["status"] = "failed"
+            task["error"] = str(e)
+            return
         if not wf:
             task["status"] = "failed"
             task["error"] = "模板读取失败"
@@ -229,7 +203,7 @@ def _run_task(task):
         task["ended"] = int(time.time())
         if task["status"] == "done" and task.get("started"):
             elapsed = task["ended"] - task["started"]
-            _update_gen_stats(task["model"], elapsed)
+            update_gen_stats(task["model"], elapsed)
         log_event("queue_finish", task=task["id"], model=task["model"], status=task["status"],
                   err=task["error"][-200:] if task["error"] else "")
 

@@ -11,7 +11,7 @@ from core.logger import log_error
 from core.utils import run_args
 
 
-def query_gpu_memory():
+def query_gpu_memory() -> dict:
     """查询 GPU 显存总览（total/used/free/utilization）。
 
     Returns:
@@ -35,7 +35,7 @@ def query_gpu_memory():
     }
 
 
-def query_compute_apps():
+def query_compute_apps() -> dict:
     """查询宿主机 GPU 计算进程列表（pid + process_name）。
 
     Returns:
@@ -65,7 +65,7 @@ def query_compute_apps():
     return {"ok": rc == 0, "processes": processes, "count": len(processes)}
 
 
-def query_container_compute_pids(container_name):
+def query_container_compute_pids(container_name: str) -> list:
     """查询指定容器内的 GPU 计算进程 PID 列表。
 
     Args:
@@ -84,7 +84,7 @@ def query_container_compute_pids(container_name):
     return [l.strip() for l in out.splitlines() if l.strip().isdigit()]
 
 
-def query_container_processes(container_name):
+def query_container_processes(container_name: str) -> dict:
     """查询容器内所有进程（pid + comm）。
 
     Args:

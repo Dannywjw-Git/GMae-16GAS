@@ -1,4 +1,4 @@
-"""
+﻿"""
 GMae v0.3.1 — 准入闸门模块（AdmissionGate）
 
 所有写操作（场景切换、任务提交、模型加载、显存释放、进程驱逐）统一过闸门。
@@ -25,6 +25,7 @@ C-Eng 的 LLM 决策和用户手动操作共用同一闸门，确保铁律不可
 
 from dataclasses import dataclass, field
 from typing import Optional
+from core.logger import logger
 
 
 # 允许的 action 白名单
@@ -300,24 +301,24 @@ if __name__ == "__main__":
         danger_thresholds={"danger_mb": 15073, "free_target_mb": 2457}
     )
 
-    print("=== 准入闸门测试 ===\n")
+    logger.info("=== 准入闸门测试 ===\n")
 
     # 测试1：加载 SDXL（应该通过，因为会先释放9b）
     r1 = check("submit_task", {"model": "SDXL", "params": {"prompt": "test"}}, ctx)
-    print(f"测试1 - 提交 SDXL 任务: allowed={r1['allowed']}, reason={r1['reason']}")
+    logger.info(f"测试1 - 提交 SDXL 任务: allowed={r1['allowed']}, reason={r1['reason']}")
 
     # 测试2：加载 Flux（应该 R2 违规，因为已有9b）
     r2 = check("submit_task", {"model": "Flux-Q5", "params": {"prompt": "test"}}, ctx)
-    print(f"测试2 - 提交 Flux 任务: allowed={r2['allowed']}, violated={r2['violated_rules']}")
+    logger.info(f"测试2 - 提交 Flux 任务: allowed={r2['allowed']}, violated={r2['violated_rules']}")
 
     # 测试3：加载模型 ctx 超 8K（应该 R3 违规）
     r3 = check("load_model", {"model": "qwen3.5:9b", "ctx": 32768}, ctx)
-    print(f"测试3 - 加载 9b@32K: allowed={r3['allowed']}, violated={r3['violated_rules']}")
+    logger.info(f"测试3 - 加载 9b@32K: allowed={r3['allowed']}, violated={r3['violated_rules']}")
 
     # 测试4：未知 action（应该格式失败）
     r4 = check("destroy_gpu", {}, ctx)
-    print(f"测试4 - 未知 action: allowed={r4['allowed']}, reason={r4['reason']}")
+    logger.info(f"测试4 - 未知 action: allowed={r4['allowed']}, reason={r4['reason']}")
 
     # 测试5：未登记模型（应该 R7 违规）
     r5 = check("load_model", {"model": "unknown-model:7b"}, ctx)
-    print(f"测试5 - 未登记模型: allowed={r5['allowed']}, violated={r5['violated_rules']}")
+    logger.info(f"测试5 - 未登记模型: allowed={r5['allowed']}, violated={r5['violated_rules']}")

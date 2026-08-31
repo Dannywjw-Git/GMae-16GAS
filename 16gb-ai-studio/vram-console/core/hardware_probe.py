@@ -1,4 +1,4 @@
-"""
+﻿"""
 GMae v0.3.1 — 硬件探测模块（HardwareProbe）
 
 启动时自动探测硬件环境，生成 hardware_profile.json，为动态阈值提供数据基础。
@@ -16,6 +16,7 @@ import subprocess
 import time
 from dataclasses import dataclass, asdict
 from typing import Optional
+from core.logger import logger
 
 
 @dataclass
@@ -287,15 +288,15 @@ if __name__ == "__main__":
     profile_path = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "resources", "hardware_profile.json"
     )
-    print("GMae 硬件探测中...")
+    logger.info("GMae 硬件探测中...")
     p = generate_profile(measure_noise=True)
-    print(f"\nGPU: {p.gpus[0]['name'] if p.gpus else '未检测到'}")
-    print(f"显存: {p.gpus[0]['vram_total_mb'] if p.gpus else 0} MB")
-    print(f"底噪: {p.base_noise_mb} MB (置信度: {p.base_noise_confidence})")
-    print(f"内存: {p.ram_total_mb} MB")
-    print(f"系统: {p.os_type}")
-    print(f"Docker: {'可用' if p.docker_available else '不可用'}")
+    logger.info(f"\nGPU: {p.gpus[0]['name'] if p.gpus else '未检测到'}")
+    logger.info(f"显存: {p.gpus[0]['vram_total_mb'] if p.gpus else 0} MB")
+    logger.info(f"底噪: {p.base_noise_mb} MB (置信度: {p.base_noise_confidence})")
+    logger.info(f"内存: {p.ram_total_mb} MB")
+    logger.info(f"系统: {p.os_type}")
+    logger.info(f"Docker: {'可用' if p.docker_available else '不可用'}")
     if save_profile(p, profile_path):
-        print(f"\n配置已保存: {profile_path}")
+        logger.info(f"\n配置已保存: {profile_path}")
     else:
-        print(f"\n保存失败: {profile_path}")
+        logger.info(f"\n保存失败: {profile_path}")

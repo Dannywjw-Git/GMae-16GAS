@@ -1,0 +1,638 @@
+{
+  "scenario": "S5_新手第一天",
+  "timestamp": "2026-09-01T00:48:20.542359",
+  "checks": [
+    {
+      "name": "显存数据准确性（GMae vs nvidia-smi 误差<300MB）",
+      "passed": true,
+      "detail": "误差=4MB"
+    },
+    {
+      "name": "Ollama 模型加载后 GMae 正确感知",
+      "passed": true,
+      "detail": "感知到=['qwen3.5:9b']"
+    },
+    {
+      "name": "高负载时 guard_level 升级到 warning 以上",
+      "passed": true,
+      "detail": "level=critical"
+    },
+    {
+      "name": "高负载时给出具体建议",
+      "passed": true,
+      "detail": "suggest=[], advice=[{'id': 'ollama_stop_qwen3.5:9b', 'type': 'ollama_stop', 'target': 'qwen3.5:9b', 'title': '停止对话模型 qwen3.5:9b', 'recover_mb': 10240, 'actionable': True, 'reason': '停止可释放 10.0GB'}]"
+    },
+    {
+      "name": "系统进程不被误报为未登记",
+      "passed": true,
+      "detail": "unknown_pids=[]"
+    },
+    {
+      "name": "释放后显存回落到基线附近（>90%）",
+      "passed": true,
+      "detail": "恢复后free=15173MB, 基线free=14775MB"
+    }
+  ],
+  "snapshots": {
+    "baseline": {
+      "label": "基线",
+      "ts": 1788194772.935867,
+      "gmae_used_mb": 1333,
+      "gmae_free_mb": 14775,
+      "nvidia_used_mb": 1329,
+      "nvidia_free_mb": 14779,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "guard_suggest": [],
+      "advice_suggestions": [],
+      "known_procs": [
+        "python"
+      ],
+      "unknown_pids": [],
+      "unknown_mb": 0,
+      "ollama_models": [],
+      "comfy_models": [],
+      "scene": "comfy"
+    },
+    "after_ollama": {
+      "label": "加载 Ollama 后",
+      "ts": 1788194839.4742017,
+      "gmae_used_mb": 12018,
+      "gmae_free_mb": 4090,
+      "nvidia_used_mb": 12018,
+      "nvidia_free_mb": 4090,
+      "guard_level": "warning",
+      "guard_alerts": [
+        "显存空闲 4090MB < 4G，注意多余占用"
+      ],
+      "guard_suggest": [],
+      "advice_suggestions": [
+        {
+          "id": "ollama_stop_qwen3.5:9b",
+          "type": "ollama_stop",
+          "target": "qwen3.5:9b",
+          "title": "停止对话模型 qwen3.5:9b",
+          "recover_mb": 10240,
+          "actionable": true,
+          "reason": "停止可释放 10.0GB"
+        }
+      ],
+      "known_procs": [
+        "llama-server",
+        "python"
+      ],
+      "unknown_pids": [],
+      "unknown_mb": 242,
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [],
+      "scene": "comfy"
+    },
+    "after_comfy": {
+      "label": "加载 ComfyUI SDXL 后",
+      "ts": 1788194877.3390954,
+      "gmae_used_mb": 13592,
+      "gmae_free_mb": 2516,
+      "nvidia_used_mb": 13592,
+      "nvidia_free_mb": 2516,
+      "guard_level": "warning",
+      "guard_alerts": [
+        "显存空闲 2516MB < 4G，注意多余占用"
+      ],
+      "guard_suggest": [],
+      "advice_suggestions": [
+        {
+          "id": "ollama_stop_qwen3.5:9b",
+          "type": "ollama_stop",
+          "target": "qwen3.5:9b",
+          "title": "停止对话模型 qwen3.5:9b",
+          "recover_mb": 10240,
+          "actionable": true,
+          "reason": "停止可释放 10.0GB"
+        }
+      ],
+      "known_procs": [
+        "llama-server",
+        "python"
+      ],
+      "unknown_pids": [],
+      "unknown_mb": 256,
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [],
+      "scene": "comfy"
+    },
+    "high_load": {
+      "label": "高负载观察",
+      "ts": 1788194882.0522432,
+      "gmae_used_mb": 15916,
+      "gmae_free_mb": 192,
+      "nvidia_used_mb": 15898,
+      "nvidia_free_mb": 210,
+      "guard_level": "critical",
+      "guard_alerts": [
+        "显存空闲 192MB < 2G，逼近打满（死机风险），建议立即驱逐"
+      ],
+      "guard_suggest": [],
+      "advice_suggestions": [
+        {
+          "id": "ollama_stop_qwen3.5:9b",
+          "type": "ollama_stop",
+          "target": "qwen3.5:9b",
+          "title": "停止对话模型 qwen3.5:9b",
+          "recover_mb": 10240,
+          "actionable": true,
+          "reason": "停止可释放 10.0GB"
+        }
+      ],
+      "known_procs": [
+        "llama-server",
+        "python"
+      ],
+      "unknown_pids": [],
+      "unknown_mb": 0,
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [],
+      "scene": "comfy"
+    },
+    "recovered": {
+      "label": "恢复后",
+      "ts": 1788194900.5421195,
+      "gmae_used_mb": 935,
+      "gmae_free_mb": 15173,
+      "nvidia_used_mb": 946,
+      "nvidia_free_mb": 15162,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "guard_suggest": [],
+      "advice_suggestions": [],
+      "known_procs": [
+        "python"
+      ],
+      "unknown_pids": [],
+      "unknown_mb": 0,
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "scene": "comfy"
+    }
+  },
+  "guard_check": {
+    "ok": true,
+    "level": "critical",
+    "alerts": [
+      "显存空闲 210MB < 2G，逼近打满（死机风险），建议立即驱逐"
+    ],
+    "suggest": [],
+    "ts": 1788194882
+  },
+  "budget": {
+    "ok": true,
+    "total_gb": 16.0,
+    "noise_gb": 1.0,
+    "reserve_gb": 2.5,
+    "safe_ceiling_gb": 13.5,
+    "used_gb": 15.5,
+    "unreleasable_gb": 0.0,
+    "releasable_gb": 16.4,
+    "avail_gb": 12.5,
+    "models": [
+      {
+        "source": "ollama",
+        "id": "qwen3.5:9b",
+        "name": "Qwen3.5 9B",
+        "vram_gb": 9.9,
+        "exclusive": false,
+        "loaded": true,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "已加载（利用缓存）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 4分57秒",
+        "context_vram": {
+          "16384": 6.2,
+          "65536": 7.7,
+          "131072": 9.9,
+          "200704": 11.0
+        },
+        "default_ctx": 16384,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwen3:0.6b",
+        "name": "Qwen3 0.6B",
+        "vram_gb": 5.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分42秒",
+        "context_vram": {
+          "40960": 5.4
+        },
+        "default_ctx": 16384,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwythos-9b:q4km",
+        "name": "Qwythos 9B Q4KM",
+        "vram_gb": 7.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分45秒",
+        "context_vram": {
+          "16384": 6.0,
+          "65536": 7.5,
+          "131072": 10.3,
+          "196608": 12.5
+        },
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "darkidol-8b:q4km",
+        "name": "Darkidol 8B Q4KM",
+        "vram_gb": 7.0,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分30秒",
+        "context_vram": {
+          "16384": 7.0,
+          "57344": 12.8
+        },
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "bge-m3:latest",
+        "name": "BGE-M3 Embedding",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "bge-m3-cpu:latest",
+        "name": "BGE-M3 CPU",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qllama/bge-reranker-v2-m3:latest",
+        "name": "BGE Reranker V2 M3",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "defiant-9b:q4km",
+        "name": "defiant-9b:q4km",
+        "vram_gb": 8.6,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 4分18秒",
+        "context_vram": {
+          "16384": 7.1,
+          "65536": 8.6,
+          "131072": 10.0
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma-4-12b-it:q4km",
+        "name": "gemma-4-12b-it:q4km",
+        "vram_gb": 11.2,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分36秒",
+        "context_vram": {
+          "65536": 10.5,
+          "131072": 11.2
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma-4-12b-it:q8_0",
+        "name": "gemma-4-12b-it:q8_0",
+        "vram_gb": 14.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "free_L1",
+        "need_free_gb": 1.9,
+        "gap_gb": 0,
+        "note": "释放 1.9 GB（Ollama 停模型）后可加载",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 7分12秒",
+        "context_vram": {
+          "65536": 14.4
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma4:12b-it-q4_K_M",
+        "name": "gemma4:12b-it-q4_K_M",
+        "vram_gb": 10.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分12秒",
+        "context_vram": {
+          "65536": 10.4,
+          "131072": 11.0
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "minicpm5-1b:q4km",
+        "name": "minicpm5-1b:q4km",
+        "vram_gb": 5.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分42秒",
+        "context_vram": {
+          "65536": 3.6,
+          "131072": 5.4
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwen3.5:0.8b",
+        "name": "qwen3.5:0.8b",
+        "vram_gb": 6.6,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分18秒",
+        "context_vram": {
+          "65536": 3.5,
+          "131072": 4.5,
+          "262144": 6.6
+        },
+        "default_ctx": 262144,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "minicpm5-fable5:q8",
+        "name": "minicpm5-fable5:q8",
+        "vram_gb": 5.8,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分54秒",
+        "context_vram": {
+          "65536": 4.0,
+          "131072": 5.8
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "SDXL",
+        "name": "SDXL",
+        "vram_gb": 6.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": 26.2,
+        "gen_count": 6,
+        "est_time_text": "基于 6 次历史生成，平均约 26秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Flux-Q5",
+        "name": "Flux.1 Dev Q5",
+        "vram_gb": 11.7,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分51秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Music3",
+        "name": "MiniMax Music 3",
+        "vram_gb": 13.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "free_L2",
+        "need_free_gb": 0.5,
+        "gap_gb": 0,
+        "note": "释放 0.5 GB（ComfyUI /free）后可加载",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 6分30秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Wan2.2-TI2V",
+        "name": "Wan2.2 TI2V 5B",
+        "vram_gb": 10.9,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分27秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "ACE-Step-1.5",
+        "name": "ACE-Step 1.5",
+        "vram_gb": 6.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "LTX-2.5-Q4",
+        "name": "LTX-2.5 Distilled",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "HunyuanVideo-1.5",
+        "name": "HunyuanVideo 1.5",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      }
+    ],
+    "loaded_models": [
+      {
+        "source": "ollama",
+        "id": "qwen3.5:9b",
+        "name": "Qwen3.5 9B",
+        "vram_gb": 9.9,
+        "exclusive": false
+      }
+    ],
+    "ts": 1788194883
+  }
+}

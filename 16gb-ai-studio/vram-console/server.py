@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 指挥家显存调度系统 - 入口文件
@@ -32,13 +32,13 @@ from services.docker import (docker_containers, infer_scene, docker_action,
 from gpu.monitor import (gpu_status, _container_pids, _gpu_app_pids,
     desktop_gpu_processes, gpu_processes, _update_process_lifecycle, _find_pid_container,
     _proc_lifecycle, _proc_events)
-from gpu.guard import gpu_guard_kick, PROTECT_COMMS
+from gpu.process_guard import gpu_guard_kick, PROTECT_COMMS
 from engine.reaper import service_activity, start_idle_reaper
 from engine.qos import (qos_check, qos_status, qos_execute_suggestion, start_qos,
     auto_protect_status, auto_protect_config, QOS_CFG)
 from services.comfy_ws import ComfyWS, comfy_events, start_comfy_ws, _COMFY_EVENTS, _COMFY_EVENTS_LOCK
 from engine.budget import budget_engine, vram_advice
-from engine.guard import gpu_guard_check, gpu_guard_evict, GUARD_UNKNOWN_POLICY, GUARD_WARN_THRESHOLD
+from engine.eviction_guard import gpu_guard_check, gpu_guard_evict, GUARD_UNKNOWN_POLICY, GUARD_WARN_THRESHOLD
 from engine.scanner import model_scan, scan_register, start_auto_scanner
 from engine.queue import queue_enqueue, queue_snapshot, queue_cancel
 from services.scene import (scene_switch, combo_switch, service_action, model_action,
@@ -51,13 +51,13 @@ _get_threshold_value = get_threshold_value
 _dyn_thresholds = get_dyn_thresholds()
 
 # 认证模块
-import auth as auth_mod
+from api import auth as auth_mod
 
 # v0.3.1 模块
 try:
-    import hardware_probe
-    import thresholds as thresholds_mod
-    import admission_gate
+    from core import hardware_probe
+    from core import thresholds as thresholds_mod
+    from engine import admission_gate
 except ImportError as _e:
     log_error("v031_modules_import_failed_server", error=_e)
 

@@ -1,0 +1,19 @@
+﻿# 敏感文件
+config.json
+users.json
+.api_token
+sessions.json
+
+# 运行时生成
+__pycache__/
+*.pyc
+logs/
+*.log
+
+# 备份
+*.bak
+*.bak.*
+
+# IDE
+.vscode/
+.idea/

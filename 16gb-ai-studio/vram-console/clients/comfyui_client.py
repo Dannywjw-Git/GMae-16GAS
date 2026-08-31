@@ -13,7 +13,7 @@ from core.logger import log_error
 COMFY_BASE = "http://127.0.0.1:8188"
 
 
-def _get(path, timeout=5):
+def _get(path: str, timeout: int = 5) -> tuple:
     """发送 GET 请求到 ComfyUI API。
 
     Args:
@@ -31,7 +31,7 @@ def _get(path, timeout=5):
         return False, {}, str(e)
 
 
-def _post(path, body, timeout=30):
+def _post(path: str, body: dict, timeout: int = 30) -> tuple:
     """发送 POST 请求到 ComfyUI API。
 
     Args:
@@ -54,7 +54,7 @@ def _post(path, body, timeout=30):
         return False, 0, str(e)
 
 
-def system_stats():
+def system_stats() -> dict:
     """ComfyUI /system_stats：设备级显存实测（容器内服务自报，torch 视角）。
 
     Returns:
@@ -76,7 +76,7 @@ def system_stats():
     }
 
 
-def queue_status():
+def queue_status() -> dict:
     """ComfyUI /queue：正在跑 / 排队任务。
 
     Returns:
@@ -109,7 +109,7 @@ def queue_status():
     }
 
 
-def free_memory(unload_models=True, free_memory=True):
+def free_memory(unload_models: bool = True, free_memory: bool = True) -> dict:
     """调用 ComfyUI /free 端点，卸载模型 + 释放显存缓存。
 
     Args:
@@ -128,7 +128,7 @@ def free_memory(unload_models=True, free_memory=True):
     return {"ok": True, "http": http_code}
 
 
-def is_online():
+def is_online() -> bool:
     """检查 ComfyUI 服务是否在线。
 
     Returns:

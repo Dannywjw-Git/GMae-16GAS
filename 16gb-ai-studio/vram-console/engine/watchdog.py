@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GPU Maestro 看门狗 - 监控 server.py 进程，崩溃后自动重启
@@ -21,7 +21,7 @@ PORT = int(os.environ.get("VRAM_CONSOLE_PORT", "8787"))
 
 os.makedirs(os.path.join(BASE_DIR, "logs"), exist_ok=True)
 
-def log(msg):
+def log(msg: str) -> None:
     ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = "{} | {}".format(ts, msg)
     try:
@@ -34,7 +34,7 @@ def log(msg):
     except Exception:
         pass
 
-def _port_open():
+def _port_open() -> bool:
     """探测1：端口连通性（TCP 连接，检测端口是否在监听）"""
     import socket
     try:
@@ -47,7 +47,7 @@ def _port_open():
         return False
 
 
-def _health_ok():
+def _health_ok() -> bool:
     """探测2：/api/health 内容校验（检测服务内部是否正常，防半死状态）。
 
     注意：health 返回的 ok 字段反映的是下游服务（ollama/comfyui 等）连通状态，
@@ -66,7 +66,7 @@ def _health_ok():
         return False
 
 
-def _server_alive():
+def _server_alive() -> bool:
     """双探测：端口通 + health 正常 = 服务活着；端口通但 health 异常 = 半死，需重启"""
     port_up = _port_open()
     if not port_up:
@@ -77,7 +77,7 @@ def _server_alive():
     return health_ok
 
 
-def _start_server():
+def _start_server() -> None:
     return subprocess.Popen(
         [sys.executable, SERVER_SCRIPT],
         cwd=BASE_DIR,
@@ -86,7 +86,7 @@ def _start_server():
     )
 
 
-def main():
+def main() -> None:
     log("=" * 50)
     log("Watchdog started (port-based health), server: {}".format(SERVER_SCRIPT))
     log("Python: {}".format(sys.executable))

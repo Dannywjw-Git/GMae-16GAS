@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae v0.3.1 C-Eng — 认知引擎 HTTP 服务（端口 8789）
@@ -51,7 +51,7 @@ privacy_filter = PrivacyFilter(send_prompts_to_cloud=False)
 _decision_cache: dict = {}
 
 
-def add_cloud_provider(name: str, base_url: str, api_key: str, model: str):
+def add_cloud_provider(name: str, base_url: str, api_key: str, model: str) -> dict:
     """添加云端推理后端。"""
     provider = OpenAICompatProvider(name=name, base_url=base_url, api_key=api_key, model=model)
     provider_manager.add_provider(provider)
@@ -179,7 +179,7 @@ class CEngHandler(BaseHTTPRequestHandler):
         pass  # 静默 HTTP 日志
 
 
-def main():
+def main() -> None:
     print("=" * 60)
     print("GMae v0.3.1 C-Eng — 认知引擎服务")
     print("=" * 60)

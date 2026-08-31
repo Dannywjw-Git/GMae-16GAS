@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 显存预算引擎模块
@@ -15,6 +15,7 @@ from services.ollama import ollama_ps
 from services.comfy import comfy_loaded_models
 from services.helper import _helper_health, _helper_req
 from engine.reaper import service_activity
+from engine.gen_stats import load_gen_stats
 
 
 def _calc_vram_breakdown(used_mb: int) -> dict:
@@ -226,8 +227,7 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
     safe_ceiling_mb = total_mb - reserve_mb
     gpu = gpu_status()
     procs = gpu_processes()
-    from engine.queue import _load_gen_stats  # 延迟导入避免循环依赖
-    gen_stats = _load_gen_stats()
+    gen_stats = load_gen_stats()
     unreleasable_mb = (procs.get("unknown_mb") or 0) + (procs.get("desktop_used_mb") or 0)
     releasable_mb = procs.get("known_total_mb") or 0
     ol_loaded = set()

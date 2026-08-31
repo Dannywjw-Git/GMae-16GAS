@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 GMae 调度中心认证模块
 - 用户管理（单管理员，users.json）
@@ -29,7 +29,7 @@ SESSION_REMEMBER_TTL = 30 * 24 * 3600      # 30 天（记住我）
 SESSIONS_FILE = os.path.join(BASE_DIR, "sessions.json")
 SESSIONS = {}  # session_id -> {user_email, expires_at, created_at, remember}
 
-def _load_sessions():
+def _load_sessions() -> None:
     """启动时从 sessions.json 加载持久化 session（重启不丢登录态）。"""
     global SESSIONS
     try:
@@ -43,7 +43,7 @@ def _load_sessions():
     except Exception:
         SESSIONS = {}
 
-def _save_sessions():
+def _save_sessions() -> None:
     """持久化 session 到 sessions.json。"""
     try:
         with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
@@ -69,7 +69,7 @@ SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 # 密码哈希（PBKDF2-HMAC-SHA256，Python 标准库，零依赖）
 # ============================================================
 
-def hash_password(password, salt=None, iterations=100000):
+def hash_password(password: str, salt: bytes = None, iterations: int = 100000) -> str:
     """生成密码哈希，返回格式 pbkdf2_sha256$100000$<salt_hex>$<hash_hex>"""
     if salt is None:
         salt = secrets.token_bytes(16)
@@ -79,7 +79,7 @@ def hash_password(password, salt=None, iterations=100000):
     return "pbkdf2_sha256${}${}${}".format(iterations, salt.hex(), dk.hex())
 
 
-def verify_password(password, stored_hash):
+def verify_password(password: str, stored_hash: str) -> bool:
     """验证密码是否匹配存储的哈希"""
     try:
         parts = stored_hash.split("$")
@@ -98,7 +98,7 @@ def verify_password(password, stored_hash):
 # 用户管理（单管理员，users.json）
 # ============================================================
 
-def _load_users():
+def _load_users() -> dict:
     """加载用户数据，失败返回空 dict"""
     try:
         with open(USERS_FILE, "r", encoding="utf-8") as f:
@@ -107,7 +107,7 @@ def _load_users():
         return {}
 
 
-def _save_users(users):
+def _save_users(users: dict) -> bool:
     """保存用户数据到 users.json"""
     try:
         with open(USERS_FILE, "w", encoding="utf-8") as f:
@@ -117,13 +117,13 @@ def _save_users(users):
         return False
 
 
-def has_admin():
+def has_admin() -> bool:
     """是否已设置管理员账户"""
     users = _load_users()
     return bool(users.get("admin"))
 
 
-def setup_admin(email, password):
+def setup_admin(email: str, password: str) -> tuple:
     """首次设置管理员账户。返回 (ok, message)"""
     if has_admin():
         return False, "管理员账户已存在，如需重置请使用忘记密码"
@@ -143,7 +143,7 @@ def setup_admin(email, password):
     return False, "保存用户数据失败"
 
 
-def authenticate(email, password):
+def authenticate(email: str, password: str) -> tuple:
     """验证邮箱+密码，返回 (ok, user_dict)"""
     users = _load_users()
     admin = users.get("admin")
@@ -156,7 +156,7 @@ def authenticate(email, password):
     return True, admin
 
 
-def change_password(email, old_password, new_password):
+def change_password(email: str, old_password: str, new_password: str) -> tuple:
     """修改密码。返回 (ok, message)"""
     ok, user = authenticate(email, old_password)
     if not ok:
@@ -174,7 +174,7 @@ def change_password(email, old_password, new_password):
     return False, "修改密码失败"
 
 
-def reset_password(email, code, new_password):
+def reset_password(email: str, code: str, new_password: str) -> tuple:
     """通过验证码重置密码。返回 (ok, message)"""
     ok, msg = _verify_reset_code(email, code)
     if not ok:
@@ -198,7 +198,7 @@ def reset_password(email, code, new_password):
 # Session 管理（Cookie + 内存存储）
 # ============================================================
 
-def create_session(email, remember=False):
+def create_session(email: str, remember: bool = False) -> str:
     """创建 Session，返回 session_id"""
     session_id = secrets.token_urlsafe(32)
     ttl = SESSION_REMEMBER_TTL if remember else SESSION_DEFAULT_TTL
@@ -212,7 +212,7 @@ def create_session(email, remember=False):
     return session_id
 
 
-def get_session(session_id):
+def get_session(session_id: str) -> dict:
     """获取 Session，过期返回 None"""
     if not session_id:
         return None
@@ -225,13 +225,13 @@ def get_session(session_id):
     return sess
 
 
-def destroy_session(session_id):
+def destroy_session(session_id: str) -> None:
     """销毁 Session（登出）"""
     SESSIONS.pop(session_id, None)
     _save_sessions()
 
 
-def _clear_user_sessions(email):
+def _clear_user_sessions(email: str) -> None:
     """清除指定用户的所有 Session（修改密码/重置密码后调用）"""
     email = email.strip().lower()
     expired = [sid for sid, s in SESSIONS.items() if s.get("user_email") == email]
@@ -239,7 +239,7 @@ def _clear_user_sessions(email):
         SESSIONS.pop(sid, None)
 
 
-def parse_cookie(cookie_header):
+def parse_cookie(cookie_header: str) -> dict:
     """解析 Cookie 头，返回 dict"""
     cookies = {}
     if not cookie_header:
@@ -256,7 +256,7 @@ def parse_cookie(cookie_header):
 # 密码重置验证码
 # ============================================================
 
-def generate_reset_code(email):
+def generate_reset_code(email: str) -> tuple:
     """生成密码重置验证码并发送邮件。返回 (ok, message)"""
     email = email.strip().lower()
     # 检查邮箱是否是管理员邮箱
@@ -277,7 +277,7 @@ def generate_reset_code(email):
     return False, "邮件发送失败: " + msg
 
 
-def _verify_reset_code(email, code):
+def _verify_reset_code(email: str, code: str) -> tuple:
     """验证重置验证码。返回 (ok, message)"""
     email = email.strip().lower()
     record = RESET_CODES.get(email)
@@ -299,7 +299,7 @@ def _verify_reset_code(email, code):
 # SMTP 邮件发送（QQ 邮箱，SSL 465）
 # ============================================================
 
-def _send_reset_email(to_email, code):
+def _send_reset_email(to_email: str, code: str) -> tuple:
     """发送密码重置验证码邮件。返回 (ok, message)"""
     if not SMTP_PASSWORD:
         return False, "SMTP 密码未配置（环境变量 SMTP_PASSWORD）"
@@ -347,7 +347,7 @@ def _send_reset_email(to_email, code):
 # 认证状态查询
 # ============================================================
 
-def auth_status():
+def auth_status() -> dict:
     """返回认证系统状态"""
     return {
         "has_admin": has_admin(),

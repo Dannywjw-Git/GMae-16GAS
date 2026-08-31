@@ -1,4 +1,7 @@
 {
-  "helper_token": "your_helper_token_here",
-  "helper_idle_timeout": 300
+  "helper_token": "6858769cf9dc44528ad5d2812133a9a2",
+  "auto_protect": {
+    "enabled": true,
+    "mode": "standard"
+  }
 }

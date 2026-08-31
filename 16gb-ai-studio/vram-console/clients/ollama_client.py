@@ -13,7 +13,7 @@ from core.logger import log_error
 OLLAMA_BASE = "http://127.0.0.1:11434"
 
 
-def _get(path, timeout=5):
+def _get(path: str, timeout: int = 5) -> tuple:
     """发送 GET 请求到 Ollama API。
 
     Args:
@@ -31,7 +31,7 @@ def _get(path, timeout=5):
         return False, {}, str(e)
 
 
-def list_loaded_models():
+def list_loaded_models() -> dict:
     """查询 Ollama 已加载模型（/api/ps）。
 
     Returns:
@@ -48,7 +48,7 @@ def list_loaded_models():
     return {"ok": True, "models": models}
 
 
-def list_installed_models():
+def list_installed_models() -> set:
     """获取已安装的 Ollama 模型名称集合（/api/tags）。
 
     Returns:
@@ -60,7 +60,7 @@ def list_installed_models():
     return {m.get("name", "") for m in d.get("models", [])}
 
 
-def is_online():
+def is_online() -> bool:
     """检查 Ollama 服务是否在线。
 
     Returns:

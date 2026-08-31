@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 状态汇总模块（应用服务层）
@@ -18,7 +18,7 @@ from core.config import (REGISTRY, get_threshold_value, VRAM_BASELINE_NOISE_MB,
                          VRAM_LOADING_SPEED_MB_PER_S, VRAM_LOADING_OVERHEAD_MB)
 from core.registry import registry
 from gpu.monitor import gpu_status, gpu_processes
-from engine.guard import gpu_guard_check
+from engine.eviction_guard import gpu_guard_check
 from services.docker import docker_containers, infer_scene
 from services.ollama import ollama_ps, ollama_tags
 from services.comfy import comfy_system_stats, comfy_queue
