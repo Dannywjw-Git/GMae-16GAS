@@ -1,0 +1,679 @@
+{
+  "scenario": "S2_贪心创作者",
+  "timestamp": "2026-09-01T00:54:33.278930",
+  "checks": [
+    {
+      "name": "预算引擎正确识别 Flux 显存不足",
+      "passed": true,
+      "detail": "decision=free_L2, gap=0GB"
+    },
+    {
+      "name": "高负载时 guard_level 升级",
+      "passed": false,
+      "detail": "level=ok"
+    },
+    {
+      "name": "自动防死机在 critical 时触发释放",
+      "passed": true,
+      "detail": "last_trigger={'ts': 1788195236.4773903, 'level': 'critical', 'free_mb': 247, 'actions': [{'level': 'L2', 'action': 'ComfyUI 释放生成模型显存'}]}"
+    },
+    {
+      "name": "系统未死机（测试正常完成）",
+      "passed": true,
+      "detail": "测试脚本正常执行完毕"
+    },
+    {
+      "name": "释放后显存回落到基线附近（>85%）",
+      "passed": false,
+      "detail": "恢复后free=8705MB, 基线free=15165MB"
+    },
+    {
+      "name": "全程最低空闲显存 > 500MB（没打满）",
+      "passed": false,
+      "detail": "min_free=247MB"
+    }
+  ],
+  "max_used_mb": 16137,
+  "min_free_mb": 247,
+  "auto_protect_triggered": true,
+  "snapshots": {
+    "baseline": {
+      "label": "基线",
+      "ts": 1788195186.2699418,
+      "used_mb": 943,
+      "free_mb": 15165,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "advice_suggestions": [],
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "auto_protect_enabled": true,
+      "auto_protect_mode": "standard",
+      "auto_protect_last_trigger": null,
+      "auto_protect_history": []
+    },
+    "after_llm": {
+      "label": "加载 qwen3.5:9b 后",
+      "ts": 1788195231.216973,
+      "used_mb": 11635,
+      "free_mb": 4473,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "advice_suggestions": [
+        {
+          "id": "ollama_stop_qwen3.5:9b",
+          "type": "ollama_stop",
+          "target": "qwen3.5:9b",
+          "title": "停止对话模型 qwen3.5:9b",
+          "recover_mb": 10240,
+          "actionable": true,
+          "reason": "停止可释放 10.0GB"
+        }
+      ],
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "auto_protect_enabled": true,
+      "auto_protect_mode": "standard",
+      "auto_protect_last_trigger": null,
+      "auto_protect_history": []
+    },
+    "after_greedy": {
+      "label": "贪心加载后",
+      "ts": 1788195258.7481027,
+      "used_mb": 5870,
+      "free_mb": 10238,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "advice_suggestions": [],
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "auto_protect_enabled": true,
+      "auto_protect_mode": "standard",
+      "auto_protect_last_trigger": {
+        "ts": 1788195236.4773903,
+        "level": "critical",
+        "free_mb": 247,
+        "actions": [
+          {
+            "level": "L2",
+            "action": "ComfyUI 释放生成模型显存"
+          }
+        ]
+      },
+      "auto_protect_history": [
+        {
+          "ts": 1788195236.4773903,
+          "level": "critical",
+          "free_mb": 247,
+          "actions": [
+            {
+              "level": "L2",
+              "action": "ComfyUI 释放生成模型显存"
+            }
+          ]
+        }
+      ]
+    },
+    "recovered": {
+      "label": "恢复后",
+      "ts": 1788195273.2787485,
+      "used_mb": 7403,
+      "free_mb": 8705,
+      "guard_level": "ok",
+      "guard_alerts": [],
+      "advice_suggestions": [],
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "auto_protect_enabled": true,
+      "auto_protect_mode": "standard",
+      "auto_protect_last_trigger": {
+        "ts": 1788195236.4773903,
+        "level": "critical",
+        "free_mb": 247,
+        "actions": [
+          {
+            "level": "L2",
+            "action": "ComfyUI 释放生成模型显存"
+          }
+        ]
+      },
+      "auto_protect_history": [
+        {
+          "ts": 1788195236.4773903,
+          "level": "critical",
+          "free_mb": 247,
+          "actions": [
+            {
+              "level": "L2",
+              "action": "ComfyUI 释放生成模型显存"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "budget": {
+    "ok": true,
+    "total_gb": 16.0,
+    "noise_gb": 1.0,
+    "reserve_gb": 2.5,
+    "safe_ceiling_gb": 13.5,
+    "used_gb": 11.4,
+    "unreleasable_gb": 1.0,
+    "releasable_gb": 10.0,
+    "avail_gb": 11.5,
+    "models": [
+      {
+        "source": "ollama",
+        "id": "qwen3.5:9b",
+        "name": "Qwen3.5 9B",
+        "vram_gb": 9.9,
+        "exclusive": false,
+        "loaded": true,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "已加载（利用缓存）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 4分57秒",
+        "context_vram": {
+          "16384": 6.2,
+          "65536": 7.7,
+          "131072": 9.9,
+          "200704": 11.0
+        },
+        "default_ctx": 16384,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwen3:0.6b",
+        "name": "Qwen3 0.6B",
+        "vram_gb": 5.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分42秒",
+        "context_vram": {
+          "40960": 5.4
+        },
+        "default_ctx": 16384,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwythos-9b:q4km",
+        "name": "Qwythos 9B Q4KM",
+        "vram_gb": 7.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分45秒",
+        "context_vram": {
+          "16384": 6.0,
+          "65536": 7.5,
+          "131072": 10.3,
+          "196608": 12.5
+        },
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "darkidol-8b:q4km",
+        "name": "Darkidol 8B Q4KM",
+        "vram_gb": 7.0,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分30秒",
+        "context_vram": {
+          "16384": 7.0,
+          "57344": 12.8
+        },
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "bge-m3:latest",
+        "name": "BGE-M3 Embedding",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "bge-m3-cpu:latest",
+        "name": "BGE-M3 CPU",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qllama/bge-reranker-v2-m3:latest",
+        "name": "BGE Reranker V2 M3",
+        "vram_gb": 1.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 45秒",
+        "context_vram": {},
+        "default_ctx": 8192,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "defiant-9b:q4km",
+        "name": "defiant-9b:q4km",
+        "vram_gb": 8.6,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 4分18秒",
+        "context_vram": {
+          "16384": 7.1,
+          "65536": 8.6,
+          "131072": 10.0
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma-4-12b-it:q4km",
+        "name": "gemma-4-12b-it:q4km",
+        "vram_gb": 11.2,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分36秒",
+        "context_vram": {
+          "65536": 10.5,
+          "131072": 11.2
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma-4-12b-it:q8_0",
+        "name": "gemma-4-12b-it:q8_0",
+        "vram_gb": 14.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "free_L1",
+        "need_free_gb": 2.9,
+        "gap_gb": 0,
+        "note": "释放 2.9 GB（Ollama 停模型）后可加载",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 7分12秒",
+        "context_vram": {
+          "65536": 14.4
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "gemma4:12b-it-q4_K_M",
+        "name": "gemma4:12b-it-q4_K_M",
+        "vram_gb": 10.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分12秒",
+        "context_vram": {
+          "65536": 10.4,
+          "131072": 11.0
+        },
+        "default_ctx": 65536,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "minicpm5-1b:q4km",
+        "name": "minicpm5-1b:q4km",
+        "vram_gb": 5.4,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分42秒",
+        "context_vram": {
+          "65536": 3.6,
+          "131072": 5.4
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "qwen3.5:0.8b",
+        "name": "qwen3.5:0.8b",
+        "vram_gb": 6.6,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分18秒",
+        "context_vram": {
+          "65536": 3.5,
+          "131072": 4.5,
+          "262144": 6.6
+        },
+        "default_ctx": 262144,
+        "specified_ctx": null
+      },
+      {
+        "source": "ollama",
+        "id": "minicpm5-fable5:q8",
+        "name": "minicpm5-fable5:q8",
+        "vram_gb": 5.8,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 2分54秒",
+        "context_vram": {
+          "65536": 4.0,
+          "131072": 5.8
+        },
+        "default_ctx": 131072,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "SDXL",
+        "name": "SDXL",
+        "vram_gb": 6.5,
+        "exclusive": false,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": 26.2,
+        "gen_count": 6,
+        "est_time_text": "基于 6 次历史生成，平均约 26秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Flux-Q5",
+        "name": "Flux.1 Dev Q5",
+        "vram_gb": 11.7,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "free_L2",
+        "need_free_gb": 0.2,
+        "gap_gb": 0,
+        "note": "释放 0.2 GB（ComfyUI /free）后可加载",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分51秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Music3",
+        "name": "MiniMax Music 3",
+        "vram_gb": 13.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "free_L2",
+        "need_free_gb": 1.5,
+        "gap_gb": 0,
+        "note": "释放 1.5 GB（ComfyUI /free）后可加载",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 6分30秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "Wan2.2-TI2V",
+        "name": "Wan2.2 TI2V 5B",
+        "vram_gb": 10.9,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分27秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "ACE-Step-1.5",
+        "name": "ACE-Step 1.5",
+        "vram_gb": 6.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 3分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "LTX-2.5-Q4",
+        "name": "LTX-2.5 Distilled",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      },
+      {
+        "source": "comfyui",
+        "id": "HunyuanVideo-1.5",
+        "name": "HunyuanVideo 1.5",
+        "vram_gb": 10.0,
+        "exclusive": true,
+        "loaded": false,
+        "decision": "ok",
+        "need_free_gb": 0,
+        "gap_gb": 0,
+        "note": "可直接加载（不触发释放）",
+        "avg_seconds": null,
+        "gen_count": 0,
+        "est_time_text": "首次运行，估算约 5分0秒",
+        "context_vram": {},
+        "default_ctx": 0,
+        "specified_ctx": null
+      }
+    ],
+    "loaded_models": [
+      {
+        "source": "ollama",
+        "id": "qwen3.5:9b",
+        "name": "Qwen3.5 9B",
+        "vram_gb": 9.9,
+        "exclusive": false
+      }
+    ],
+    "ts": 1788195231
+  },
+  "flux_decision": {
+    "source": "comfyui",
+    "id": "Flux-Q5",
+    "name": "Flux.1 Dev Q5",
+    "vram_gb": 11.7,
+    "exclusive": true,
+    "loaded": false,
+    "decision": "free_L2",
+    "need_free_gb": 0.2,
+    "gap_gb": 0,
+    "note": "释放 0.2 GB（ComfyUI /free）后可加载",
+    "avg_seconds": null,
+    "gen_count": 0,
+    "est_time_text": "首次运行，估算约 5分51秒",
+    "context_vram": {},
+    "default_ctx": 0,
+    "specified_ctx": null
+  },
+  "auto_protect_final": {
+    "ok": true,
+    "enabled": true,
+    "mode": "standard",
+    "modes": {
+      "conservative": "保守：仅 <1GB 危急时卸载多余模型 + ComfyUI 释放；不碰容器",
+      "standard": "标准：<2GB 开始卸载多余模型 + ComfyUI 释放；<1GB 再加停 Fooocus",
+      "aggressive": "激进：<4GB 即卸载多余模型；<2GB 加 ComfyUI 释放；<1GB 加停 Fooocus"
+    },
+    "last_trigger": {
+      "ts": 1788195236.4773903,
+      "level": "critical",
+      "free_mb": 247,
+      "actions": [
+        {
+          "level": "L2",
+          "action": "ComfyUI 释放生成模型显存"
+        }
+      ]
+    },
+    "history": [
+      {
+        "ts": 1788195236.4773903,
+        "level": "critical",
+        "free_mb": 247,
+        "actions": [
+          {
+            "level": "L2",
+            "action": "ComfyUI 释放生成模型显存"
+          }
+        ]
+      }
+    ]
+  }
+}

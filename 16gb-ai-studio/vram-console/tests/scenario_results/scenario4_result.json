@@ -1,0 +1,298 @@
+{
+  "scenario": "S4_创作流中断恢复",
+  "timestamp": "2026-09-01T01:04:25.883140",
+  "checks": [
+    {
+      "name": "切换到对话态成功",
+      "passed": false,
+      "detail": "scene=comfy"
+    },
+    {
+      "name": "切换后 Ollama 模型可用",
+      "passed": true,
+      "detail": "models=['qwen3.5:9b']"
+    },
+    {
+      "name": "切回出图态成功",
+      "passed": true,
+      "detail": "scene=comfy"
+    },
+    {
+      "name": "切换对话态时 ComfyUI 模型释放",
+      "passed": false,
+      "detail": "切换前free=10206MB, 切换后free=155MB"
+    },
+    {
+      "name": "切换后队列状态保留",
+      "passed": true,
+      "detail": "queue=0, tasks=3"
+    },
+    {
+      "name": "队列 worker 运行中（任务能自动执行）",
+      "passed": true,
+      "detail": "worker_alive=True"
+    },
+    {
+      "name": "恢复后显存回落到基线附近（>85%）",
+      "passed": false,
+      "detail": "恢复后free=8906MB, 基线free=15103MB"
+    }
+  ],
+  "snapshots": {
+    "baseline": {
+      "label": "基线",
+      "ts": 1788195499.4152312,
+      "used_mb": 1005,
+      "free_mb": 15103,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 0,
+      "queue_tasks": 0,
+      "worker_alive": false
+    },
+    "after_enqueue": {
+      "label": "入队后",
+      "ts": 1788195502.531051,
+      "used_mb": 2158,
+      "free_mb": 13950,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 2,
+      "queue_tasks": 3,
+      "worker_alive": true
+    },
+    "during_generation": {
+      "label": "ComfyUI出图中",
+      "ts": 1788195508.9422565,
+      "used_mb": 5902,
+      "free_mb": 10206,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 2,
+      "queue_tasks": 3,
+      "worker_alive": true
+    },
+    "after_switch_chat": {
+      "label": "切换到对话态后",
+      "ts": 1788195628.562399,
+      "used_mb": 15953,
+      "free_mb": 155,
+      "guard_level": "critical",
+      "scene": "comfy",
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 1,
+      "queue_tasks": 3,
+      "worker_alive": true
+    },
+    "during_chat": {
+      "label": "对话查资料中",
+      "ts": 1788195816.7302878,
+      "used_mb": 15983,
+      "free_mb": 125,
+      "guard_level": "critical",
+      "scene": "comfy",
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 0,
+      "queue_tasks": 3,
+      "worker_alive": true
+    },
+    "after_switch_back": {
+      "label": "切回出图态后",
+      "ts": 1788195849.3655455,
+      "used_mb": 5645,
+      "free_mb": 10463,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 0,
+      "queue_tasks": 3,
+      "worker_alive": true
+    },
+    "recovered": {
+      "label": "恢复后",
+      "ts": 1788195865.8829572,
+      "used_mb": 7202,
+      "free_mb": 8906,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_len": 0,
+      "queue_tasks": 3,
+      "worker_alive": true
+    }
+  },
+  "queue_results": [
+    {
+      "ok": true,
+      "task": {
+        "id": "e5ed75fc66",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 0",
+          "seed": 1000
+        },
+        "status": "precheck",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788195499,
+        "started": null,
+        "ended": null,
+        "error": "",
+        "result": null
+      }
+    },
+    {
+      "ok": true,
+      "task": {
+        "id": "214d5d25d9",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 1",
+          "seed": 1001
+        },
+        "status": "queued",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788195499,
+        "started": null,
+        "ended": null,
+        "error": "",
+        "result": null
+      }
+    },
+    {
+      "ok": true,
+      "task": {
+        "id": "61cf4c99d5",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 2",
+          "seed": 1002
+        },
+        "status": "queued",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788195500,
+        "started": null,
+        "ended": null,
+        "error": "",
+        "result": null
+      }
+    }
+  ],
+  "switch_chat": {
+    "ok": false,
+    "error": "Remote end closed connection without response"
+  },
+  "switch_back": {
+    "ok": true,
+    "scene": "comfy",
+    "error": null,
+    "actions": [
+      {
+        "step": "pre-release VRAM (<4G detected, gpu_release.ps1)",
+        "rc": 0,
+        "output": ""
+      },
+      {
+        "step": "stop ollama models (free VRAM for image gen)",
+        "rc": 0,
+        "output": "gemma4:12b-it-q4_K_M:rc0 | qwythos-9b:q4km:rc0 | minicpm5-fable5:q8:rc0 | defiant-9b:q4km:rc0 | minicpm5-1b:q4km:rc0 | gemma-4-12b-it:q8_0:rc0 | qwen3.5:9b:rc0 | gemma-4-12b-it:q4km:rc0 | qwen3.5:0.8b:rc0 | darkidol-8b:q4km:rc0 | qwen3:0.6b:rc0"
+      },
+      {
+        "step": "start comfyui",
+        "rc": 0,
+        "output": "comfyui"
+      },
+      {
+        "step": "stop fooocus",
+        "rc": 0,
+        "output": "fooocus"
+      },
+      {
+        "step": "release VRAM (gpu_release.ps1)",
+        "rc": 0,
+        "output": ""
+      },
+      {
+        "step": "wait comfyui ready (:8188)",
+        "rc": 0,
+        "output": "waited 0s"
+      }
+    ]
+  },
+  "notes": []
+}
