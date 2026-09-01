@@ -12,6 +12,30 @@
 
 import { events } from './events.js';
 
+/**
+ * v1格式解包：{ok, data, error, meta} → 扁平格式（兼容现有前端代码）
+ * v0格式（扁平）直接返回
+ */
+function unwrap(resp) {
+  if (!resp || typeof resp !== 'object') return resp;
+  // v1格式：有 data 和 meta 字段
+  if ('data' in resp && 'meta' in resp) {
+    const flat = { ok: resp.ok !== false };
+    if (resp.data && typeof resp.data === 'object') {
+      Object.assign(flat, resp.data);
+    } else if (resp.data !== null && resp.data !== undefined) {
+      flat.data = resp.data;
+    }
+    if (resp.error) {
+      flat.error = typeof resp.error === 'object' ? resp.error.message : resp.error;
+      flat.error_code = typeof resp.error === 'object' ? resp.error.code : '';
+    }
+    flat._meta = resp.meta; // 保留meta供调试
+    return flat;
+  }
+  return resp;
+}
+
 const BASE = '';
 const DEFAULT_TIMEOUT = 15000;       // 普通请求 15s
 const LONG_TIMEOUT = 120000;         // 长操作（场景切换/队列）120s
@@ -84,24 +108,25 @@ async function request(path, opts = {}) {
 
       // 业务失败（HTTP 4xx/5xx，但 body 可能含后端错误信息）
       if (!resp.ok) {
-        const message = (data && (data.error || data.message)) || `HTTP ${resp.status}`;
-        if (!silent) events.emit('api:error', { message, path, status: resp.status });
-        const err = new Error(message);
+        const errMsg = data?.error?.message || data?.error || data?.message || `HTTP ${resp.status}`;
+        if (!silent) events.emit('api:error', { message: errMsg, path, status: resp.status });
+        const err = new Error(errMsg);
         err.status = resp.status;
         err.data = data;
         throw err;
       }
 
-      // 后端约定 { ok:false, error }
+      // 后端约定 { ok:false, error } 或 v1格式 { ok:false, error:{code,message} }
       if (data && typeof data === 'object' && data.ok === false) {
-        const message = data.error || data.message || '操作失败';
-        if (!silent) events.emit('api:error', { message, path });
-        const err = new Error(message);
+        const errMsg = data?.error?.message || data.error || data.message || '操作失败';
+        if (!silent) events.emit('api:error', { message: errMsg, path });
+        const err = new Error(errMsg);
         err.data = data;
         throw err;
       }
 
-      return data;
+      // v1格式解包：{ok, data, meta} → 扁平格式（兼容现有前端代码）
+      return unwrap(data);
     } catch (err) {
       // AbortError = 超时
       if (err.name === 'AbortError') {

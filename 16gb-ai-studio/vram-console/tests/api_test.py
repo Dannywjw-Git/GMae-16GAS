@@ -35,6 +35,28 @@ def load_token():
 # 辅助函数
 # ============================================================
 
+def _normalize(body):
+    """自动识别 v0/v1 格式，统一为扁平格式（兼容测试）。
+    v1: {ok, data, error, meta} → 扁平: {ok, ...data字段, error}
+    """
+    if isinstance(body, dict) and 'data' in body and 'meta' in body:
+        normalized = {'ok': body.get('ok', False)}
+        data = body.get('data')
+        if isinstance(data, dict):
+            normalized.update(data)
+        elif data is not None:
+            normalized['data'] = data
+        err = body.get('error')
+        if err:
+            if isinstance(err, dict):
+                normalized['error'] = err.get('message', str(err))
+                normalized['error_code'] = err.get('code', '')
+            else:
+                normalized['error'] = str(err)
+        return normalized
+    return body
+
+
 def api_get(path, params=None, auth=True):
     """发送 GET 请求"""
     url = BASE_URL + path
@@ -47,10 +69,10 @@ def api_get(path, params=None, auth=True):
     req = urllib.request.Request(url, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-            return resp.status, json.loads(resp.read().decode("utf-8"))
+            return resp.status, _normalize(json.loads(resp.read().decode("utf-8")))
     except urllib.error.HTTPError as e:
         try:
-            body = json.loads(e.read().decode("utf-8"))
+            body = _normalize(json.loads(e.read().decode("utf-8")))
         except Exception:
             body = {"error": str(e)}
         return e.code, body
@@ -68,10 +90,10 @@ def api_post(path, data=None, auth=True):
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-            return resp.status, json.loads(resp.read().decode("utf-8"))
+            return resp.status, _normalize(json.loads(resp.read().decode("utf-8")))
     except urllib.error.HTTPError as e:
         try:
-            body = json.loads(e.read().decode("utf-8"))
+            body = _normalize(json.loads(e.read().decode("utf-8")))
         except Exception:
             body = {"error": str(e)}
         return e.code, body

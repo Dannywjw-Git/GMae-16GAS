@@ -28,6 +28,7 @@ from api.route_helpers import (
     serve_static_file, health_check, read_logs, registry_view,
     read_html, read_login_html, build_gate_context
 )
+from core.response import api_success, api_error
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -49,7 +50,8 @@ class Handler(BaseHTTPRequestHandler):
             provided = self.headers.get("X-API-Key", "")
             if provided == API_TOKEN:
                 return True
-        self._json({"ok": False, "error": "unauthorized: please login first", "need_login": True}, 401)
+        self._error("UNAUTHORIZED", "unauthorized: please login first", 401,
+                    details={"need_login": True})
         return False
 
     def _current_user(self):
@@ -69,6 +71,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def _json(self, obj: dict, code: int = 200) -> None:
         self._send(code, json.dumps(obj, ensure_ascii=False).encode("utf-8"))
+
+    def _success(self, data=None, meta=None, cached=False) -> None:
+        """v1格式成功响应：{ok, data, error:null, meta}"""
+        self._json(api_success(data, meta=meta, cached=cached))
+
+    def _error(self, code: str, message: str, http_status: int = 400, details=None) -> None:
+        """v1格式失败响应：{ok:false, data:null, error:{code,message,details}, meta}"""
+        resp, status = api_error(code, message, details=details, http_status=http_status)
+        self._json(resp, status)
 
     def _read_body(self) -> dict:
         """读取 POST 请求体 JSON。"""
@@ -92,10 +103,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         # 公开 API（无需认证）
         if self.path == "/api/health":
-            self._json(health_check())
+            self._success(health_check())
             return
         if self.path == "/api/auth/status":
-            self._json(auth_mod.auth_status())
+            self._success(auth_mod.auth_status())
             return
         # 需认证 API
         if not self._check_auth():
@@ -127,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         # 状态查询组
         if path == "/api/status":
-            self._json(current_status())
+            self._success(current_status())
         elif path == "/api/logs":
             qs = parse_qs(urlparse(self.path).query)
             limit = qs.get("limit", ["150"])[0]
@@ -135,33 +146,33 @@ class Handler(BaseHTTPRequestHandler):
                 limit = int(limit)
             except ValueError:
                 limit = 150
-            self._json(read_logs(limit))
+            self._success(read_logs(limit))
         elif path == "/api/registry":
-            self._json(registry_view())
+            self._success(registry_view())
         elif path == "/api/comfy_events":
-            self._json(comfy_events())
+            self._success(comfy_events())
         elif path == "/api/advice":
-            self._json(vram_advice())
+            self._success(vram_advice())
         elif path == "/api/hardware":
-            self._json(_hardware_info())
+            self._success(_hardware_info())
         # 显存/桌面组
         elif path == "/api/desktop_vram":
-            self._json(desktop_vram_detail())
+            self._success(desktop_vram_detail())
         elif path == "/api/desktop/helper/status":
-            self._json(helper_status())
+            self._success(helper_status())
         # 预算组
         elif path == "/api/budget":
             self._handle_get_budget()
         # 队列/扫描组
         elif path == "/api/scan":
-            self._json(model_scan())
+            self._success(model_scan())
         elif path == "/api/queue":
-            self._json(queue_snapshot())
+            self._success(queue_snapshot())
         # QoS/自动保护组
         elif path == "/api/auto-protect/status":
-            self._json(auto_protect_status())
+            self._success(auto_protect_status())
         else:
-            self._json({"ok": False, "error": "not found"}, 404)
+            self._error("NOT_FOUND", "endpoint not found", 404)
 
     def _handle_get_budget(self) -> None:
         """处理 /api/budget，支持 context 查询参数。"""
@@ -177,7 +188,7 @@ class Handler(BaseHTTPRequestHandler):
                         context_overrides[mid.strip()] = int(ctx.strip())
                     except ValueError:
                         pass
-        self._json(budget_engine(context_overrides))
+        self._success(budget_engine(context_overrides))
 
     # ============================================================
     # POST 请求分发
@@ -198,18 +209,27 @@ class Handler(BaseHTTPRequestHandler):
         """处理认证相关 POST，返回 True 表示已处理。"""
         if self.path == "/api/auth/setup":
             ok, msg = auth_mod.setup_admin(data.get("email", ""), data.get("password", ""))
-            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            if ok:
+                self._success({"message": msg})
+            else:
+                self._error("BAD_REQUEST", msg, 400)
             return True
         if self.path == "/api/auth/login":
             self._handle_login(data)
             return True
         if self.path == "/api/auth/forgot":
             ok, msg = auth_mod.generate_reset_code(data.get("email", ""))
-            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            if ok:
+                self._success({"message": msg})
+            else:
+                self._error("BAD_REQUEST", msg, 400)
             return True
         if self.path == "/api/auth/reset":
             ok, msg = auth_mod.reset_password(data.get("email", ""), data.get("code", ""), data.get("password", ""))
-            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            if ok:
+                self._success({"message": msg})
+            else:
+                self._error("BAD_REQUEST", msg, 400)
             return True
         return False
 
@@ -223,64 +243,65 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Set-Cookie", "{}={}; Path=/; HttpOnly; SameSite=Lax; Max-Age={}".format(
                 auth_mod.SESSION_COOKIE_NAME, session_id,
                 auth_mod.SESSION_REMEMBER_TTL if data.get("remember") else auth_mod.SESSION_DEFAULT_TTL))
-            body = json.dumps({"ok": True, "message": "登录成功", "email": user["email"]}, ensure_ascii=False).encode("utf-8")
+            resp = api_success({"message": "登录成功", "email": user["email"]})
+            body = json.dumps(resp, ensure_ascii=False).encode("utf-8")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
         else:
-            self._json({"ok": False, "error": "邮箱或密码不正确"}, 401)
+            self._error("UNAUTHORIZED", "邮箱或密码不正确", 401)
 
     def _handle_post_authenticated(self, data: dict) -> None:
         """处理需认证的 POST 请求。"""
         # 场景/组合控制
         if self.path == "/api/scene":
-            self._json(scene_switch(data.get("scene", "")))
+            self._success(scene_switch(data.get("scene", "")))
         elif self.path == "/api/combo":
-            self._json(combo_switch(data.get("combo", "")))
+            self._success(combo_switch(data.get("combo", "")))
         # 显存释放/门卫
         elif self.path == "/api/free":
             result = free_all()
             invalidate_status_cache()
-            self._json(result)
+            self._success(result)
         elif self.path == "/api/guard":
             if data.get("action") == "kick":
-                self._json(gpu_guard_kick(data.get("pid", "")))
+                self._success(gpu_guard_kick(data.get("pid", "")))
             else:
-                self._json(gpu_guard_evict() if data.get("evict") else gpu_guard_check())
+                self._success(gpu_guard_evict() if data.get("evict") else gpu_guard_check())
         # QoS 组
         elif self.path == "/api/qos/status":
-            self._json(qos_status())
+            self._success(qos_status())
         elif self.path == "/api/qos/check":
-            self._json(qos_check())
+            self._success(qos_check())
         elif self.path == "/api/qos/execute":
-            self._json(qos_execute_suggestion(data.get("suggestion_id", "")))
+            self._success(qos_execute_suggestion(data.get("suggestion_id", "")))
         elif self.path == "/api/auto-protect/config":
-            self._json(auto_protect_config(data))
+            self._success(auto_protect_config(data))
         # 服务/模型控制
         elif self.path == "/api/service":
-            self._json(service_action(data.get("name", ""), data.get("action", "")))
+            self._success(service_action(data.get("name", ""), data.get("action", "")))
         elif self.path == "/api/model":
-            self._json(model_action(data.get("name", ""), data.get("action", "")))
+            self._success(model_action(data.get("name", ""), data.get("action", "")))
         # 桌面/容器控制
         elif self.path == "/api/desktop/kill":
-            self._json(desktop_kill(data.get("pid", "")))
+            self._success(desktop_kill(data.get("pid", "")))
         elif self.path == "/api/container/stop":
-            self._json(container_stop(data.get("name", "")))
+            self._success(container_stop(data.get("name", "")))
         elif self.path == "/api/desktop/helper/start":
-            self._json(helper_start())
+            self._success(helper_start())
         elif self.path == "/api/desktop/helper/stop":
-            self._json(helper_stop())
+            self._success(helper_stop())
         # 队列组
         elif self.path == "/api/queue":
-            self._json(queue_enqueue(data.get("model", ""), data.get("params", {})))
+            self._success(queue_enqueue(data.get("model", ""), data.get("params", {})))
         elif self.path == "/api/queue/cancel":
-            self._json(queue_cancel(data.get("id", "")))
+            self._success(queue_cancel(data.get("id", "")))
         # 准入闸门
         elif self.path == "/api/admission":
             self._handle_admission(data)
         # 扫描登记
         elif self.path == "/api/scan/register":
-            self._json(scan_register(data.get("source", "comfyui"), data.get("name", ""),
+            self._success(scan_register(data.get("source", "comfyui"), data.get("name", ""),
                                      data.get("vram_gb"), data.get("category", "image")))
         # 登出/改密
         elif self.path == "/api/auth/logout":
@@ -288,14 +309,17 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/api/auth/change-password":
             email = self._current_user()
             ok, msg = auth_mod.change_password(email or "", data.get("old_password", ""), data.get("new_password", ""))
-            self._json({"ok": ok, "message": msg}, 200 if ok else 400)
+            if ok:
+                self._success({"message": msg})
+            else:
+                self._error("BAD_REQUEST", msg, 400)
         else:
-            self._json({"ok": False, "error": "not found"}, 404)
+            self._error("NOT_FOUND", "endpoint not found", 404)
 
     def _handle_admission(self, data: dict) -> None:
         """处理准入闸门检查。"""
         if not _V031_MODULES:
-            self._json({"ok": False, "error": "admission_gate module not available"}, 503)
+            self._error("SERVICE_UNAVAILABLE", "admission_gate module not available", 503)
             return
         from engine import admission_gate
         ctx = build_gate_context()
@@ -304,7 +328,7 @@ class Handler(BaseHTTPRequestHandler):
             args=data.get("args", {}),
             ctx=ctx
         )
-        self._json(result)
+        self._success(result)
 
     def _handle_logout(self) -> None:
         """处理登出，清除 Session Cookie。"""
@@ -314,7 +338,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Set-Cookie", "{}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0".format(auth_mod.SESSION_COOKIE_NAME))
-        body = json.dumps({"ok": True, "message": "已登出"}, ensure_ascii=False).encode("utf-8")
+        resp = api_success({"message": "已登出"})
+        body = json.dumps(resp, ensure_ascii=False).encode("utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
