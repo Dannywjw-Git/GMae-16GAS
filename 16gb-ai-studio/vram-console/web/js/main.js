@@ -56,33 +56,37 @@ function wireGlobalEvents() {
 /* ========== 页面注册 ========== */
 
 async function registerPages() {
-  // 阶段 1：总览
+  // v2.0 信息架构：总览 / 观测 / 诊断 / 工作负载 / 设置
   const { default: dashboard } = await import('./pages/dashboard.js');
   register('dashboard', dashboard);
 
-  // v0.3.1：C-Eng 指挥家对话页
+  const { default: observability } = await import('./pages/observability.js');
+  register('observability', observability);
+
+  const { default: diagnostics } = await import('./pages/diagnostics.js');
+  register('diagnostics', diagnostics);
+
+  const { default: workloads } = await import('./pages/workloads.js');
+  register('workloads', workloads);
+
+  const { default: settings } = await import('./pages/settings.js');
+  register('settings', settings);
+
+  // 旧页面保留注册（可通过直接访问URL进入，后续迭代移除）
   const { default: chat } = await import('./pages/chat.js');
   register('chat', chat);
-
-  // 阶段 2：模型登记台 + 显存账本
   const { default: models } = await import('./pages/models.js');
   register('models', models);
   const { default: vram } = await import('./pages/vram.js');
   register('vram', vram);
-
-  // 阶段 3：场景切换 + 任务队列
   const { default: scenes } = await import('./pages/scenes.js');
   register('scenes', scenes);
   const { default: queue } = await import('./pages/queue.js');
   register('queue', queue);
-
-  // 阶段 4：门卫 + 日志 + 设置
   const { default: guard } = await import('./pages/guard.js');
   register('guard', guard);
   const { default: logs } = await import('./pages/logs.js');
   register('logs', logs);
-  const { default: settings } = await import('./pages/settings.js');
-  register('settings', settings);
 }
 
 /* ========== 启动 ========== */

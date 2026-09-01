@@ -133,3 +133,143 @@
   gap: var(--space-md);
   color: var(--txt-secondary);
 }
+
+/* ========== v2.0 总览页新样式 ========== */
+
+.dashboard-section {
+  margin-bottom: 24px;
+}
+
+.dashboard-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.dashboard-section__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--txt);
+}
+
+/* 告警面板 */
+.dashboard-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboard-alerts__empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--txt-secondary);
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+}
+
+.dashboard-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--txt-tertiary);
+}
+
+.dashboard-alert--error {
+  border-left-color: var(--bad);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.dashboard-alert--warning {
+  border-left-color: var(--warn);
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.dashboard-alert--info {
+  border-left-color: var(--primary);
+}
+
+.dashboard-alert__icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.dashboard-alert__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-alert__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 2px;
+}
+
+.dashboard-alert__desc {
+  font-size: 12px;
+  color: var(--txt-secondary);
+}
+
+.dashboard-alert__time {
+  font-size: 11px;
+  color: var(--txt-tertiary);
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+/* 图表卡片 */
+.dashboard-chart-card {
+  background: var(--card);
+  border: 1px solid var(--line-dark);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.dashboard-chart-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 12px;
+}
+
+.dashboard-chart-card canvas {
+  width: 100%;
+  height: 150px;
+}
+
+/* 服务状态行 */
+.service-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line-dark);
+}
+
+.service-row:last-child {
+  border-bottom: none;
+}
+
+.service-row__name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--txt);
+}
+
+.service-row__status {
+  font-size: 12px;
+  color: var(--txt-secondary);
+}
+
+/* 快速操作区 */
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

@@ -13,6 +13,8 @@
 @import './components/table.css';
 @import './components/form.css';
 @import './components/chart.css';
+@import './components/status-card.css';
+@import './components/tab-nav.css';
 @import './components/demo.css';
 @import './pages/dashboard.css';
 @import './pages/chat.css';

@@ -1,294 +1,102 @@
 /**
- * GMae 指挥家 v2.0 - pages/dashboard.js
- * 总览页（阶段 1）：L0 一瞥（显存水位/场景/健康）+ L1 动作（预演/一键释放）
- * 蓝图 §11.2 信息架构：一屏一主题，少即是多
- * 数据流：refresh → api.status → store.set('status') → subscribe 重渲染
+ * GMae v2.0 - pages/dashboard.js
+ * 总览页：健康四卡片 + 告警面板 + 关键指标趋势 + 快速操作
+ *
+ * 信息架构：
+ * - L0：健康四卡片（GPU/容器/模型/队列）一眼看全局
+ * - L1：告警面板（最近异常，按严重程度排序）
+ * - L2：关键指标趋势（显存/延迟/队列长度）
+ * - L3：快速操作（一键释放/场景切换快捷入口）
  */
 
-import { store } from '../core/state.js';
 import { api } from '../core/api.js';
 import { events } from '../core/events.js';
-import { el, empty, escapeHtml, fmtMb, fmtPct } from '../core/utils.js';
-import { open as openModal } from '../components/modal.js';
-import { openDemo } from '../components/demo.js';
+import { el, empty, fmtMb, fmtPct } from '../core/utils.js';
+import { go } from '../core/router.js';
+import StatusCard from '../components/StatusCard.js';
 
 const POLL_INTERVAL = 10000;
 let pollTimer = null;
-let unsubscribe = null;
 let page = null;
+let statusData = null;
+let vramHistory = []; // 显存历史（最近30个点）
 
-/** 水位状态映射（蓝图 11.4：绿<60% 黄 60-85% 红>85%） */
-function levelOf(status) {
-  const gpu = status?.gpu;
-  if (!gpu || !gpu.total_mb) return 'unknown';
-  const ratio = gpu.used_mb / gpu.total_mb;
-  if (ratio < 0.6) return 'safe';
-  if (ratio <= 0.85) return 'warn';
-  return 'danger';
-}
+/* ========== 页面渲染 ========== */
 
-const LEVEL_META = {
-  safe:   { label: '安全',   cls: 'ok' },
-  warn:   { label: '紧张',   cls: 'warn' },
-  danger: { label: '危险',   cls: 'bad' },
-  unknown:{ label: '未知',   cls: 'muted' },
-};
-
-const SCENE_LABEL = {
-  dialogue: '对话', comfy: '出图', h3: '视频', music: '音乐',
-  game: '游戏', fooocus: '出图(Fooocus)', none: '空闲',
-};
-
-/* ========== 数据视图更新 ========== */
-
-function updateView(status) {
-  if (!page || !page.isConnected) return;
-  updateVramBar(status);
-  updateStats(status);
-  updateActivity(status);
-  const hint = page.querySelector('[data-refresh-hint]');
-  if (hint) hint.textContent = `更新于 ${new Date().toLocaleTimeString()}`;
-}
-
-function updateVramBar(status) {
-  const slot = page.querySelector('[data-l0]');
-  if (!slot) return;
-  empty(slot);
-  const gpu = status?.gpu;
-  const used = gpu?.used_mb ?? 0;
-  const total = gpu?.total_mb ?? 0;
-  const pct = total ? (used / total) * 100 : 0;
-  const lv = levelOf(status);
-  const meta = LEVEL_META[lv];
-
-  const bar = el(`<div class="vram-bar">
-    <div class="vram-bar__label">
-      <span class="vram-bar__pct text-${meta.cls}">${fmtPct(pct)}</span>
-      <span class="text-muted text-xs">已用 ${fmtMb(used)} / 共 ${fmtMb(total)}</span>
-    </div>
-    <div class="vram-bar__track">
-      <div class="vram-bar__fill vram-bar__fill--${meta.cls}" style="width:${Math.min(pct, 100)}%"></div>
-    </div>
-    <div class="vram-bar__hint text-xs">水位状态：<span class="text-${meta.cls}">${meta.label}</span>
-      ${status?.vram_ledger?.note ? ` · ${escapeHtml(status.vram_ledger.note)}` : ''}
-    </div>
-    <div class="vram-bar__segs flex gap-sm"></div>
-  </div>`);
-
-  // 分段占用标签
-  if (status?.vram_ledger) {
-    const l = status.vram_ledger;
-    const segs = [
-      { label: '对话模型', mb: l.ollama_loaded_mb, cls: 'primary' },
-      { label: '生成引擎', mb: l.comfy_loaded_mb, cls: 'ok' },
-      { label: '底噪', mb: l.noise_mb, cls: 'muted' },
-    ];
-    const seg = bar.querySelector('.vram-bar__segs');
-    for (const s of segs) {
-      const sw = total ? (s.mb / total) * 100 : 0;
-      if (sw < 0.5) continue;
-      seg.appendChild(el(`<span class="tag tag--${s.cls}" title="${escapeHtml(s.label)} ${fmtMb(s.mb)}">${escapeHtml(s.label)} ${fmtMb(s.mb)}</span>`));
-    }
-  }
-  slot.appendChild(bar);
-}
-
-function updateStats(status) {
-  const slot = page.querySelector('[data-stats]');
-  if (!slot) return;
-  empty(slot);
-  const gpu = status?.gpu;
-  const scene = status?.scene || 'none';
-  const ollamaModels = status?.ollama?.models?.length || 0;
-  const qosLevel = status?.qos?.level || '—';
-
-  const cards = [
-    { label: 'GPU 显存', value: gpu ? `${fmtMb(gpu.used_mb)} / ${fmtMb(gpu.total_mb, 0)}` : '—', hint: gpu ? `利用率 ${gpu.utilization ?? 0}%` : '未检测到 GPU' },
-    { label: '当前场景', value: SCENE_LABEL[scene] || scene || '—', hint: '场景 = 一套模型组合' },
-    { label: '活跃对话模型', value: String(ollamaModels), hint: '已加载的 ollama 模型数' },
-    { label: 'QoS 水位', value: qosLevel, hint: status?.qos?.msg ? escapeHtml(status.qos.msg) : 'GREEN=安全' },
-  ];
-
-  const grid = el('<div class="grid grid-4 dashboard-stats"></div>');
-  for (const c of cards) {
-    grid.appendChild(el(`<div class="stat-card">
-      <div class="stat-card__label">${escapeHtml(c.label)}</div>
-      <div class="stat-card__value">${c.value}</div>
-      <div class="stat-card__hint">${c.hint || ''}</div>
-    </div>`));
-  }
-  slot.appendChild(grid);
-}
-
-function updateActivity(status) {
-  const slot = page.querySelector('[data-lower]');
-  if (!slot) return;
-  empty(slot);
-  const act = status?.activity?.services;
-  if (!act || !Object.keys(act).length) {
-    slot.appendChild(el('<div class="card"><div class="card__title">服务活跃度</div><div class="card__body text-muted text-sm mt-sm">暂无服务活跃记录</div></div>'));
-    return;
-  }
-  const rows = Object.entries(act).map(([name, info]) => {
-    const busy = info?.busy;
-    const last = info?.last_busy ? new Date(info.last_busy * 1000).toLocaleTimeString() : '—';
-    const idle = info?.idle_s ? `${Math.round(info.idle_s / 60)} 分钟` : '';
-    return `<div class="activity-row flex justify-between">
-      <span>${escapeHtml(name)} <span class="tag ${busy ? 'tag--ok' : 'tag--muted'}">${busy ? '忙碌' : '空闲'}</span></span>
-      <span class="text-muted text-xs">最后忙碌 ${last}${idle ? ` · 空闲 ${idle}` : ''}</span>
-    </div>`;
-  }).join('');
-  slot.appendChild(el(`<div class="card"><div class="card__title">服务活跃度</div><div class="card__body mt-sm">${rows}</div></div>`));
-}
-
-/* ========== 页面骨架 ========== */
-
-function render() {
+export function render() {
   page = el(`<div class="page dashboard-page">
-    <div class="page-header flex justify-between items-center">
-      <div>
-        <div class="page-title">总览</div>
-        <div class="page-subtitle">一眼看清系统忙不忙、谁在干活、安不安全</div>
-      </div>
-      <div class="text-xs text-muted font-mono" data-refresh-hint></div>
+    <div class="page-header">
+      <h1 class="page-title">总览</h1>
+      <p class="page-subtitle">全局健康状态一眼掌握，异常及时发现</p>
     </div>
-    <div class="flex-col gap-lg">
-      <div data-l0></div>
-      <div data-actions></div>
-      <div data-stats></div>
-      <div class="grid grid-2" data-lower></div>
+
+    <!-- L0：健康四卡片 -->
+    <div data-health-cards class="status-card-grid" style="grid-template-columns:repeat(4,1fr)"></div>
+
+    <!-- L1：告警面板 -->
+    <div class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2 class="dashboard-section__title">⚠️ 最近告警</h2>
+        <span data-alert-count class="text-xs text-muted"></span>
+      </div>
+      <div data-alerts class="dashboard-alerts"></div>
+    </div>
+
+    <!-- L2：关键指标趋势 -->
+    <div class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2 class="dashboard-section__title">📈 关键指标趋势</h2>
+        <span data-refresh-hint class="text-xs text-muted"></span>
+      </div>
+      <div class="grid grid-2">
+        <div class="dashboard-chart-card">
+          <div class="dashboard-chart-card__title">显存使用趋势</div>
+          <canvas data-vram-chart width="400" height="150"></canvas>
+        </div>
+        <div class="dashboard-chart-card">
+          <div class="dashboard-chart-card__title">服务状态</div>
+          <div data-services-list></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- L3：快速操作 -->
+    <div class="dashboard-section">
+      <div class="dashboard-section__header">
+        <h2 class="dashboard-section__title">⚡ 快速操作</h2>
+      </div>
+      <div class="dashboard-actions">
+        <button class="btn btn--primary" data-action="free">🧹 一键释放显存</button>
+        <button class="btn btn--ghost" data-action="scene-comfy">🎨 切换到出图场景</button>
+        <button class="btn btn--ghost" data-action="scene-dialogue">💬 切换到对话场景</button>
+        <button class="btn btn--ghost" data-action="observability">🔍 查看观测中心</button>
+        <button class="btn btn--ghost" data-action="diagnostics">🩺 进入诊断中心</button>
+      </div>
     </div>
   </div>`);
 
-  // L1 动作（仅绑定一次）
-  const actions = page.querySelector('[data-actions]');
-  actions.appendChild(el(`<div class="dashboard-actions flex gap-md">
-    <button class="btn btn--primary btn--lg" data-action="preview">🎼 预演模式</button>
-    <button class="btn btn--lg" data-action="demo" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c4b5fd">🎬 一键演示</button>
-    <button class="btn btn--ok btn--lg" data-action="free">🧹 一键释放</button>
-  </div>`));
-
-  actions.querySelector('[data-action="free"]').addEventListener('click', async (e) => {
-    const btn = e.currentTarget;
-    btn.disabled = true;
-    btn.textContent = '释放中…';
-    try {
-      const result = await api.free();
-      const msg = result?.message || '显存已释放';
-      events.emit('toast', { type: 'success', message: msg });
-      // 释放后延迟刷新：等 PowerShell 脚本实际执行完，显存数据才准确
-      setTimeout(async () => { await refresh(); }, 3000);
-      await refresh();  // 先立即刷新一次（可能还是旧数据，但按钮状态会恢复）
-    } catch (err) {
-      events.emit('toast', { type: 'error', message: err.message });
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '🧹 一键释放';
-    }
-  });
-
-  actions.querySelector('[data-action="preview"]').addEventListener('click', openPreview);
-  actions.querySelector('[data-action="demo"]').addEventListener('click', openDemo);
-
+  bindActions(page);
   return page;
 }
 
-/* ========== 预演模式（阶段5）：显存预算引擎 ========== */
-
-function decisionTag(m) {
-  if (m.decision === 'ok') return '<span class="tag tag--ok">可直接加载</span>';
-  if (m.decision === 'free' || m.need_free_gb > 0) return `<span class="tag tag--warn">需释放 ${m.need_free_gb}G</span>`;
-  if (m.gap_gb > 0) return `<span class="tag tag--bad">超限 ${m.gap_gb}G</span>`;
-  return `<span class="tag tag--muted">${escapeHtml(String(m.decision || '—'))}</span>`;
+export function onEnter() {
+  startPolling();
+  refresh();
 }
 
-function buildCtxSelect(m, overrides, onChange) {
-  const ctxMap = m.context_vram || {};
-  const keys = Object.keys(ctxMap);
-  if (!keys.length) return el('<span class="text-muted text-xs">默认</span>');
-  const sel = el('<select class="preview-ctx"></select>');
-  for (const k of keys) {
-    const opt = document.createElement('option');
-    opt.value = k;
-    opt.textContent = `${Math.round(Number(k) / 1024)}K → ${ctxMap[k]}G`;
-    opt.selected = String(Number(m.specified_ctx ?? m.default_ctx)) === String(Number(k));
-    sel.appendChild(opt);
-  }
-  sel.addEventListener('change', () => {
-    if (Number(sel.value) === Number(m.default_ctx)) delete overrides[m.id];
-    else overrides[m.id] = Number(sel.value);
-    onChange();
-  });
-  return sel;
+export function onLeave() {
+  stopPolling();
 }
 
-async function openPreview() {
-  const body = el('<div class="preview"><div class="text-muted">正在核算显存预算…</div></div>');
-  const close = openModal({ title: '🎼 预演模式 · 显存预算引擎', body, width: '780px' });
-  let budget = null;
-  try {
-    budget = await api.budget();
-  } catch (err) {
-    body.innerHTML = `<div class="text-bad">预算加载失败：${escapeHtml(err.message)}</div>`;
-    return;
-  }
-  const overrides = {};
-  const render = async () => {
-    try {
-      const b = await api.budget(overrides);
-      renderBudget(body, b, overrides, render);
-    } catch (err) {
-      body.innerHTML = `<div class="text-bad">重算失败：${escapeHtml(err.message)}</div>`;
-    }
-  };
-  renderBudget(body, budget, overrides, render);
-}
-
-function renderBudget(body, b, overrides, rerender) {
-  empty(body);
-  if (!b?.ok) {
-    body.innerHTML = `<div class="text-bad">预算不可用</div>`;
-    return;
-  }
-  const usedPct = b.safe_ceiling_gb ? Math.min((b.used_gb / b.safe_ceiling_gb) * 100, 100) : 0;
-
-  body.appendChild(el(`<div class="preview-overview card card--compact">
-    <div class="flex justify-between items-center">
-      <span><span class="tag tag--primary">安全上限 ${b.safe_ceiling_gb}G / ${b.total_gb}G</span></span>
-      <span class="text-xs text-muted font-mono">已用 ${b.used_gb}G · 可释放 ${b.releasable_gb}G · 可用 ${b.avail_gb}G</span>
-    </div>
-    <div class="vram-bar__track mt-sm"><div class="vram-bar__fill vram-bar__fill--ok" style="width:${usedPct}%"></div></div>
-    <div class="text-xs text-muted mt-sm">预演 = 只看不动：调整 Context 试算所需显存与加载决策，不会实际加载模型</div>
-  </div>`));
-
-  const table = el(`<table class="table mt-md">
-    <thead><tr><th>模型</th><th>所需显存</th><th>决策</th><th>Context</th><th>预计耗时</th></tr></thead>
-    <tbody></tbody>
-  </table>`);
-  const tbody = table.querySelector('tbody');
-  for (const m of b.models || []) {
-    const tr = el(`<tr>
-      <td><div class="model-name">${escapeHtml(m.name)}</div><div class="text-xs text-muted">${escapeHtml(m.source)}${m.loaded ? ' · <span class="text-ok">已加载</span>' : ''}</div></td>
-      <td class="font-mono">${m.vram_gb}G</td>
-      <td>${decisionTag(m)}</td>
-      <td></td>
-      <td class="text-xs text-muted">${escapeHtml(m.est_time_text || '—')}</td>
-    </tr>`);
-    tr.children[3].appendChild(buildCtxSelect(m, overrides, rerender));
-    tbody.appendChild(tr);
-  }
-  body.appendChild(table);
-  body.appendChild(el(`<div class="text-xs text-muted mt-md">底噪 ${b.noise_gb}G + 系统保留 ${b.reserve_gb}G → 安全上限 ${b.safe_ceiling_gb}G</div>`));
-}
-
-/* ========== 数据加载 ========== */
+/* ========== 数据刷新 ========== */
 
 async function refresh() {
   try {
-    const data = await api.status();
-    store.set('status', data);
+    statusData = await api.status();
+    updateView();
   } catch (err) {
-    // api.js 已广播 api:error
+    console.error('[dashboard] refresh error', err);
+    events.emit('toast', { type: 'error', message: '状态刷新失败：' + err.message });
   }
 }
 
@@ -298,22 +106,316 @@ function startPolling() {
 }
 
 function stopPolling() {
-  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
 }
 
-/* ========== 页面注册配置 ========== */
+/* ========== 视图更新 ========== */
 
-export default {
-  title: '总览',
-  render,
-  onEnter: () => {
-    refresh();
-    startPolling();
-    // 订阅状态变化 → 更新视图
-    unsubscribe = store.subscribe('status', updateView);
-  },
-  onLeave: () => {
-    stopPolling();
-    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-  },
-};
+function updateView() {
+  if (!page || !page.isConnected || !statusData) return;
+  updateHealthCards();
+  updateAlerts();
+  updateVramChart();
+  updateServices();
+  const hint = page.querySelector('[data-refresh-hint]');
+  if (hint) hint.textContent = `更新于 ${new Date().toLocaleTimeString()}`;
+}
+
+/* ---------- 健康四卡片 ---------- */
+
+function updateHealthCards() {
+  const slot = page.querySelector('[data-health-cards]');
+  if (!slot) return;
+  empty(slot);
+
+  const gpu = statusData.gpu || {};
+  const containers = statusData.containers || {};
+  const queue = statusData.comfy_queue || {};
+  const models = statusData.comfyui_models || {};
+
+  // GPU 卡片
+  const gpuUsed = gpu.used_mb || 0;
+  const gpuTotal = gpu.total_mb || 1;
+  const gpuPct = (gpuUsed / gpuTotal) * 100;
+  const gpuStatus = gpuPct > 85 ? 'error' : gpuPct > 60 ? 'warning' : 'ok';
+  slot.appendChild(StatusCard.render({
+    title: 'GPU 显存',
+    value: `${fmtMb(gpuUsed)} / ${fmtMb(gpuTotal)}`,
+    status: gpuStatus,
+    subtitle: `使用率 ${fmtPct(gpuPct)} · 利用率 ${gpu.utilization || 0}%`,
+    icon: '🎮',
+    trend: vramHistory.slice(-20),
+    action: { label: '查看账本', onClick: () => go('observability') },
+  }));
+
+  // 容器卡片
+  const allContainers = containers.all || [];
+  const runningCount = allContainers.filter(c =>
+    containers[c] === true || (containers.comfyui && c === 'comfyui') ||
+    (containers.fooocus && c === 'fooocus')
+  ).length;
+  const containerStatus = allContainers.length > 0 && runningCount === allContainers.length ? 'ok'
+    : runningCount > 0 ? 'warning' : 'error';
+  slot.appendChild(StatusCard.render({
+    title: '运行中服务',
+    value: `${runningCount} / ${allContainers.length}`,
+    status: containerStatus,
+    subtitle: allContainers.join(', ') || '无容器',
+    icon: '📦',
+    action: { label: '服务健康', onClick: () => go('observability') },
+  }));
+
+  // 模型卡片
+  const loadedModels = models.models || [];
+  const modelVram = loadedModels.reduce((sum, m) => sum + (m.vram_mb || 0), 0);
+  const modelStatus = loadedModels.length > 0 ? 'warning' : 'ok';
+  slot.appendChild(StatusCard.render({
+    title: '已加载模型',
+    value: `${loadedModels.length} 个`,
+    status: modelStatus,
+    subtitle: `占用 ${fmtMb(modelVram)}`,
+    icon: '🤖',
+    action: { label: '模型管理', onClick: () => go('workloads') },
+  }));
+
+  // 队列卡片
+  const queueRunning = queue.running ? 1 : 0;
+  const queuePending = (queue.pending || []).length;
+  const queueStatus = queuePending > 5 ? 'warning' : 'ok';
+  slot.appendChild(StatusCard.render({
+    title: '任务队列',
+    value: `${queuePending} 等待 · ${queueRunning} 运行`,
+    status: queueStatus,
+    subtitle: queuePending > 0 ? `有 ${queuePending} 个任务等待中` : '队列空闲',
+    icon: '📋',
+    action: { label: '查看队列', onClick: () => go('workloads') },
+  }));
+}
+
+/* ---------- 告警面板 ---------- */
+
+function updateAlerts() {
+  const slot = page.querySelector('[data-alerts]');
+  const countEl = page.querySelector('[data-alert-count]');
+  if (!slot) return;
+  empty(slot);
+
+  const alerts = generateAlerts();
+  if (countEl) countEl.textContent = `${alerts.length} 条`;
+
+  if (alerts.length === 0) {
+    slot.innerHTML = '<div class="dashboard-alerts__empty">✅ 系统运行正常，暂无告警</div>';
+    return;
+  }
+
+  alerts.forEach(alert => {
+    const item = el(`<div class="dashboard-alert dashboard-alert--${alert.level}">
+      <span class="dashboard-alert__icon">${alert.icon}</span>
+      <div class="dashboard-alert__content">
+        <div class="dashboard-alert__title">${alert.title}</div>
+        <div class="dashboard-alert__desc">${alert.desc}</div>
+      </div>
+      <span class="dashboard-alert__time">${alert.time}</span>
+    </div>`);
+    slot.appendChild(item);
+  });
+}
+
+function generateAlerts() {
+  const alerts = [];
+  const gpu = statusData.gpu || {};
+  const gpuPct = gpu.total_mb ? (gpu.used_mb / gpu.total_mb) * 100 : 0;
+  const now = new Date().toLocaleTimeString();
+
+  if (gpuPct > 85) {
+    alerts.push({
+      level: 'error', icon: '🔴',
+      title: '显存使用危险',
+      desc: `当前使用率 ${fmtPct(gpuPct)}，超过 85% 阈值，可能导致 OOM`,
+      time: now,
+    });
+  } else if (gpuPct > 60) {
+    alerts.push({
+      level: 'warning', icon: '🟡',
+      title: '显存使用偏高',
+      desc: `当前使用率 ${fmtPct(gpuPct)}，建议关注`,
+      time: now,
+    });
+  }
+
+  const containers = statusData.containers || {};
+  const all = containers.all || [];
+  const stopped = all.filter(c => !containers[c]);
+  if (stopped.length > 0 && all.length > 0) {
+    alerts.push({
+      level: 'warning', icon: '⚠️',
+      title: '部分服务未运行',
+      desc: `未运行：${stopped.join(', ')}`,
+      time: now,
+    });
+  }
+
+  const queue = statusData.comfy_queue || {};
+  const pending = (queue.pending || []).length;
+  if (pending > 5) {
+    alerts.push({
+      level: 'warning', icon: '⏳',
+      title: '任务队列堆积',
+      desc: `当前有 ${pending} 个任务等待执行`,
+      time: now,
+    });
+  }
+
+  const qos = statusData.qos || {};
+  if (qos.degraded) {
+    alerts.push({
+      level: 'warning', icon: '🛡️',
+      title: 'QoS 降级中',
+      desc: qos.msg || '服务质量已降级',
+      time: now,
+    });
+  }
+
+  return alerts.slice(0, 5); // 最多显示5条
+}
+
+/* ---------- 显存趋势图 ---------- */
+
+function updateVramChart() {
+  const canvas = page.querySelector('[data-vram-chart]');
+  if (!canvas || !statusData?.gpu) return;
+
+  const gpu = statusData.gpu;
+  vramHistory.push(gpu.used_mb || 0);
+  if (vramHistory.length > 30) vramHistory.shift();
+
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const pad = { top: 10, right: 10, bottom: 20, left: 50 };
+
+  ctx.clearRect(0, 0, w, h);
+
+  if (vramHistory.length < 2) return;
+
+  const total = gpu.total_mb || 16384;
+  const maxVal = total;
+  const data = vramHistory;
+
+  // 绘制网格
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (i / 4) * (h - pad.top - pad.bottom);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(w - pad.right, y);
+    ctx.stroke();
+    // Y轴标签
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtMb(maxVal - (i / 4) * maxVal), pad.left - 5, y + 3);
+  }
+
+  // 绘制折线
+  const gradient = ctx.createLinearGradient(0, pad.top, 0, h - pad.bottom);
+  const lastPct = (data[data.length - 1] / total) * 100;
+  const color = lastPct > 85 ? '#ef4444' : lastPct > 60 ? '#f59e0b' : '#10b981';
+  gradient.addColorStop(0, color + '60');
+  gradient.addColorStop(1, color + '00');
+
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  data.forEach((v, i) => {
+    const x = pad.left + (i / (data.length - 1)) * (w - pad.left - pad.right);
+    const y = pad.top + (1 - v / maxVal) * (h - pad.top - pad.bottom);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // 填充
+  ctx.lineTo(w - pad.right, h - pad.bottom);
+  ctx.lineTo(pad.left, h - pad.bottom);
+  ctx.closePath();
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  // 当前值标签
+  const lastX = w - pad.right;
+  const lastY = pad.top + (1 - data[data.length - 1] / maxVal) * (h - pad.top - pad.bottom);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+/* ---------- 服务状态列表 ---------- */
+
+function updateServices() {
+  const slot = page.querySelector('[data-services-list]');
+  if (!slot) return;
+  empty(slot);
+
+  const containers = statusData.containers || {};
+  const all = containers.all || [];
+
+  if (all.length === 0) {
+    slot.innerHTML = '<div class="text-muted text-sm">无监控服务</div>';
+    return;
+  }
+
+  all.forEach(name => {
+    const running = containers[name];
+    const item = el(`<div class="service-row">
+      <span class="status-dot" style="background:${running ? '#10b981' : '#6b7280'}"></span>
+      <span class="service-row__name">${name}</span>
+      <span class="service-row__status">${running ? '运行中' : '已停止'}</span>
+    </div>`);
+    slot.appendChild(item);
+  });
+}
+
+/* ========== 操作绑定 ========== */
+
+function bindActions(pageEl) {
+  pageEl.querySelector('[data-action="free"]')?.addEventListener('click', async () => {
+    try {
+      await api.free();
+      events.emit('toast', { type: 'success', message: '显存已释放' });
+      refresh();
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: '释放失败：' + err.message });
+    }
+  });
+
+  pageEl.querySelector('[data-action="scene-comfy"]')?.addEventListener('click', async () => {
+    try {
+      await api.scene('comfy');
+      events.emit('toast', { type: 'success', message: '已切换到出图场景' });
+      refresh();
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: '切换失败：' + err.message });
+    }
+  });
+
+  pageEl.querySelector('[data-action="scene-dialogue"]')?.addEventListener('click', async () => {
+    try {
+      await api.scene('dialogue');
+      events.emit('toast', { type: 'success', message: '已切换到对话场景' });
+      refresh();
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: '切换失败：' + err.message });
+    }
+  });
+
+  pageEl.querySelector('[data-action="observability"]')?.addEventListener('click', () => go('observability'));
+  pageEl.querySelector('[data-action="diagnostics"]')?.addEventListener('click', () => go('diagnostics'));
+}
+
+export default { render, onEnter, onLeave };

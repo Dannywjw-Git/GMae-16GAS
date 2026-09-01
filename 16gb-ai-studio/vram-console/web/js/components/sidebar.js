@@ -8,16 +8,14 @@ import { el } from '../core/utils.js';
 import { events } from '../core/events.js';
 import { go } from '../core/router.js';
 
-/** 导航项（name 需与 router.register 的页面名一致） */
+/** 导航项（name 需与 router.register 的页面名一致）
+ *  v2.0 信息架构：总览 / 观测 / 诊断 / 工作负载 / 设置
+ */
 const NAV_ITEMS = [
   { name: 'dashboard', label: '总览', icon: '📊' },
-  { name: 'chat', label: '指挥家', icon: '🎼' },
-  { name: 'scenes', label: '场景', icon: '🎭' },
-  { name: 'models', label: '模型', icon: '🤖' },
-  { name: 'vram', label: '账本', icon: '📈' },
-  { name: 'queue', label: '队列', icon: '📋' },
-  { name: 'guard', label: '门卫', icon: '🛡️' },
-  { name: 'logs', label: '日志', icon: '📜' },
+  { name: 'observability', label: '观测中心', icon: '🔍' },
+  { name: 'diagnostics', label: '诊断中心', icon: '🩺' },
+  { name: 'workloads', label: '工作负载', icon: '⚙️' },
   { name: 'settings', label: '设置', icon: '⚙️' },
 ];
 
