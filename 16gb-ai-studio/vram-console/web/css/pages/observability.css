@@ -309,3 +309,71 @@
   padding: 6px 12px;
   font-size: 12px;
 }
+
+/* ========== 显存账本：分布条 ========== */
+.vram-dist {
+  display: flex;
+  height: 20px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.vram-dist__seg {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+.vram-dist__legend {
+  flex-wrap: wrap;
+}
+
+.vram-dist__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 4px;
+}
+
+/* ========== 显存账本：进程分组表 ========== */
+.vram-group {
+  cursor: pointer;
+  background: var(--card-hover);
+  transition: background 0.15s;
+}
+
+.vram-group:hover {
+  background: var(--line-dark);
+}
+
+.vram-group.expanded {
+  background: rgba(20, 184, 166, 0.06);
+}
+
+.vram-group__toggle {
+  display: inline-block;
+  width: 16px;
+  color: var(--dim);
+  font-size: 10px;
+  transition: transform 0.15s;
+}
+
+.vram-group__name {
+  font-weight: 600;
+  color: var(--txt);
+}
+
+.vram-group__child {
+  background: var(--bg-tertiary);
+}
+
+.vram-group__child td {
+  font-size: var(--text-sm);
+  color: var(--sub);
+}
+
+.vram-noise__fixed td {
+  font-style: italic;
+  color: var(--dim);
+}
