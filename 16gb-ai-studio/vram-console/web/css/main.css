@@ -17,6 +17,7 @@
 @import './components/tab-nav.css';
 @import './components/demo.css';
 @import './pages/dashboard.css';
+@import './pages/observability.css';
 @import './pages/chat.css';
 @import './pages/models.css';
 @import './pages/vram.css';

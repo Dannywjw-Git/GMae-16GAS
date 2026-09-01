@@ -1,0 +1,311 @@
+/* 观测中心页面样式 */
+
+.observability-page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+/* 通用卡片 */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--txt);
+  margin-bottom: 12px;
+}
+
+.card__header .card__title {
+  margin-bottom: 0;
+}
+
+/* 数据表格 */
+.data-table {
+  overflow-x: auto;
+}
+
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--bg-tertiary);
+  color: var(--txt-secondary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--txt);
+}
+
+.data-table tr:hover {
+  background: var(--card-hover);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* ========== 显存账本 ========== */
+
+.vram-overview {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.vram-overview__main {
+  text-align: center;
+  min-width: 120px;
+}
+
+.vram-overview__pct {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--txt);
+}
+
+.vram-overview__detail {
+  font-size: 12px;
+  color: var(--txt-secondary);
+  margin-top: 4px;
+}
+
+.vram-bar {
+  flex: 1;
+}
+
+.vram-bar__track {
+  height: 20px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.vram-bar__fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+/* 显存分段 */
+.vram-segments {
+  margin-top: 12px;
+}
+
+.vram-seg-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.vram-seg {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.vram-seg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vram-seg-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--txt-secondary);
+}
+
+.vram-seg-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+/* ========== 服务健康 ========== */
+
+.observability-health .status-card-grid {
+  margin-bottom: 16px;
+}
+
+.observability-health .status-card {
+  padding: 12px;
+}
+
+.observability-health .status-card__value {
+  font-size: 28px;
+}
+
+/* ========== 事件日志 ========== */
+
+.events-filter {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--txt);
+  font-size: 13px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.events-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.event-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent;
+}
+
+.event-item:hover {
+  background: var(--card-hover);
+}
+
+.event-item--info {
+  border-left-color: var(--primary);
+}
+
+.event-item--warning {
+  border-left-color: var(--warn);
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.event-item--error {
+  border-left-color: var(--bad);
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.event-item--critical {
+  border-left-color: var(--bad);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.event-item__time {
+  font-size: 11px;
+  color: var(--txt-tertiary);
+  font-family: var(--font-mono);
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.event-item__level {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  min-width: 60px;
+  text-align: center;
+  flex-shrink: 0;
+  height: fit-content;
+}
+
+.event--info .event-item__level {
+  background: var(--primary-bg);
+  color: var(--primary-light);
+}
+
+.event--warning .event-item__level {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.event--error .event-item__level,
+.event--critical .event-item__level {
+  background: var(--bad-bg);
+  color: var(--bad);
+}
+
+.event-item__service {
+  font-size: 12px;
+  color: var(--txt-secondary);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.event-item__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-item__type {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--txt);
+  font-family: var(--font-mono);
+}
+
+.event-item__msg {
+  font-size: 12px;
+  color: var(--txt-secondary);
+  margin-top: 2px;
+}
+
+.event-meta {
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.event-meta summary {
+  cursor: pointer;
+  color: var(--txt-tertiary);
+}
+
+.event-meta pre {
+  background: var(--bg-tertiary);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  overflow-x: auto;
+  font-size: 11px;
+}
+
+/* 按钮尺寸 */
+.btn--xs {
+  padding: 2px 8px;
+  font-size: 11px;
+}
+
+.btn--sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
