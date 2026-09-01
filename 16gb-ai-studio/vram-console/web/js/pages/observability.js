@@ -10,7 +10,7 @@ import TabNav from '../components/TabNav.js';
 
 // 通用 API 请求（新 v1 端点直接用 fetch）
 async function apiGet(path) {
-  const token = localStorage.getItem('api_token') || '';
+  const token = localStorage.getItem('gm_api_token') || '';
   const headers = { 'X-API-Key': token };
   const resp = await fetch(path, { headers });
   const data = await resp.json();
@@ -18,7 +18,7 @@ async function apiGet(path) {
 }
 
 async function apiPost(path, body = {}) {
-  const token = localStorage.getItem('api_token') || '';
+  const token = localStorage.getItem('gm_api_token') || '';
   const headers = { 'X-API-Key': token, 'Content-Type': 'application/json' };
   const resp = await fetch(path, { method: 'POST', headers, body: JSON.stringify(body) });
   const data = await resp.json();
