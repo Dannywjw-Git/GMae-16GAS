@@ -176,7 +176,9 @@ function render() {
       const result = await api.free();
       const msg = result?.message || '显存已释放';
       events.emit('toast', { type: 'success', message: msg });
-      await refresh();
+      // 释放后延迟刷新：等 PowerShell 脚本实际执行完，显存数据才准确
+      setTimeout(async () => { await refresh(); }, 3000);
+      await refresh();  // 先立即刷新一次（可能还是旧数据，但按钮状态会恢复）
     } catch (err) {
       events.emit('toast', { type: 'error', message: err.message });
     } finally {

@@ -191,7 +191,21 @@ function render() {
       <div class="grid grid-2" data-comfy></div>
     </div>
   </div>`);
-  page.querySelector('[data-qrefresh]').addEventListener('click', refresh);
+  page.querySelector('[data-qrefresh]').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '刷新中…';
+    try {
+      await refresh();
+      events.emit('toast', { type: 'success', message: '队列已刷新' });
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: err.message });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
   return page;
 }
 

@@ -350,6 +350,7 @@ def _send_reset_email(to_email: str, code: str) -> tuple:
 def auth_status() -> dict:
     """返回认证系统状态"""
     return {
+        "ok": True,
         "has_admin": has_admin(),
         "admin_email": (_load_users().get("admin") or {}).get("email", ""),
         "smtp_configured": bool(SMTP_PASSWORD),

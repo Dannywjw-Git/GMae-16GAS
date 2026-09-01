@@ -100,11 +100,11 @@ def _helper_req(path, data=None):
 
 
 def _helper_process_count():
-    """进程级探测：返回 vram-helper.py 进程数。"""
+    """进程级探测：返回 vram_helper.py 进程数。"""
     try:
         ps = subprocess.run(
             ["powershell", "-NoProfile", "-Command",
-             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -match 'vram-helper' } | Measure-Object | Select-Object -ExpandProperty Count"],
+             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -match 'vram[_-]helper' } | Measure-Object | Select-Object -ExpandProperty Count"],
             capture_output=True, text=True, timeout=10)
         n = int((ps.stdout or "0").strip() or "0")
         return n
@@ -113,11 +113,11 @@ def _helper_process_count():
 
 
 def _helper_kill_processes():
-    """强杀所有 vram-helper 进程。"""
+    """强杀所有 vram_helper 进程。"""
     try:
         subprocess.run(
             ["powershell", "-NoProfile", "-Command",
-             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -match 'vram-helper' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],
+             "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -match 'vram[_-]helper' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],
             capture_output=True, text=True, timeout=10)
     except Exception:
         pass
@@ -142,7 +142,7 @@ def helper_start() -> dict:
             return {"ok": False, "running": False,
                     "msg": "检测到 vram-helper 残留进程且自动清理失败，请手动结束进程后重试"}
     token = _config().get("helper_token", "")
-    script = os.path.join(BASE_DIR, "vram-helper.py")
+    script = os.path.join(BASE_DIR, "services", "vram_helper.py")
     import sys
 
     is_admin = False

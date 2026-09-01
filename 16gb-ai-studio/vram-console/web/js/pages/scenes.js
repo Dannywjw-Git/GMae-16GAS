@@ -95,6 +95,8 @@ async function switchScene(id) {
     renderLog(d.actions);
     if (d.ok) {
       showStatus(`<span class="text-ok">✅ 已切换到「${s.label}」</span>`);
+      renderScenes(id);  // 立即更新"当前"标记，不依赖 store 订阅延迟
+      renderCombos(id);
     } else {
       showStatus(`<span class="text-bad">❌ 切换异常：${s.label}</span>`);
       events.emit('toast', { type: 'error', message: `场景切换失败：${s.label}` });
@@ -134,6 +136,7 @@ async function switchCombo(id) {
     showStatus(d.ok
       ? `<span class="text-ok">✅ 组合完成：${label}</span>`
       : `<span class="text-bad">❌ 组合异常：${label}</span>`);
+    if (d.ok) renderCombos(store.get('status')?.scene);  // 立即刷新组合状态
     await refresh();
   } catch (err) {
     showStatus(`<span class="text-bad">✘ 请求失败：${escapeHtml(err.message)}</span>`);

@@ -1,7 +1,7 @@
 {
   "version": "1.1",
   "description": "GPU Maestro 资源注册表 - 所有模型/容器/场景的唯一数据源（模型详细信息已整合自档案库）",
-  "last_updated": "2026-08-30",
+  "last_updated": "2026-09-01",
   "ollama": {
     "container": "ollama",
     "port": 11434,
@@ -531,6 +531,26 @@
       "containers": [
         "ollama",
         "open-webui"
+      ],
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "docker_stop",
+          "target": "fooocus",
+          "critical": false,
+          "label": "停止 Fooocus"
+        },
+        {
+          "action": "docker_stop",
+          "target": "comfyui",
+          "critical": false,
+          "label": "停止 ComfyUI（释放WSL内存）"
+        }
       ]
     },
     "comfy": {
@@ -539,6 +559,44 @@
       "containers": [
         "comfyui",
         "ollama"
+      ],
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "ollama_stop_all",
+          "critical": false,
+          "label": "停止 Ollama 模型（释放显存）"
+        },
+        {
+          "action": "docker_start",
+          "target": "comfyui",
+          "critical": true,
+          "label": "启动 ComfyUI"
+        },
+        {
+          "action": "docker_stop",
+          "target": "fooocus",
+          "critical": false,
+          "label": "停止 Fooocus"
+        },
+        {
+          "action": "vram_release",
+          "critical": false,
+          "label": "释放显存"
+        },
+        {
+          "action": "wait_ready",
+          "port": 8188,
+          "timeout_s": 120,
+          "critical": true,
+          "label": "等待 ComfyUI 就绪",
+          "requires": "docker_start:comfyui"
+        }
       ]
     },
     "h3": {
@@ -547,7 +605,45 @@
       "containers": [
         "comfyui"
       ],
-      "exclusive": true
+      "exclusive": true,
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "ollama_stop_all",
+          "critical": false,
+          "label": "停止 Ollama 模型（H3需全卡）"
+        },
+        {
+          "action": "docker_start",
+          "target": "comfyui",
+          "critical": true,
+          "label": "启动 ComfyUI"
+        },
+        {
+          "action": "docker_stop",
+          "target": "fooocus",
+          "critical": false,
+          "label": "停止 Fooocus（防叠加）"
+        },
+        {
+          "action": "vram_release",
+          "critical": false,
+          "label": "释放显存"
+        },
+        {
+          "action": "wait_ready",
+          "port": 8188,
+          "timeout_s": 120,
+          "critical": true,
+          "label": "等待 ComfyUI 就绪",
+          "requires": "docker_start:comfyui"
+        }
+      ]
     },
     "fooocus": {
       "label": "Flux出图",
@@ -555,7 +651,45 @@
       "containers": [
         "fooocus"
       ],
-      "exclusive": true
+      "exclusive": true,
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "ollama_stop_all",
+          "critical": false,
+          "label": "停止 Ollama 模型（Flux需全卡）"
+        },
+        {
+          "action": "docker_start",
+          "target": "fooocus",
+          "critical": true,
+          "label": "启动 Fooocus"
+        },
+        {
+          "action": "docker_stop",
+          "target": "comfyui",
+          "critical": false,
+          "label": "停止 ComfyUI（防SDXL驻留叠加）"
+        },
+        {
+          "action": "vram_release",
+          "critical": false,
+          "label": "释放显存"
+        },
+        {
+          "action": "wait_ready",
+          "port": 7865,
+          "timeout_s": 180,
+          "critical": true,
+          "label": "等待 Fooocus 就绪",
+          "requires": "docker_start:fooocus"
+        }
+      ]
     },
     "music": {
       "label": "音乐态",
@@ -563,12 +697,75 @@
       "containers": [
         "comfyui"
       ],
-      "exclusive": true
+      "exclusive": true,
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "ollama_stop_all",
+          "critical": false,
+          "label": "停止 Ollama 模型（Music3需全卡）"
+        },
+        {
+          "action": "docker_start",
+          "target": "comfyui",
+          "critical": true,
+          "label": "启动 ComfyUI"
+        },
+        {
+          "action": "docker_stop",
+          "target": "fooocus",
+          "critical": false,
+          "label": "停止 Fooocus"
+        },
+        {
+          "action": "vram_release",
+          "critical": false,
+          "label": "释放显存"
+        },
+        {
+          "action": "wait_ready",
+          "port": 8188,
+          "timeout_s": 120,
+          "critical": true,
+          "label": "等待 ComfyUI 就绪",
+          "requires": "docker_start:comfyui"
+        }
+      ]
     },
     "game": {
       "label": "游戏态",
       "vram_budget_gb": 5,
-      "containers": []
+      "containers": [],
+      "steps": [
+        {
+          "action": "pre_release_vram",
+          "threshold_mb": 4096,
+          "critical": true,
+          "label": "预释放显存（<4G时）"
+        },
+        {
+          "action": "docker_stop",
+          "target": "comfyui",
+          "critical": false,
+          "label": "停止 ComfyUI"
+        },
+        {
+          "action": "docker_stop",
+          "target": "fooocus",
+          "critical": false,
+          "label": "停止 Fooocus"
+        },
+        {
+          "action": "game_on",
+          "critical": false,
+          "label": "游戏模式优化"
+        }
+      ]
     }
   },
   "gpu_guard": {

@@ -106,12 +106,19 @@ class Handler(BaseHTTPRequestHandler):
         """处理页面路由，返回 True 表示已处理。"""
         if self.path == "/" or self.path == "/index.html":
             if not auth_mod.has_admin() or not self._current_user():
-                self._send(200, read_login_html(), "text/html")
+                html = read_login_html()
+                # 首次安装：自动显示"首次设置"tab（注入 data-setup 属性）
+                if not auth_mod.has_admin():
+                    html = html.replace(b"<body>", b'<body data-setup="1">', 1)
+                self._send(200, html, "text/html")
             else:
                 self._send(200, read_html(), "text/html")
             return True
         if self.path == "/login":
-            self._send(200, read_login_html(), "text/html")
+            html = read_login_html()
+            if not auth_mod.has_admin():
+                html = html.replace(b"<body>", b'<body data-setup="1">', 1)
+            self._send(200, html, "text/html")
             return True
         return False
 

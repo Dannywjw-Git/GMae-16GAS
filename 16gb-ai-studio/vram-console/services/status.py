@@ -276,6 +276,7 @@ def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
     helper = results["helper"]
 
     return {
+        "ok": True,
         "gpu": gpu,
         "gpu_processes": gpu_procs,
         "guard": guard,
@@ -309,6 +310,7 @@ def current_status() -> dict:
         cached = cache["data"].copy()
         cached["ts"] = int(now)
         cached["cached"] = True
+        cached["ok"] = True
         return cached
 
     # 2. 缓存未命中：并行采集 + 场景推断 + 显存账本

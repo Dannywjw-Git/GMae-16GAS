@@ -61,7 +61,21 @@ function renderGuard(status) {
     </div>
   </div>`);
 
-  card.querySelector('[data-guard-check]').addEventListener('click', refresh);
+  card.querySelector('[data-guard-check]').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '检查中…';
+    try {
+      await refresh();
+      events.emit('toast', { type: 'success', message: '门卫已重新检查' });
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: err.message });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
   card.querySelector('[data-guard-evict]').addEventListener('click', onEvict);
   slot.appendChild(card);
 }

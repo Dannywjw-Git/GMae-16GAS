@@ -6,8 +6,34 @@ GMae Docker 客户端
 - 提供容器列表、容器操作、容器内命令执行等接口
 - 所有调用统一超时和错误处理
 """
-from core.logger import log_error
+import os
+import shutil
+from core.logger import log_error, log_event
 from core.utils import run_args
+
+# Docker 命令常见路径（Windows Docker Desktop）
+_DOCKER_CANDIDATES = [
+    "docker",
+    r"C:\Program Files\Docker\Docker\resources\bin\docker.exe",
+    r"C:\Program Files\Docker\Docker\resources\bin\docker",
+]
+
+_docker_cmd_cache = None
+
+def _get_docker_cmd() -> str:
+    """获取 docker 命令路径，缓存结果。"""
+    global _docker_cmd_cache
+    if _docker_cmd_cache:
+        return _docker_cmd_cache
+    for candidate in _DOCKER_CANDIDATES:
+        path = shutil.which(candidate) or (candidate if os.path.isfile(candidate) else None)
+        if path:
+            _docker_cmd_cache = path
+            log_event("docker_cmd_found", path=path)
+            return path
+    log_error("docker_cmd_not_found", "docker command not found in PATH or common locations")
+    _docker_cmd_cache = "docker"  # fallback, will likely fail
+    return _docker_cmd_cache
 
 
 def list_running_containers() -> set:
@@ -16,8 +42,10 @@ def list_running_containers() -> set:
     Returns:
         set: 容器名称集合
     """
-    rc, out = run_args(["docker", "ps", "--format", "{{.Names}}"], 10)
+    docker = _get_docker_cmd()
+    rc, out = run_args([docker, "ps", "--format", "{{.Names}}"], 10)
     if rc != 0:
+        log_error("docker_ps_failed", rc=rc, output=out[:200])
         return set()
     return {line.strip() for line in out.splitlines() if line.strip()}
 
@@ -61,7 +89,7 @@ def exec_command(container_name: str, command: list, timeout: int = 60) -> tuple
     Returns:
         tuple: (return_code: int, output: str)
     """
-    return run_args(["docker", "exec", container_name] + command, timeout)
+    return run_args([_get_docker_cmd(), "exec", container_name] + command, timeout)
 
 
 def stop_container(container_name: str, timeout: int = 30) -> tuple:
@@ -74,7 +102,7 @@ def stop_container(container_name: str, timeout: int = 30) -> tuple:
     Returns:
         tuple: (ok: bool, message: str)
     """
-    rc, out = run_args(["docker", "stop", container_name], timeout)
+    rc, out = run_args([_get_docker_cmd(), "stop", container_name], timeout)
     if rc != 0:
         return False, "stop failed: " + out[:200]
     return True, "stopped"
@@ -90,7 +118,7 @@ def start_container(container_name: str, timeout: int = 30) -> tuple:
     Returns:
         tuple: (ok: bool, message: str)
     """
-    rc, out = run_args(["docker", "start", container_name], timeout)
+    rc, out = run_args([_get_docker_cmd(), "start", container_name], timeout)
     if rc != 0:
         return False, "start failed: " + out[:200]
     return True, "started"
@@ -107,7 +135,7 @@ def kill_process_in_container(container_name: str, pid: int, timeout: int = 10) 
     Returns:
         tuple: (ok: bool, message: str)
     """
-    rc, out = run_args(["docker", "exec", container_name, "kill", "-9", str(pid)], timeout)
+    rc, out = run_args([_get_docker_cmd(), "exec", container_name, "kill", "-9", str(pid)], timeout)
     if rc != 0:
         return False, "kill failed: " + out[:200]
     return True, "killed"
@@ -124,7 +152,7 @@ def inspect_container(container_name: str, format_str: str, timeout: int = 10) -
     Returns:
         tuple: (rc: int, output: str)
     """
-    return run_args(["docker", "inspect", "--format", format_str, container_name], timeout)
+    return run_args([_get_docker_cmd(), "inspect", "--format", format_str, container_name], timeout)
 
 
 def container_action(container_name: str, action: str, timeout: int = 60) -> tuple:
@@ -140,4 +168,4 @@ def container_action(container_name: str, action: str, timeout: int = 60) -> tup
     """
     if action not in ("start", "stop", "restart"):
         return -1, "unsupported action: " + str(action)
-    return run_args(["docker", action, container_name], timeout)
+    return run_args([_get_docker_cmd(), action, container_name], timeout)

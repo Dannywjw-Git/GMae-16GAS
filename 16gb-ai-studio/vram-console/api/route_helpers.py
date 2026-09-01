@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae HTTP 路由辅助函数
@@ -178,21 +178,21 @@ a{color:#0d9488;text-decoration:none;cursor:pointer}
 <input id="login-email" placeholder="邮箱" type="email">
 <input id="login-password" placeholder="密码" type="password">
 <label style="font-size:14px;color:#94a3b8"><input type="checkbox" id="login-remember" style="width:auto;margin-right:6px">记住我 30 天</label>
-<button onclick="doLogin()">登录</button>
+<button type="button" onclick="doLogin()">登录</button>
 </div>
 <div id="setup" class="hidden">
 <input id="setup-email" placeholder="管理员邮箱" type="email">
 <input id="setup-password" placeholder="设置密码（至少6位）" type="password">
 <input id="setup-password2" placeholder="确认密码" type="password">
-<button onclick="doSetup()">创建管理员账户</button>
+<button type="button" onclick="doSetup()">创建管理员账户</button>
 </div>
 <div id="forgot" class="hidden">
 <input id="forgot-email" placeholder="注册邮箱" type="email">
-<button onclick="doForgot()">发送验证码</button>
+<button type="button" onclick="doForgot()">发送验证码</button>
 <div id="reset-step" class="hidden" style="margin-top:16px">
 <input id="reset-code" placeholder="6位验证码" maxlength="6">
 <input id="reset-password" placeholder="新密码（至少6位）" type="password">
-<button onclick="doReset()">重置密码</button>
+<button type="button" onclick="doReset()">重置密码</button>
 </div>
 </div>
 <div class="msg" id="msg"></div>
@@ -202,7 +202,7 @@ function showTab(t){document.querySelectorAll('.tab div').forEach((e,i)=>e.class
 function msg(t,c){var e=document.getElementById('msg');e.textContent=t;e.className='msg '+(c||'');}
 async function api(url,data){var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});return await r.json();}
 async function doLogin(){var e=document.getElementById('login-email').value,p=document.getElementById('login-password').value,r=document.getElementById('login-remember').checked;if(!e||!p)return msg('请输入邮箱和密码','err');var d=await api('/api/auth/login',{email:e,password:p,remember:r});if(d.ok){msg('登录成功，正在跳转...','ok');setTimeout(()=>location.href='/',800);}else msg(d.error||'登录失败','err');}
-window.addEventListener('DOMContentLoaded',function(){var ei=document.getElementById('login-email');if(ei){ei.focus();}['login-email','login-password'].forEach(function(id){var el=document.getElementById(id);if(el){el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();doLogin();}});}});});
+window.addEventListener('DOMContentLoaded',function(){var ei=document.getElementById('login-email');if(ei){ei.focus();}['login-email','login-password'].forEach(function(id){var el=document.getElementById(id);if(el){el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();doLogin();}});}});if(window.location.search.indexOf('setup=1')>=0||document.body.dataset.setup==='1'){showTab('setup');}});
 async function doSetup(){var e=document.getElementById('setup-email').value,p=document.getElementById('setup-password').value,p2=document.getElementById('setup-password2').value;if(!e||!p)return msg('请输入邮箱和密码','err');if(p!==p2)return msg('两次密码不一致','err');var d=await api('/api/auth/setup',{email:e,password:p});if(d.ok){msg('创建成功，请登录','ok');showTab('login');}else msg(d.message||'创建失败','err');}
 async function doForgot(){var e=document.getElementById('forgot-email').value;if(!e)return msg('请输入邮箱','err');var d=await api('/api/auth/forgot',{email:e});msg(d.message,d.ok?'ok':'err');if(d.ok)document.getElementById('reset-step').classList.remove('hidden');}
 async function doReset(){var e=document.getElementById('forgot-email').value,c=document.getElementById('reset-code').value,p=document.getElementById('reset-password').value;var d=await api('/api/auth/reset',{email:e,code:c,password:p});if(d.ok){msg('密码重置成功，请登录','ok');showTab('login');}else msg(d.message||'重置失败','err');}

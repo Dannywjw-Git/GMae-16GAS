@@ -99,30 +99,45 @@ def wait_ready(port, timeout=90):
 
 
 def free_all() -> dict:
-    """一键释放：遍历 registry gpu_guard.managed 列表，按 evict 方式释放。"""
-    from gpu.monitor import gpu_status
+    """一键释放：遍历 registry gpu_guard.managed 列表，按 evict 方式释放。
+    返回格式兼容前端 showFreeResult：{freed_mb, free_mb_before, free_mb_after,
+    stopped, running, success_count, total_count, actions}"""
+    from gpu.monitor import gpu_status, gpu_processes
     from services.ollama import ollama_stop_all
     from services.comfy import comfy_free
 
     before = gpu_status()
     actions = []
+    stopped = []
     guard = REGISTRY.get("gpu_guard", {})
     managed = guard.get("managed", [])
+    containers = docker_containers()
+    # 受保护的进程（不显示在 running 中或标记为受保护）
+    protect_comms = guard.get("PROTECT_COMMS", []) or guard.get("protect_comms", [])
     for item in managed:
         name = item.get("name", "")
         evict = item.get("evict", "")
-        if not name or name not in docker_containers():
+        if not name or name not in containers:
             continue
         if evict == "stop models" and name == "ollama":
             rc, out = ollama_stop_all()
-            actions.append({"name": name, "action": "stop models", "ok": rc == 0, "output": out[-200:]})
+            ok = rc == 0
+            actions.append({"name": name, "action": "stop models", "ok": ok, "output": out[-200:]})
+            if ok:
+                stopped.append({"name": name, "method": "stop_models"})
         elif evict == "/free" and name == "comfyui":
             r = comfy_free()
-            actions.append({"name": name, "action": "/free", "ok": r.get("ok", False),
+            ok = r.get("ok", False)
+            actions.append({"name": name, "action": "/free", "ok": ok,
                             "freed_mb": r.get("freed_mb", 0)})
+            if ok:
+                stopped.append({"name": name, "method": "/free"})
         elif evict == "docker stop":
             r = container_stop(name)
-            actions.append({"name": name, "action": "docker stop", "ok": r.get("ok", False)})
+            ok = r.get("ok", False)
+            actions.append({"name": name, "action": "docker stop", "ok": ok})
+            if ok:
+                stopped.append({"name": name, "method": "docker_stop"})
     # 通用扫描：未登记但挂载 GPU 的容器
     if guard.get("system", {}).get("gpu_container_scan", False):
         for cont in docker_containers():
@@ -130,14 +145,38 @@ def free_all() -> dict:
                 continue
             if _container_has_gpu(cont):
                 r = container_stop(cont)
-                actions.append({"name": cont, "action": "docker stop (auto-scan)",
-                                "ok": r.get("ok", False)})
+                ok = r.get("ok", False)
+                actions.append({"name": cont, "action": "docker stop (auto-scan)", "ok": ok})
+                if ok:
+                    stopped.append({"name": cont, "method": "docker_stop"})
     time.sleep(1)
     after = gpu_status()
+    # 构建 running 数组：释放后仍在运行且占用 GPU 的进程
+    running = []
+    try:
+        proc_info = gpu_processes()
+        for p in proc_info.get("processes", []):
+            if p.get("used_mb", 0) > 0:
+                app = p.get("app", p.get("name", "unknown"))
+                is_protected = any(pr.lower() in p.get("name", "").lower() for pr in protect_comms)
+                running.append({
+                    "name": app,
+                    "gpu_mb": p.get("used_mb", 0),
+                    "protected": is_protected,
+                    "pid": p.get("pid"),
+                })
+    except Exception as e:
+        log_error("free_all_running_scan_failed", error=e)
+    total_count = len(actions)
+    success_count = sum(1 for a in actions if a.get("ok", False))
     return {
         "ok": True,
         "free_mb_before": before.get("free_mb", 0),
         "free_mb_after": after.get("free_mb", 0),
         "freed_mb": max(0, after.get("free_mb", 0) - before.get("free_mb", 0)),
         "actions": actions,
+        "stopped": stopped,
+        "running": running,
+        "success_count": success_count,
+        "total_count": total_count,
     }

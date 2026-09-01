@@ -1,7 +1,12 @@
 {
   "SDXL": {
-    "count": 9,
-    "total_seconds": 528,
-    "avg_seconds": 58.7
+    "count": 13,
+    "total_seconds": 714,
+    "avg_seconds": 54.9
+  },
+  "Flux-Q5": {
+    "count": 1,
+    "total_seconds": 127,
+    "avg_seconds": 127.0
   }
 }

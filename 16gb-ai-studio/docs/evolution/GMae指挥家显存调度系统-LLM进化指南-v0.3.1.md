@@ -61,7 +61,7 @@ v0.3.1 引入 LLM 认知编排层，将系统从"按规则执行"升级为"理�
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    用户交互层（Surface）                       │
-│  自然语言对话框 · 8页面前端 · 模型登记台 · REST API            │
+│  自然语言对话框 · 8页面前端 · 模型登记台 · REST API · CLI 命令行  │
 ├─────────────────────────────────────────────────────────────┤
 │  C-Eng 认知引擎（独立进程，端口 8788）                        │
 │  ┌──────────────────────────────────────────────────────┐   │
@@ -100,6 +100,57 @@ v0.3.1 引入 LLM 认知编排层，将系统从"按规则执行"升级为"理�
 - **P-Eng 独立进程**（端口 8787），M-Eng 作为 P-Eng 内后台线程运行
 - 两进程各自有看门狗、日志、启动/停止脚本
 - C-Eng 故障不影响 P-Eng；P-Eng 故障时 C-Eng 降级为"只读+提示"
+
+### 2.3 用户交互层（Surface）
+
+GMae 提供五种互补的用户交互方式，覆盖从"小白一句话"到"专家脚本自动化"的全频谱：
+
+| 交互方式 | 定位 | 典型用户 | 核心能力 |
+|---------|------|---------|---------|
+| **8 页面 Web 前端** | 主交互面 | 所有用户 | 可视化显存水位、场景切换、模型管理、门卫、日志、设置 |
+| **自然语言对话框** | 智能编排面 | 创作者 | 一句话表达创作意图，C-Eng 理解→规划→执行 |
+| **模型登记台** | 资产管理面 | 开发者 | 模型扫描、评测、元数据管理、工作流模板关联 |
+| **REST API** | 集成接口 | 开发者/第三方 | 30+ 端点，完整可编程能力，支持 Session/Token 双认证 |
+| **CLI 命令行** | 专家/自动化面 | 开发者/运维 | 终端直接操控，脚本化批量操作，CI/CD 集成 |
+
+#### 2.3.1 CLI 命令行工具（gmae-cli）
+
+**定位**：GMae 的终端客户端，封装全部 REST API，为开发者和运维提供"无需打开浏览器"的操作通道，同时是脚本自动化和 CI/CD 集成的基础。
+
+**设计原则**：
+- **零依赖**：仅用 Python 标准库（argparse + urllib），`pip install -e .` 即用
+- **双输出模式**：默认人类可读表格/摘要，`--json` 输出原始 JSON 便于 `jq`/脚本解析
+- **配置即代码**：`~/.gmae/config.json` 管理服务器地址/Token/超时/输出格式，环境变量 `GMAE_SERVER`/`GMAE_TOKEN` 可覆盖
+- **命令组分层**：`gmae <命令组> <子命令> [参数]`，10 个命令组覆盖全部 API
+
+**命令组清单**：
+
+| 命令组 | 子命令 | 对应 API |
+|--------|--------|---------|
+| `status` | — | GET /api/status |
+| `vram` | `free` / `budget` / `advice` / `desktop` | POST /api/free, GET /api/budget, /api/advice, /api/desktop_vram |
+| `scene` | `list` / `switch` / `combo` | GET /api/registry, POST /api/scene, /api/combo |
+| `model` | `list` / `load` / `unload` / `scan` / `register` | GET /api/registry, POST /api/model, /api/scan, /api/scan/register |
+| `queue` | `list` / `submit` / `cancel` | GET /api/queue, POST /api/queue, /api/queue/cancel |
+| `guard` | `check` / `evict` / `kick` | POST /api/guard |
+| `service` | `status` / `start` / `stop` / `helper` / `container` | POST /api/service, /api/desktop/helper/*, /api/container/stop |
+| `logs` | `-n` / `--level` / `--event` | GET /api/logs |
+| `config` | `show` / `set` / `autoprotect` / `qos` | 本地配置 + GET/POST /api/auto-protect/*, /api/qos/* |
+| `auth` | `status` / `login` / `logout` / `whoami` | GET /api/auth/status, POST /api/auth/login |
+
+**典型用法**：
+```bash
+gmae status                              # 系统状态总览
+gmae vram free                           # 一键释放显存
+gmae vram budget --context qwen3.5:9b:32768  # 预算引擎上下文覆盖
+gmae scene switch comfyui                # 切换场景
+gmae model list --category llm           # 仅列 LLM 模型
+gmae queue submit sdxl --prompt "a cat"  # 提交生成任务
+gmae logs -n 20 --level error            # 最近 20 条错误日志
+gmae config autoprotect enable --mode standard --level danger  # 启用自动防死机
+```
+
+**代码位置**：`vram-console/cli/`（17 个文件，核心层 client/config/formatter + 10 命令组 + main 入口）
 
 ---
 

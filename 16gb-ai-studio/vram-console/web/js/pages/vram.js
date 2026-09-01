@@ -471,7 +471,21 @@ function render() {
     </div>
   </div>`);
 
-  page.querySelector('[data-refresh]').addEventListener('click', refresh);
+  page.querySelector('[data-refresh]').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '刷新中…';
+    try {
+      await refresh();
+      events.emit('toast', { type: 'success', message: '显存数据已刷新' });
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: err.message });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
   load(page);
   return page;
 }
@@ -558,13 +572,36 @@ function renderHelperCard(status) {
   card.querySelector('[data-helper]').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const action = btn.dataset.helper;
+    const orig = btn.textContent;
     btn.disabled = true;
+    btn.textContent = action === 'start' ? '启动中…' : '停止中…';
     try {
-      if (action === 'start') await api.helperStart();
-      else await api.helperStop();
-      await refresh();
+      if (action === 'start') {
+        await api.helperStart();
+        events.emit('toast', { type: 'success', message: 'Helper 已启动' });
+      } else {
+        await api.helperStop();
+        events.emit('toast', { type: 'success', message: 'Helper 已停止' });
+      }
+      // 直接更新 DOM：状态标签 + 按钮文本/属性
+      const newRunning = action === 'start';
+      const tag = card.querySelector('.tag');
+      if (tag) {
+        tag.textContent = newRunning ? '运行中' : '未运行';
+        tag.classList.toggle('tag--ok', newRunning);
+        tag.classList.toggle('tag--muted', !newRunning);
+      }
+      btn.dataset.helper = newRunning ? 'stop' : 'start';
+      btn.textContent = newRunning ? '停止 Helper' : '启动 Helper';
+      // 同步更新 store，供其他页面和下次轮询使用
+      const cur = store.get('status') || {};
+      cur.helper_running = newRunning;
+      store.set('status', cur);
+      // 不立即 refresh：避免 status 缓存未更新导致重新渲染覆盖 DOM 变化
+      // 15 秒轮询会自动刷新，届时状态已正确
     } catch (err) {
       events.emit('toast', { type: 'error', message: err.message });
+      btn.textContent = orig;
     } finally {
       btn.disabled = false;
     }

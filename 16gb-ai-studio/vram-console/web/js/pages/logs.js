@@ -105,7 +105,21 @@ function render() {
     const last = lastEntries;
     if (last) renderEntries(last);
   });
-  page.querySelector('[data-log-refresh]').addEventListener('click', refresh);
+  page.querySelector('[data-log-refresh]').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '刷新中…';
+    try {
+      await refresh();
+      events.emit('toast', { type: 'success', message: '日志已刷新' });
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: err.message });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
   return page;
 }
 

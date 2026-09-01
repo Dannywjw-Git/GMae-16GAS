@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# 环境与敏感配置
+.env
+.env.local
+*.env
+.api_token
+config.json
+credentials*
+*.key
+*.pem
+
+# 日志
+*.log
+logs/
+vram-console.log*
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+cookies.txt
+check_helper.ps1
+gen_pdf.py
+
+# 生成输出物（用户生成的图/视频/音频，不入库）
+outputs/
+
+# 模型大文件（不入库，用户自行下载）
+*.gguf
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# 运行时状态
+vram-console/resources/scene_state.json
+vram-console/resources/generation_stats.json
+
+# 测试临时数据
+tests/scenario_results/
+tests/*.json
+!tests/test_*.py
+
+# Docker 覆盖配置
+docker-compose.override.yml

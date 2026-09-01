@@ -11,6 +11,16 @@ import socket
 import time
 from http.server import ThreadingHTTPServer
 
+# === 确保 Docker 命令在 PATH 中（Windows Docker Desktop 常见路径）===
+_DOCKER_PATHS = [
+    r"C:\Program Files\Docker\Docker\resources\bin",
+    r"C:\Program Files\Docker\Docker\resources\bin\docker.exe",
+]
+for _dp in _DOCKER_PATHS:
+    if os.path.exists(_dp) and _dp not in os.environ.get("PATH", ""):
+        os.environ["PATH"] = _dp + os.pathsep + os.environ.get("PATH", "")
+        break
+
 # === 模块化导入（v2.0 重构）===
 from core.logger import logger, log_event, log_error, log_info, toast_notify, LOG_DIR, LOG_FILE
 from core.config import (

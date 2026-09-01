@@ -155,6 +155,7 @@ def qos_execute_suggestion(suggestion_id):
 
 def qos_status():
     return {
+        "ok": True,
         "level": _qos_state["level"],
         "last_action": _qos_state["last_action"],
         "suggestions": _qos_state["suggestions"],

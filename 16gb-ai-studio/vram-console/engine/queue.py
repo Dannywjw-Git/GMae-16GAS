@@ -96,9 +96,10 @@ def queue_enqueue(model: str, params: dict) -> dict:
     with _task_lock:
         _tasks[tid] = task
         _task_queue.append(tid)
-    if not _queue_state["worker_alive"]:
-        _queue_state["worker_alive"] = True
-        threading.Thread(target=_queue_worker, daemon=True).start()
+        # 原子检查+启动：防止快速连续提交时创建多个 worker（16GB 卡必须串行）
+        if not _queue_state["worker_alive"]:
+            _queue_state["worker_alive"] = True
+            threading.Thread(target=_queue_worker, daemon=True).start()
     log_event("queue_enqueue", task=tid, model=model, workflow=wf_name)
     return {"ok": True, "task": task}
 

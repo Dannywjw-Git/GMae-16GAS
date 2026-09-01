@@ -1,0 +1,419 @@
+{
+  "scenario": "S1_漫剧一天 + S3_夜间批量",
+  "timestamp": "2026-09-01T01:13:16.388974",
+  "checks": [
+    {
+      "name": "场景1: 场景切换成功率（2/4）",
+      "passed": true,
+      "detail": "成功=2, 崩溃=2, 平均耗时=8.7s"
+    },
+    {
+      "name": "场景1: 平均切换耗时 < 30秒",
+      "passed": true,
+      "detail": "平均=8.7秒"
+    },
+    {
+      "name": "场景1: 全程未死机（测试正常完成）",
+      "passed": true,
+      "detail": "脚本执行完毕"
+    },
+    {
+      "name": "场景3: 批量任务完成率（4/5）",
+      "passed": true,
+      "detail": "完成率=80%, 失败=1"
+    },
+    {
+      "name": "场景3: 队列 worker 运行中",
+      "passed": true,
+      "detail": "worker_alive=True"
+    },
+    {
+      "name": "场景3: 任务严格串行（max_queue<=1）",
+      "passed": false,
+      "detail": "max_running=4"
+    },
+    {
+      "name": "恢复后显存回落到基线附近（>80%）",
+      "passed": false,
+      "detail": "恢复后free=10311MB, 基线free=15341MB"
+    }
+  ],
+  "scenario1": {
+    "switches": [
+      {
+        "to": "chat",
+        "ok": false,
+        "time": 4.633409261703491
+      },
+      {
+        "to": "comfy",
+        "ok": true,
+        "time": 12.586571455001831
+      },
+      {
+        "to": "chat",
+        "ok": false,
+        "time": 4.641340494155884
+      },
+      {
+        "to": "comfy",
+        "ok": true,
+        "time": 13.047421216964722
+      }
+    ],
+    "switch_times": [
+      4.633409261703491,
+      12.586571455001831,
+      4.641340494155884,
+      13.047421216964722
+    ],
+    "crashes": 2
+  },
+  "scenario3": {
+    "tasks_total": 5,
+    "tasks_done": 4,
+    "tasks_failed": 1,
+    "max_queue": 4
+  },
+  "snapshots": {
+    "baseline": {
+      "label": "早晨基线",
+      "ts": 1788195957.7700956,
+      "used_mb": 767,
+      "free_mb": 15341,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 0,
+      "queue_tasks": 3,
+      "worker_alive": false
+    },
+    "after_chat": {
+      "label": "对话态-写剧本中",
+      "ts": 1788196148.815641,
+      "used_mb": 11475,
+      "free_mb": 4633,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 0,
+      "queue_tasks": 3,
+      "worker_alive": false
+    },
+    "after_image": {
+      "label": "出图态-生成分镜中",
+      "ts": 1788196173.8334718,
+      "used_mb": 5667,
+      "free_mb": 10441,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 0,
+      "queue_tasks": 3,
+      "worker_alive": false
+    },
+    "after_chat2": {
+      "label": "对话态-查资料中",
+      "ts": 1788196299.0483074,
+      "used_mb": 11585,
+      "free_mb": 4523,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [
+        "qwen3.5:9b"
+      ],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 0,
+      "queue_tasks": 3,
+      "worker_alive": false
+    },
+    "after_image2": {
+      "label": "出图态-继续出图",
+      "ts": 1788196315.8392458,
+      "used_mb": 871,
+      "free_mb": 15237,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 0,
+      "queue_tasks": 3,
+      "worker_alive": false
+    },
+    "recovered": {
+      "label": "恢复后",
+      "ts": 1788196396.3884492,
+      "used_mb": 5797,
+      "free_mb": 10311,
+      "guard_level": "ok",
+      "scene": "comfy",
+      "ollama_models": [],
+      "comfy_models": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "queue_running": 2,
+      "queue_tasks": 8,
+      "worker_alive": true
+    }
+  },
+  "final_queue": {
+    "ok": true,
+    "queue": [
+      "fc8b28f890",
+      "2a918ab7f6"
+    ],
+    "tasks": [
+      {
+        "id": "fc8b28f890",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "night batch scene 3",
+          "seed": 2003,
+          "steps": 5
+        },
+        "status": "queued",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788196317,
+        "started": null,
+        "ended": null,
+        "error": "",
+        "result": null
+      },
+      {
+        "id": "2a918ab7f6",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "night batch scene 4",
+          "seed": 2004,
+          "steps": 5
+        },
+        "status": "queued",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788196317,
+        "started": null,
+        "ended": null,
+        "error": "",
+        "result": null
+      },
+      {
+        "id": "f520d12ff1",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "night batch scene 1",
+          "seed": 2001,
+          "steps": 5
+        },
+        "status": "failed",
+        "progress": "",
+        "prompt_id": null,
+        "created": 1788196316,
+        "started": null,
+        "ended": 1788196377,
+        "error": "预检拒绝：差 12.3 GB，连释放都不够",
+        "result": null
+      },
+      {
+        "id": "1f15c9f3cf",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "night batch scene 2",
+          "seed": 2002,
+          "steps": 5
+        },
+        "status": "running",
+        "progress": "已提交，等待执行…",
+        "prompt_id": "70ea4ace-5cb8-46ca-8b5a-1ec1d3aa0675",
+        "created": 1788196316,
+        "started": 1788196377,
+        "ended": null,
+        "error": "",
+        "result": null
+      },
+      {
+        "id": "156a6f7cea",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "night batch scene 0",
+          "seed": 2000,
+          "steps": 5
+        },
+        "status": "done",
+        "progress": "已提交，等待执行…",
+        "prompt_id": "0c77c91a-71b8-4874-8b23-0c2bf9e0783a",
+        "created": 1788196315,
+        "started": 1788196316,
+        "ended": 1788196376,
+        "error": "",
+        "result": {
+          "outputs": [
+            "7"
+          ],
+          "images": [
+            {
+              "filename": "sdxl_t2i_00012_.png",
+              "subfolder": "",
+              "type": "output",
+              "url": "http://127.0.0.1:8188/view?filename=sdxl_t2i_00012_.png&subfolder=&type=output",
+              "node": "7"
+            }
+          ]
+        }
+      },
+      {
+        "id": "61cf4c99d5",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 2",
+          "seed": 1002
+        },
+        "status": "done",
+        "progress": "已提交，等待执行…",
+        "prompt_id": "9471a0c9-6ae2-47ad-b757-caee3aa5879d",
+        "created": 1788195500,
+        "started": 1788195801,
+        "ended": 1788195882,
+        "error": "",
+        "result": {
+          "outputs": [
+            "7"
+          ],
+          "images": [
+            {
+              "filename": "sdxl_t2i_00011_.png",
+              "subfolder": "",
+              "type": "output",
+              "url": "http://127.0.0.1:8188/view?filename=sdxl_t2i_00011_.png&subfolder=&type=output",
+              "node": "7"
+            }
+          ]
+        }
+      },
+      {
+        "id": "e5ed75fc66",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 0",
+          "seed": 1000
+        },
+        "status": "done",
+        "progress": "已提交，等待执行…",
+        "prompt_id": "e5e1197c-c501-4ccb-a4d0-6032ac3c64f5",
+        "created": 1788195499,
+        "started": 1788195499,
+        "ended": 1788195560,
+        "error": "",
+        "result": {
+          "outputs": [
+            "7"
+          ],
+          "images": [
+            {
+              "filename": "sdxl_t2i_00009_.png",
+              "subfolder": "",
+              "type": "output",
+              "url": "http://127.0.0.1:8188/view?filename=sdxl_t2i_00009_.png&subfolder=&type=output",
+              "node": "7"
+            }
+          ]
+        }
+      },
+      {
+        "id": "214d5d25d9",
+        "model": "SDXL",
+        "workflow": "sdxl_t2i.json",
+        "params": {
+          "prompt": "test image 1",
+          "seed": 1001
+        },
+        "status": "done",
+        "progress": "已提交，等待执行…",
+        "prompt_id": "2b80baea-df3b-41fa-a8cb-bb93da68f3a1",
+        "created": 1788195499,
+        "started": 1788195570,
+        "ended": 1788195799,
+        "error": "",
+        "result": {
+          "outputs": [
+            "7"
+          ],
+          "images": [
+            {
+              "filename": "sdxl_t2i_00010_.png",
+              "subfolder": "",
+              "type": "output",
+              "url": "http://127.0.0.1:8188/view?filename=sdxl_t2i_00010_.png&subfolder=&type=output",
+              "node": "7"
+            }
+          ]
+        }
+      }
+    ],
+    "worker_alive": true,
+    "client_id": "7150fbcc-3f7b-45fe-879d-4114ec35137a"
+  },
+  "issues": [
+    "场景切换崩溃 2 次",
+    "平均切换耗时 8.7秒",
+    "批量完成率 80%"
+  ]
+}

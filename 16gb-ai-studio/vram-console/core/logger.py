@@ -40,9 +40,11 @@ def log_event(event_type: str, **kwargs) -> None:
     logger.info(json.dumps(entry, ensure_ascii=False))
 
 
-def log_error(event_type: str, error, **kwargs) -> None:
-    """记录错误日志"""
-    entry = {"ts": datetime.datetime.now().isoformat(), "event": event_type, "error": str(error)}
+def log_error(event_type: str, error=None, **kwargs) -> None:
+    """记录错误日志（error 支持位置参数和关键字参数）"""
+    entry = {"ts": datetime.datetime.now().isoformat(), "event": event_type}
+    if error is not None:
+        entry["error"] = str(error)
     entry.update(kwargs)
     logger.error(json.dumps(entry, ensure_ascii=False))
 

@@ -124,7 +124,21 @@ function render() {
   </div>`);
 
   page.querySelector('[data-scan]').addEventListener('click', onScan);
-  page.querySelector('[data-refresh]').addEventListener('click', load);
+  page.querySelector('[data-refresh]').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const orig = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '刷新中…';
+    try {
+      await load(page);
+      events.emit('toast', { type: 'success', message: '模型列表已刷新' });
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: err.message });
+    } finally {
+      btn.disabled = false;
+      btn.textContent = orig;
+    }
+  });
   load(page);
   return page;
 }
