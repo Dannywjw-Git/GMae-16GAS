@@ -155,7 +155,11 @@ function renderVramDistribution() {
   const noiseMb = ledger.noise_mb || 1200;
   const actualUsed = ledger.actual_used_mb || gpu.used_mb || 0;
 
-  // 从 helper 数据中拆分 vmwp（WSL2/Docker GPU直通基础开销）和桌面应用
+  // 从 helper 数据中拆分 vmwp（WSL2/Docker GPU直通）和桌面应用
+  // 关键口径：
+  // - vmwp 显存 = WSL2 内所有 GPU 进程总和（已包含 Ollama/ComfyUI/Fooocus）
+  // - ollama/comfy/fooocus 的 mb 是从容器 API 获取的模型大小声明值
+  // - 以 nvidia-smi 的 actualUsed 为唯一基准，各层声明值只用于细分归因
   let vmwpMb = 0;
   let desktopAppMb = 0;
   if (desktopVramData?.processes) {
@@ -170,17 +174,50 @@ function renderVramDistribution() {
     }
   }
 
-  const otherMb = Math.max(actualUsed - noiseMb - ollamaMb - comfyMb - fooocusMb - vmwpMb - desktopAppMb, 0);
+  // WSL2 内部细分：如果模型声明值 > vmwp 实际显存，按比例缩放
+  const knownContainerMb = ollamaMb + comfyMb + fooocusMb;
+  let wsl2BaseMb, displayOllamaMb, displayComfyMb, displayFooocusMb;
+  if (knownContainerMb <= 0) {
+    wsl2BaseMb = vmwpMb;
+    displayOllamaMb = displayComfyMb = displayFooocusMb = 0;
+  } else if (knownContainerMb <= vmwpMb) {
+    wsl2BaseMb = vmwpMb - knownContainerMb;
+    displayOllamaMb = ollamaMb;
+    displayComfyMb = comfyMb;
+    displayFooocusMb = fooocusMb;
+  } else {
+    // 模型声明值 > vmwp 实际显存（如 Ollama 模型未全量加载），按比例缩放
+    const scale = vmwpMb / knownContainerMb;
+    wsl2BaseMb = 0;
+    displayOllamaMb = ollamaMb * scale;
+    displayComfyMb = comfyMb * scale;
+    displayFooocusMb = fooocusMb * scale;
+  }
+
+  // 8层声明值（不含空闲）
+  const declaredLayers = [
+    { label: '底噪/系统', mb: noiseMb, color: 'var(--txt-tertiary)', group: '底噪 / 系统' },
+    { label: 'WSL2/Docker基础', mb: wsl2BaseMb, color: '#795548', group: null },
+    { label: '桌面应用', mb: desktopAppMb, color: '#607d8b', group: '底噪 / 系统' },
+    { label: '对话模型', mb: displayOllamaMb, color: 'var(--primary)', group: 'Ollama · 对话模型' },
+    { label: '生成引擎', mb: displayComfyMb, color: 'var(--ok)', group: 'ComfyUI · 生成引擎' },
+    { label: 'Fooocus', mb: displayFooocusMb, color: '#9c27b0', group: 'Fooocus · Flux 出图' },
+  ];
+
+  // 以 actualUsed 为基准：声明值超额则按比例缩放，不足则差额放入"其他"
+  const sumDeclared = declaredLayers.reduce((s, l) => s + l.mb, 0);
+  let otherMb = 0;
+  if (sumDeclared > actualUsed && actualUsed > 0) {
+    const scale = actualUsed / sumDeclared;
+    declaredLayers.forEach(l => l.mb *= scale);
+  } else {
+    otherMb = Math.max(actualUsed - sumDeclared, 0);
+  }
   const freeMb = Math.max(total - actualUsed, 0);
 
-  // 8层分段：底噪→WSL2基础→桌面应用→Ollama→ComfyUI→Fooocus→其他→空闲
+  // 最终分段（加上其他和空闲）
   const segs = [
-    { label: '底噪/系统', mb: noiseMb, color: 'var(--txt-tertiary)', group: '底噪 / 系统' },
-    { label: 'WSL2/Docker基础', mb: vmwpMb, color: '#795548', group: null },
-    { label: '桌面应用', mb: desktopAppMb, color: '#607d8b', group: '底噪 / 系统' },
-    { label: '对话模型', mb: ollamaMb, color: 'var(--primary)', group: 'Ollama · 对话模型' },
-    { label: '生成引擎', mb: comfyMb, color: 'var(--ok)', group: 'ComfyUI · 生成引擎' },
-    { label: 'Fooocus', mb: fooocusMb, color: '#9c27b0', group: 'Fooocus · Flux 出图' },
+    ...declaredLayers,
     { label: '其他', mb: otherMb, color: 'var(--warn)', group: null },
     { label: '空闲', mb: freeMb, color: 'var(--line)', group: null },
   ];
