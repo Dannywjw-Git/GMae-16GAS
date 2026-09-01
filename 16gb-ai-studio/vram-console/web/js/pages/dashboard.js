@@ -19,7 +19,17 @@ const POLL_INTERVAL = 10000;
 let pollTimer = null;
 let page = null;
 let statusData = null;
+let healthData = null;
 let vramHistory = []; // 显存历史（最近30个点）
+
+// 通用 API 请求（新 v1 端点直接用 fetch）
+async function apiGet(path) {
+  const token = localStorage.getItem('gm_api_token') || '';
+  const headers = { 'X-API-Key': token };
+  const resp = await fetch(path, { headers });
+  const data = await resp.json();
+  return data.data || data;
+}
 
 /* ========== 页面渲染 ========== */
 
@@ -92,7 +102,12 @@ export function onLeave() {
 
 async function refresh() {
   try {
-    statusData = await api.status();
+    const [status, health] = await Promise.all([
+      api.status().catch(() => null),
+      apiGet('/api/v1/health/services').catch(() => null),
+    ]);
+    statusData = status;
+    healthData = health;
     updateView();
   } catch (err) {
     console.error('[dashboard] refresh error', err);
@@ -151,45 +166,48 @@ function updateHealthCards() {
     action: { label: '查看账本', onClick: () => go('observability') },
   }));
 
-  // 容器卡片
-  const allContainers = containers.all || [];
-  const runningCount = allContainers.filter(c =>
-    containers[c] === true || (containers.comfyui && c === 'comfyui') ||
-    (containers.fooocus && c === 'fooocus')
-  ).length;
-  const containerStatus = allContainers.length > 0 && runningCount === allContainers.length ? 'ok'
-    : runningCount > 0 ? 'warning' : 'error';
+  // 服务卡片（用健康探测数据）
+  const healthSummary = healthData?.summary || {};
+  const healthServices = healthData?.services || {};
+  const svcTotal = healthSummary.total || Object.keys(healthServices).length;
+  const svcRunning = healthSummary.running || Object.values(healthServices).filter(s => s.status === 'running').length;
+  const svcStopped = healthSummary.stopped || 0;
+  const svcNames = Object.keys(healthServices);
+  const svcStatus = svcTotal > 0 && svcRunning === svcTotal ? 'ok'
+    : svcRunning > 0 ? 'warning' : 'error';
   slot.appendChild(StatusCard.render({
-    title: '运行中服务',
-    value: `${runningCount} / ${allContainers.length}`,
-    status: containerStatus,
-    subtitle: allContainers.join(', ') || '无容器',
+    title: '监控服务',
+    value: `${svcRunning} / ${svcTotal} 运行`,
+    status: svcStatus,
+    subtitle: svcStopped > 0 ? `${svcStopped} 个已停止 · ${svcNames.join(', ')}` : svcNames.join(', ') || '无监控服务',
     icon: '📦',
     action: { label: '服务健康', onClick: () => go('observability') },
   }));
 
-  // 模型卡片
-  const loadedModels = models.models || [];
+  // 模型卡片（处理 ComfyUI 未运行的情况）
+  const modelsOk = models?.ok !== false;
+  const loadedModels = modelsOk ? (models.models || []) : [];
   const modelVram = loadedModels.reduce((sum, m) => sum + (m.vram_mb || 0), 0);
-  const modelStatus = loadedModels.length > 0 ? 'warning' : 'ok';
+  const modelStatus = !modelsOk ? 'error' : loadedModels.length > 0 ? 'warning' : 'ok';
   slot.appendChild(StatusCard.render({
     title: '已加载模型',
-    value: `${loadedModels.length} 个`,
+    value: modelsOk ? `${loadedModels.length} 个` : 'ComfyUI 未运行',
     status: modelStatus,
-    subtitle: `占用 ${fmtMb(modelVram)}`,
+    subtitle: modelsOk ? `占用 ${fmtMb(modelVram)}` : models?.error || '无法获取模型列表',
     icon: '🤖',
     action: { label: '模型管理', onClick: () => go('workloads') },
   }));
 
-  // 队列卡片
-  const queueRunning = queue.running ? 1 : 0;
-  const queuePending = (queue.pending || []).length;
-  const queueStatus = queuePending > 5 ? 'warning' : 'ok';
+  // 队列卡片（处理 ComfyUI 未运行的情况）
+  const queueOk = queue?.ok !== false;
+  const queueRunning = queueOk && queue.running ? 1 : 0;
+  const queuePending = queueOk ? (queue.pending || []).length : 0;
+  const queueStatus = !queueOk ? 'error' : queuePending > 5 ? 'warning' : 'ok';
   slot.appendChild(StatusCard.render({
     title: '任务队列',
-    value: `${queuePending} 等待 · ${queueRunning} 运行`,
+    value: queueOk ? `${queuePending} 等待 · ${queueRunning} 运行` : 'ComfyUI 未运行',
     status: queueStatus,
-    subtitle: queuePending > 0 ? `有 ${queuePending} 个任务等待中` : '队列空闲',
+    subtitle: queueOk ? (queuePending > 0 ? `有 ${queuePending} 个任务等待中` : '队列空闲') : queue?.error || '无法获取队列状态',
     icon: '📋',
     action: { label: '查看队列', onClick: () => go('workloads') },
   }));
@@ -246,14 +264,16 @@ function generateAlerts() {
     });
   }
 
-  const containers = statusData.containers || {};
-  const all = containers.all || [];
-  const stopped = all.filter(c => !containers[c]);
-  if (stopped.length > 0 && all.length > 0) {
+  // 服务告警（用健康探测数据）
+  const healthServices = healthData?.services || {};
+  const stoppedServices = Object.entries(healthServices)
+    .filter(([, s]) => s.status !== 'running')
+    .map(([name]) => name);
+  if (stoppedServices.length > 0 && Object.keys(healthServices).length > 0) {
     alerts.push({
       level: 'warning', icon: '⚠️',
       title: '部分服务未运行',
-      desc: `未运行：${stopped.join(', ')}`,
+      desc: `未运行：${stoppedServices.join(', ')}`,
       time: now,
     });
   }
@@ -362,20 +382,25 @@ function updateServices() {
   if (!slot) return;
   empty(slot);
 
-  const containers = statusData.containers || {};
-  const all = containers.all || [];
+  const services = healthData?.services || {};
+  const names = Object.keys(services);
 
-  if (all.length === 0) {
+  if (names.length === 0) {
     slot.innerHTML = '<div class="text-muted text-sm">无监控服务</div>';
     return;
   }
 
-  all.forEach(name => {
-    const running = containers[name];
+  names.forEach(name => {
+    const svc = services[name];
+    const status = svc.status || 'unknown';
+    const running = status === 'running';
+    const color = running ? '#10b981' : status === 'stopped' ? '#6b7280' : '#ef4444';
+    const label = { running: '运行中', stopped: '已停止', unreachable: '不可达', timeout: '超时', unknown: '未知' }[status] || status;
+    const latency = svc.latency_ms != null ? ` · ${svc.latency_ms}ms` : '';
     const item = el(`<div class="service-row">
-      <span class="status-dot" style="background:${running ? '#10b981' : '#6b7280'}"></span>
-      <span class="service-row__name">${name}</span>
-      <span class="service-row__status">${running ? '运行中' : '已停止'}</span>
+      <span class="status-dot" style="background:${color}"></span>
+      <span class="service-row__name">${svc.name || name}</span>
+      <span class="service-row__status">${label}${latency}</span>
     </div>`);
     slot.appendChild(item);
   });
