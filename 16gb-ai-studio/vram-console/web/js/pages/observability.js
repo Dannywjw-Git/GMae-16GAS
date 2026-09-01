@@ -624,8 +624,79 @@ function renderHealthTab(slot) {
     <div class="card">
       <div class="card__header">
         <div class="card__title">服务列表 (${services.length})</div>
-        <button class="btn btn--sm btn--primary" data-action="probe-all">立即探测</button>
+        <div class="flex gap-sm">
+          <button class="btn btn--sm btn--ghost" data-action="toggle-add">+ 添加服务</button>
+          <button class="btn btn--sm btn--primary" data-action="probe-all">立即探测</button>
+        </div>
       </div>
+
+      <!-- 添加服务表单（默认折叠） -->
+      <div class="health-add-form" style="display:none;padding:16px;border-bottom:1px solid var(--border)">
+        <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div>
+            <label class="form-label">服务 ID *</label>
+            <input type="text" class="form-input" data-field="id" placeholder="如: immich">
+          </div>
+          <div>
+            <label class="form-label">服务名称 *</label>
+            <input type="text" class="form-input" data-field="name" placeholder="如: Immich 相册">
+          </div>
+          <div>
+            <label class="form-label">探测类型 *</label>
+            <select class="form-input" data-field="type">
+              <option value="docker">Docker 容器</option>
+              <option value="http">HTTP 请求</option>
+              <option value="tcp">TCP 端口</option>
+              <option value="custom">自定义脚本</option>
+            </select>
+          </div>
+          <div data-field-group="docker">
+            <label class="form-label">容器名 *</label>
+            <input type="text" class="form-input" data-field="container" placeholder="如: immich_server">
+          </div>
+          <div data-field-group="docker">
+            <label class="form-label">端口</label>
+            <input type="number" class="form-input" data-field="port" placeholder="如: 2283">
+          </div>
+          <div data-field-group="docker" style="grid-column:span 1">
+            <label class="form-label">分类</label>
+            <input type="text" class="form-input" data-field="category" placeholder="如: media">
+          </div>
+          <div data-field-group="http" style="display:none;grid-column:span 2">
+            <label class="form-label">URL *</label>
+            <input type="text" class="form-input" data-field="url" placeholder="如: http://127.0.0.1:2283/api/server/ping">
+          </div>
+          <div data-field-group="http" style="display:none">
+            <label class="form-label">分类</label>
+            <input type="text" class="form-input" data-field="category" placeholder="如: media">
+          </div>
+          <div data-field-group="tcp" style="display:none">
+            <label class="form-label">主机 *</label>
+            <input type="text" class="form-input" data-field="host" value="127.0.0.1">
+          </div>
+          <div data-field-group="tcp" style="display:none">
+            <label class="form-label">端口 *</label>
+            <input type="number" class="form-input" data-field="port" placeholder="如: 2283">
+          </div>
+          <div data-field-group="tcp" style="display:none">
+            <label class="form-label">分类</label>
+            <input type="text" class="form-input" data-field="category" placeholder="如: media">
+          </div>
+          <div data-field-group="custom" style="display:none;grid-column:span 2">
+            <label class="form-label">脚本路径 *</label>
+            <input type="text" class="form-input" data-field="script" placeholder="如: /path/to/check.sh">
+          </div>
+          <div data-field-group="custom" style="display:none">
+            <label class="form-label">分类</label>
+            <input type="text" class="form-input" data-field="category" placeholder="如: custom">
+          </div>
+        </div>
+        <div class="flex gap-sm mt-md" style="margin-top:12px">
+          <button class="btn btn--sm btn--primary" data-action="confirm-add">确认添加</button>
+          <button class="btn btn--sm btn--ghost" data-action="cancel-add">取消</button>
+        </div>
+      </div>
+
       <div class="data-table">
         <table>
           <thead>
@@ -642,13 +713,16 @@ function renderHealthTab(slot) {
                 const lastCheck = svc.last_check ? new Date(svc.last_check * 1000).toLocaleTimeString() : '-';
                 return `
                   <tr>
-                    <td><strong>${svc.name || sid}</strong><div class="text-xs text-muted">${svc.container || svc.url || ''}</div></td>
+                    <td><strong>${svc.name || sid}</strong><div class="text-xs text-muted">${svc.container || svc.url || svc.host + ':' + (svc.port || '') || ''}</div></td>
                     <td>${svc.type || '-'}</td>
                     <td class="${statusCls}">● ${statusLabel}</td>
                     <td class="font-mono">${latency}</td>
                     <td class="font-mono">${errorRate}</td>
                     <td class="text-xs">${lastCheck}</td>
-                    <td><button class="btn btn--xs btn--ghost" data-probe-id="${sid}">探测</button></td>
+                    <td>
+                      <button class="btn btn--xs btn--ghost" data-probe-id="${sid}">探测</button>
+                      <button class="btn btn--xs btn--danger" data-remove-id="${sid}">删除</button>
+                    </td>
                   </tr>
                 `;
               }).join('')
@@ -658,6 +732,62 @@ function renderHealthTab(slot) {
       </div>
     </div>
   </div>`);
+
+  // 切换添加表单
+  const addForm = container.querySelector('.health-add-form');
+  container.querySelector('[data-action="toggle-add"]')?.addEventListener('click', () => {
+    const visible = addForm.style.display !== 'none';
+    addForm.style.display = visible ? 'none' : 'block';
+  });
+  container.querySelector('[data-action="cancel-add"]')?.addEventListener('click', () => {
+    addForm.style.display = 'none';
+  });
+
+  // 探测类型切换，显示对应字段
+  const typeSelect = container.querySelector('[data-field="type"]');
+  typeSelect?.addEventListener('change', () => {
+    const type = typeSelect.value;
+    container.querySelectorAll('[data-field-group]').forEach(group => {
+      group.style.display = group.dataset.fieldGroup === type ? '' : 'none';
+    });
+  });
+
+  // 确认添加
+  container.querySelector('[data-action="confirm-add"]')?.addEventListener('click', async () => {
+    const getVal = (field) => container.querySelector(`[data-field="${field}"]`)?.value?.trim();
+    const type = getVal('type');
+    const body = {
+      id: getVal('id'),
+      name: getVal('name'),
+      type,
+      category: getVal('category') || 'general',
+    };
+    if (type === 'docker') {
+      body.container = getVal('container');
+      const port = getVal('port');
+      if (port) body.port = Number(port);
+    } else if (type === 'http') {
+      body.url = getVal('url');
+    } else if (type === 'tcp') {
+      body.host = getVal('host') || '127.0.0.1';
+      body.port = Number(getVal('port'));
+    } else if (type === 'custom') {
+      body.script = getVal('script');
+    }
+
+    if (!body.id || !body.name) {
+      events.emit('toast', { type: 'error', message: '请填写服务 ID 和名称' });
+      return;
+    }
+    try {
+      await apiPost('/api/v1/health/services', body);
+      events.emit('toast', { type: 'success', message: `已添加服务 ${body.name}` });
+      addForm.style.display = 'none';
+      refresh();
+    } catch (err) {
+      events.emit('toast', { type: 'error', message: '添加失败：' + err.message });
+    }
+  });
 
   container.querySelector('[data-action="probe-all"]')?.addEventListener('click', async () => {
     try {
@@ -678,6 +808,27 @@ function renderHealthTab(slot) {
         refresh();
       } catch (err) {
         events.emit('toast', { type: 'error', message: '探测失败：' + err.message });
+      }
+    });
+  });
+
+  // 删除服务
+  container.querySelectorAll('[data-remove-id]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const sid = btn.dataset.removeId;
+      const ok = await confirm({
+        title: '删除监控服务',
+        message: `确定要从监控清单中删除「${sid}」吗？此操作不影响服务本身运行。`,
+        okText: '删除',
+        danger: true,
+      });
+      if (!ok) return;
+      try {
+        await apiPost('/api/v1/health/services/remove', { id: sid });
+        events.emit('toast', { type: 'success', message: `已删除 ${sid}` });
+        refresh();
+      } catch (err) {
+        events.emit('toast', { type: 'error', message: '删除失败：' + err.message });
       }
     });
   });
