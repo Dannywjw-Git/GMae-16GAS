@@ -870,5 +870,47 @@
         "enabled": false
       }
     ]
-  }
+  },
+  "monitored_services": [
+    {
+      "id": "comfyui",
+      "name": "comfyui",
+      "type": "docker",
+      "container": "comfyui",
+      "port": 8188,
+      "url": "http://127.0.0.1:8188/system_stats",
+      "category": "generation",
+      "enabled": true
+    },
+    {
+      "id": "fooocus",
+      "name": "fooocus",
+      "type": "docker",
+      "container": "fooocus",
+      "port": 7865,
+      "url": "http://127.0.0.1:7865/",
+      "category": "generation",
+      "enabled": true
+    },
+    {
+      "id": "ollama",
+      "name": "ollama",
+      "type": "docker",
+      "container": "ollama",
+      "port": 11434,
+      "url": "http://127.0.0.1:11434/api/tags",
+      "category": "llm",
+      "enabled": true
+    },
+    {
+      "id": "open-webui",
+      "name": "open-webui",
+      "type": "docker",
+      "container": "open-webui-open-webui-1",
+      "port": 3000,
+      "url": "http://127.0.0.1:3000/health",
+      "category": "ui",
+      "enabled": true
+    }
+  ]
 }

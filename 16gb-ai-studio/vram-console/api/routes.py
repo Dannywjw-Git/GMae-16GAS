@@ -171,6 +171,28 @@ class Handler(BaseHTTPRequestHandler):
         # QoS/自动保护组
         elif path == "/api/auto-protect/status":
             self._success(auto_protect_status())
+        # === v2.0 观测中心 ===
+        elif path == "/api/v1/health/services":
+            from observability.health_probe import health_probe
+            self._success(health_probe.get_status())
+        elif path == "/api/v1/events":
+            from core.events import events
+            qs = parse_qs(urlparse(self.path).query)
+            self._success(events.query(
+                service=qs.get("service", [None])[0],
+                level=qs.get("level", [None])[0],
+                event_type=qs.get("event_type", [None])[0],
+                keyword=qs.get("keyword", [None])[0],
+                limit=int(qs.get("limit", ["100"])[0]),
+                offset=int(qs.get("offset", ["0"])[0]),
+            ))
+        elif path == "/api/v1/events/stats":
+            from core.events import events
+            self._success(events.get_stats())
+        elif path == "/api/v1/events/alerts":
+            from core.events import events
+            qs = parse_qs(urlparse(self.path).query)
+            self._success(events.get_alerts(limit=int(qs.get("limit", ["10"])[0])))
         else:
             self._error("NOT_FOUND", "endpoint not found", 404)
 
@@ -313,6 +335,27 @@ class Handler(BaseHTTPRequestHandler):
                 self._success({"message": msg})
             else:
                 self._error("BAD_REQUEST", msg, 400)
+        # === v2.0 观测中心 ===
+        elif self.path == "/api/v1/health/services":
+            from observability.health_probe import health_probe
+            ok = health_probe.add_service(data)
+            if ok:
+                self._success({"message": "服务已添加", "id": data.get("id") or data.get("name")})
+            else:
+                self._error("BAD_REQUEST", "缺少服务 id 或 name", 400)
+        elif self.path == "/api/v1/health/services/remove":
+            from observability.health_probe import health_probe
+            sid = data.get("id", "")
+            ok = health_probe.remove_service(sid)
+            if ok:
+                self._success({"message": "服务已移除", "id": sid})
+            else:
+                self._error("NOT_FOUND", f"服务 {sid} 不存在", 404)
+        elif self.path == "/api/v1/health/probe":
+            from observability.health_probe import health_probe
+            sid = data.get("id")
+            result = health_probe.probe_now(sid)
+            self._success(result)
         else:
             self._error("NOT_FOUND", "endpoint not found", 404)
 

@@ -93,6 +93,8 @@ if __name__ == "__main__":
         start_comfy_ws()         # ComfyUI WebSocket 实时事件监听
         start_qos()              # QoS 水位节拍线程
         start_auto_scanner()     # 自动扫描器（新模型自动登记）
+        from observability.health_probe import health_probe
+        health_probe.start()     # v2.0 服务健康探测引擎
 
         auth_note = "session+token" if auth_mod.has_admin() else "setup-required"
         log_event("server_start", host=HOST, port=PORT, auth=auth_note, log_file=LOG_FILE,
