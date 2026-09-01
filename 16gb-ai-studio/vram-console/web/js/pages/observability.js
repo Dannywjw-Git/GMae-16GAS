@@ -124,7 +124,7 @@ function renderVramTab(slot) {
   const total = gpu.total_mb || 1;
   const pct = (used / total) * 100;
   const ledger = statusData.vram_ledger || {};
-  const processes = statusData.gpu_processes || [];
+  const processes = statusData.gpu_processes?.processes || [];
 
   const container = el(`<div class="observability-vram">
     <!-- 显存分布 -->
@@ -169,9 +169,9 @@ function renderVramTab(slot) {
               processes.map(p => `
                 <tr>
                   <td class="font-mono">${p.pid || '-'}</td>
-                  <td>${p.name || p.process_name || '未知'}</td>
-                  <td>${fmtMb(p.gpu_memory_mb || p.used_gpu_memory || 0)}</td>
-                  <td>${fmtPct(((p.gpu_memory_mb || p.used_gpu_memory || 0) / total) * 100)}</td>
+                  <td>${p.name || '未知'}${p.app ? ` <span class="text-xs text-muted">(${p.app})</span>` : ''}</td>
+                  <td>${fmtMb(p.used_mb || 0)}</td>
+                  <td>${fmtPct(((p.used_mb || 0) / total) * 100)}</td>
                   <td><button class="btn btn--xs btn--ghost" data-kill-pid="${p.pid}">结束</button></td>
                 </tr>
               `).join('')
@@ -211,12 +211,19 @@ function renderVramTab(slot) {
 
 function renderVramSegments(ledger) {
   const segs = [];
-  if (ledger.comfyui) segs.push({ label: 'ComfyUI', value: ledger.comfyui, color: '#3b82f6' });
-  if (ledger.ollama) segs.push({ label: 'Ollama', value: ledger.ollama, color: '#8b5cf6' });
-  if (ledger.fooocus) segs.push({ label: 'Fooocus', value: ledger.fooocus, color: '#ec4899' });
-  if (ledger.other) segs.push({ label: '其它', value: ledger.other, color: '#6b7280' });
+  const ollama = ledger.ollama_loaded_mb || 0;
+  const comfy = ledger.comfy_loaded_mb || 0;
+  const actual = ledger.actual_used_mb || 0;
+  const other = Math.max(0, actual - ollama - comfy);
 
-  if (segs.length === 0) return '<div class="text-muted text-sm">暂无分段数据</div>';
+  if (ollama > 0) segs.push({ label: 'Ollama', value: ollama, color: '#8b5cf6' });
+  if (comfy > 0) segs.push({ label: 'ComfyUI', value: comfy, color: '#3b82f6' });
+  if (other > 0) segs.push({ label: '其它/系统', value: other, color: '#6b7280' });
+
+  if (segs.length === 0) {
+    const note = ledger.note || ledger.state || '暂无分段数据';
+    return `<div class="text-muted text-sm">${note}</div>`;
+  }
 
   const total = segs.reduce((s, x) => s + x.value, 0) || 1;
   return `
