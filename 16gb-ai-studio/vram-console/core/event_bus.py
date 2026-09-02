@@ -53,6 +53,13 @@ EVENT_CATEGORIES = {"vram", "container", "model", "task", "user_action", "system
 # 事件级别枚举（5 级，与数据结构定义 §3.2 一致）
 EVENT_LEVELS = {"debug", "info", "warning", "error", "critical"}
 
+# === 兼容旧 events.py 的级别常量 ===
+LEVEL_DEBUG = "debug"
+LEVEL_INFO = "info"
+LEVEL_WARNING = "warning"
+LEVEL_ERROR = "error"
+LEVEL_CRITICAL = "critical"
+
 
 class EventBus:
     """事件总线。
@@ -213,6 +220,123 @@ class EventBus:
         with self._lock:
             self._events.clear()
 
+    # === 兼容旧 events.py 接口 ===
+
+    def log(self, event_type: str, level: str = LEVEL_INFO, service: str = "system",
+            message: str = "", metadata: Optional[Dict[str, Any]] = None,
+            related_metrics: Optional[Dict[str, Any]] = None, **kwargs) -> Dict[str, Any]:
+        """兼容旧 events.log 接口，自动转换为新格式。
+
+        Args:
+            event_type: 事件类型（旧），映射为新格式的 event 字段
+            level: 级别（旧），映射为新格式的 level 字段
+            service: 服务名（旧），映射为新格式的 source 字段
+            message: 人类可读消息
+            metadata: 附加元数据
+            related_metrics: 关联指标（合并到 metadata）
+            **kwargs: 其他参数（合并到 metadata.legacy_fields）
+        """
+        # 合并 metadata 和 related_metrics
+        meta = dict(metadata or {})
+        if related_metrics:
+            meta["related_metrics"] = related_metrics
+        if kwargs:
+            meta["legacy_fields"] = kwargs
+
+        # 推断 category（旧接口没有 category，根据 service/event_type 推断）
+        category = "system"
+        if service in ("vram", "gpu", "qos", "guard"):
+            category = "vram"
+        elif service in ("docker", "container", "comfyui", "ollama"):
+            category = "container" if service == "docker" else "model"
+        elif "model" in event_type or "ollama" in event_type or "comfy" in event_type:
+            category = "model"
+        elif "task" in event_type or "queue" in event_type:
+            category = "task"
+        elif "user" in event_type or "action" in event_type:
+            category = "user_action"
+        elif "guard" in event_type or "evict" in event_type:
+            category = "guard"
+
+        return self.record(
+            category=category,
+            level=level,
+            source=service,
+            event=event_type,
+            message=message,
+            metadata=meta,
+        )
+
+    def query_legacy(self, service: Optional[str] = None, level: Optional[str] = None,
+                     event_type: Optional[str] = None, keyword: Optional[str] = None,
+                     from_ts: Optional[float] = None, to_ts: Optional[float] = None,
+                     limit: int = 100, offset: int = 0) -> List[Dict[str, Any]]:
+        """兼容旧 events.query 接口。
+
+        旧接口参数：service, level, event_type, keyword, from_ts, to_ts, limit, offset
+        新接口参数：start_time, end_time, category, level, source, event, limit
+        """
+        from datetime import datetime, timezone
+
+        start_time = None
+        end_time = None
+        if from_ts:
+            start_time = datetime.fromtimestamp(from_ts, tz=timezone.utc).isoformat()
+        if to_ts:
+            end_time = datetime.fromtimestamp(to_ts, tz=timezone.utc).isoformat()
+
+        results = self.query(
+            start_time=start_time,
+            end_time=end_time,
+            level=level,
+            source=service,
+            event=event_type,
+            limit=limit + offset,  # 多取 offset 条用于分页
+        )
+
+        # 关键词过滤（新接口不支持，这里后处理）
+        if keyword:
+            import json
+            filtered = []
+            for evt in results:
+                search_text = (
+                    evt.get("message", "")
+                    + " " + json.dumps(evt.get("metadata", {}), ensure_ascii=False)
+                    + " " + evt.get("event", "")
+                )
+                if keyword.lower() in search_text.lower():
+                    filtered.append(evt)
+            results = filtered
+
+        return results[offset:offset + limit]
+
+    def get_stats(self) -> Dict[str, Any]:
+        """兼容旧 events.get_stats 接口，返回事件统计。"""
+        stats = {
+            "total": len(self._events),
+            "by_level": {LEVEL_INFO: 0, LEVEL_WARNING: 0, LEVEL_ERROR: 0, LEVEL_CRITICAL: 0},
+            "by_service": {},
+        }
+        with self._lock:
+            for evt in self._events:
+                lvl = evt.get("level", LEVEL_INFO)
+                if lvl in stats["by_level"]:
+                    stats["by_level"][lvl] += 1
+                svc = evt.get("source", "unknown")
+                stats["by_service"][svc] = stats["by_service"].get(svc, 0) + 1
+        return stats
+
+    def get_alerts(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """兼容旧 events.get_alerts 接口，返回告警事件（warning及以上）。"""
+        alerts = []
+        with self._lock:
+            for evt in reversed(self._events):
+                if evt.get("level") in (LEVEL_WARNING, LEVEL_ERROR, LEVEL_CRITICAL):
+                    alerts.append(evt)
+                    if len(alerts) >= limit:
+                        break
+        return alerts
+
     def _append_to_file(self, evt: Dict[str, Any]) -> None:
         """追加事件到持久化文件。"""
         try:
@@ -251,3 +375,7 @@ event_bus = EventBus(
     max_events=1000,
     log_file=None,  # 使用默认路径 logs/events.jsonl
 )
+
+# === 兼容旧 events.py 的全局别名 ===
+# 旧代码使用 `from core.events import events`，现在可以用 `from core.event_bus import events`
+events = event_bus

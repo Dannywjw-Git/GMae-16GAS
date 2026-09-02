@@ -3,6 +3,11 @@
 """
 状态缓存模块（S1.1 指标缓存层）
 
+【职责边界 - 与 registry.py 的区别】
+- 本文件：专门的 API 响应缓存（/api/status），有 TTL + 后台异步刷新
+- registry.py：通用状态存储（服务列表、队列任务、锁等），无 TTL
+- 【重要】需要 TTL 的缓存数据用本文件，通用运行时状态用 registry
+
 为 /api/status 提供 TTL 缓存，减少 docker exec 调用。
 
 核心类：

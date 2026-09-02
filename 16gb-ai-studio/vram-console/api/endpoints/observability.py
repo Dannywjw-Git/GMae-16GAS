@@ -89,8 +89,8 @@ def get_events(req: Request) -> Response:
         limit: 返回条数（默认 100）
         offset: 偏移量（默认 0）
     """
-    from core.events import events
-    result = events.query(
+    from core.event_bus import events
+    result = events.query_legacy(
         service=req.query.get("service"),
         level=req.query.get("level"),
         event_type=req.query.get("event_type"),
@@ -104,7 +104,7 @@ def get_events(req: Request) -> Response:
 @router.get("/api/v1/events/stats")
 def get_events_stats(req: Request) -> Response:
     """事件统计（按级别/类型/服务聚合）。"""
-    from core.events import events
+    from core.event_bus import events
     return Response.success(events.get_stats())
 
 
@@ -115,6 +115,6 @@ def get_events_alerts(req: Request) -> Response:
     Query 参数：
         limit: 返回条数（默认 10）
     """
-    from core.events import events
+    from core.event_bus import events
     result = events.get_alerts(limit=req.query_int("limit", 10))
     return Response.success(result)

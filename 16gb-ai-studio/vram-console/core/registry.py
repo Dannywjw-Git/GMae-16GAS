@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 GMae 全局状态注册表（唯一状态持有者）
+
+【职责边界 - 与 status_cache.py 的区别】
+- 本文件：通用状态存储（服务列表、队列任务、锁、运行时标志等），无 TTL
+- status_cache.py：专门的 API 响应缓存（/api/status），有 TTL + 后台异步刷新
+- 【重要】不要用 registry 存储需要 TTL 的缓存数据，应使用 status_cache
+
 - 所有跨模块共享状态集中管理
 - 所有访问自动加锁，消除竞态条件
 - 支持命名空间，避免 key 冲突
@@ -9,8 +15,8 @@ GMae 全局状态注册表（唯一状态持有者）
 
 使用方式：
     from core.registry import registry
-    registry.set("status_cache", {"data": None, "ts": 0})
-    cache = registry.get("status_cache")
+    registry.set("queue_tasks", {})
+    tasks = registry.get("queue_tasks")
     with registry.lock("queue"):
         registry.set("queue_tasks", {})
 """

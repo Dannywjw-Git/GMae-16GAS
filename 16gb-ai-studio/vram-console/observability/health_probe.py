@@ -16,7 +16,7 @@ import subprocess
 import datetime
 from typing import Optional, Dict, Any, List
 from core.config import REGISTRY
-from core.events import events, LEVEL_WARNING, LEVEL_ERROR, LEVEL_INFO
+from core.event_bus import events, LEVEL_WARNING, LEVEL_ERROR, LEVEL_INFO
 
 # === 探测状态 ===
 STATUS_RUNNING = "running"

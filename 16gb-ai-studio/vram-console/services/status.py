@@ -362,10 +362,14 @@ def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
 
 
 def current_status() -> dict:
-    """并行采集所有子系统状态，带 2.5s 缓存。
+    """并行采集所有子系统状态。
 
-    注意：StatusCache 集成在 api/endpoints/status.py 的 get_status 中，
-    这里只做简单的 registry 缓存，避免双重缓存。
+    【遗留缓存说明】
+    - 本函数内部有简单的 registry 缓存（_STATUS_CACHE_TTL），是遗留实现
+    - api/endpoints/status.py 的 get_status 外层还有 status_cache（TTL 10s + 后台刷新）
+    - 当前存在双重缓存，invalidate_status_cache() 会同时失效两者
+    - 【迁移计划】后续应移除本函数内部缓存，统一由 status_cache 处理
+    - 直接调用本函数的地方（topology.py/route_helpers.py等）如需缓存，应改用 status_cache
     """
     # 1. 缓存命中
     now = time.time()
