@@ -41,7 +41,7 @@ import json
 import threading
 import time
 from typing import Dict, Optional, Callable
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 class DockerEventsMonitor:

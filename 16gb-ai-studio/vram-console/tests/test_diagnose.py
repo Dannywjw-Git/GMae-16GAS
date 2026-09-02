@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 # 确保项目根目录在 path 中
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from engine.event_bus import EventBus
+from core.event_bus import EventBus
 from engine.diagnose import RuleEngine, Rule, rule_engine as global_rule_engine
 
 

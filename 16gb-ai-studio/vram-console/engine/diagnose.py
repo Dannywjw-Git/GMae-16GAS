@@ -16,7 +16,7 @@
 import re
 from typing import List, Dict, Any, Optional, Callable
 from dataclasses import dataclass, field
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @dataclass

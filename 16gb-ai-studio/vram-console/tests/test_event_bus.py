@@ -25,7 +25,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from engine.event_bus import EventBus, EVENT_CATEGORIES, EVENT_LEVELS
+from core.event_bus import EventBus, EVENT_CATEGORIES, EVENT_LEVELS
 
 
 class TestEventBusBasic(unittest.TestCase):

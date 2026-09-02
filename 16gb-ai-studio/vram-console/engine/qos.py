@@ -19,7 +19,7 @@ from services.comfy import comfy_free
 from services.docker import docker_containers, docker_action, infer_scene
 from engine.reaper import service_activity
 from gpu.monitor import gpu_status
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 # 兼容旧引用
 _get_threshold_value = get_threshold_value

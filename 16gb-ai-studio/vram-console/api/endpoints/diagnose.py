@@ -9,7 +9,7 @@ from api.router import router
 from api.request import Request
 from api.response import Response
 from engine.diagnose import rule_engine
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.post("/api/diagnose")

@@ -22,7 +22,7 @@ from services.helper import (
     helper_status, helper_start, helper_stop,
     desktop_vram_detail, desktop_kill
 )
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.post("/api/free")

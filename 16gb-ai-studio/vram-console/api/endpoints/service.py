@@ -12,7 +12,7 @@ from api.response import Response
 from services.scene import service_action, model_action
 from services.docker import container_stop
 from core.status_cache import status_cache
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.post("/api/service")

@@ -46,7 +46,7 @@ def _get_event_bus():
     if _event_bus_init_failed:
         return None
     try:
-        from engine.event_bus import event_bus
+        from core.event_bus import event_bus
         _event_bus_instance = event_bus
         return _event_bus_instance
     except Exception:

@@ -9,7 +9,7 @@ from api.request import Request
 from api.response import Response
 from api.route_helpers import build_gate_context
 from core.config import _V031_MODULES
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.post("/api/admission")

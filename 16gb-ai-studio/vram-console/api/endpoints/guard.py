@@ -10,7 +10,7 @@ from api.response import Response
 from gpu.process_guard import gpu_guard_kick
 from engine.eviction_guard import gpu_guard_check, gpu_guard_evict
 from core.status_cache import status_cache
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.post("/api/guard")

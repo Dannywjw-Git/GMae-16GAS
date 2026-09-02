@@ -12,7 +12,7 @@ from api.request import Request
 from api.response import Response
 from api.route_helpers import registry_view
 from engine.scanner import model_scan, scan_register
-from engine.event_bus import event_bus
+from core.event_bus import event_bus
 
 
 @router.get("/api/registry")
