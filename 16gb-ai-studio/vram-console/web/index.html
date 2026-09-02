@@ -62,8 +62,21 @@
     <div class="spinner"></div>
   </div>
   <div id="app"></div>
-  <script src="/js/app.js"></script>
+  <!-- 核心模块（按依赖顺序加载） -->
+  <script src="/js/core/utils.js"></script>
+  <script src="/js/core/eventbus.js"></script>
+  <script src="/js/core/state.js"></script>
+  <script src="/js/core/api.js"></script>
+  <script src="/js/core/router.js"></script>
+  <!-- 通用组件 -->
+  <script src="/js/components/icons.js"></script>
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/modal.js"></script>
+  <!-- 页面模块 -->
+  <script src="/js/pages/pages.js"></script>
   <script src="/js/topology.js"></script>
+  <!-- 应用入口 -->
+  <script src="/js/app.js"></script>
   <script>
     // 应用加载完成后隐藏 loading
     window.addEventListener('load', () => {
