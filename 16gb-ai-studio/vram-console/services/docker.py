@@ -116,7 +116,7 @@ def free_all() -> dict:
     from gpu.monitor import gpu_status, gpu_processes
     from services.ollama import ollama_ps, ollama_stop
     from services.comfy import comfy_free
-    from services.status import invalidate_status_cache
+    from core.registry import registry
     from core.status_cache import status_cache
 
     before = gpu_status()
@@ -192,10 +192,13 @@ def free_all() -> dict:
     # 最后等待5秒确保所有模型完全卸载，然后清除状态缓存
     time.sleep(5)
     try:
-        invalidate_status_cache()
-        status_cache.clear()
+        # 同时失效 registry 旧缓存和 status_cache 新缓存
+        _cache = registry.get("status_cache", {})
+        _cache["ts"] = 0
+        registry.set("status_cache", _cache)
+        status_cache.invalidate()
     except Exception as e:
-        log_error("exception_suppressed", error=e, context="docker.py:197")
+        log_error("exception_suppressed", error=e, context="docker.py:free_all_cache_invalidate")
     after = gpu_status(force_refresh=True)  # 强制刷新，避免读取释放前的缓存数据
     # 构建 running 数组：释放后仍在运行且占用 GPU 的进程
     running = []
