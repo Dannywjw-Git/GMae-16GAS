@@ -35,7 +35,7 @@ if not defined PYTHON (
 echo Using Python: %PYTHON%
 
 rem Start watchdog in minimized window
-start "" /min "%PYTHON%" watchdog.py
+start "" /min "%PYTHON%" engine\watchdog.py
 
 rem Wait for service to start
 timeout /t 5 /nobreak >nul

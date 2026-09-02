@@ -377,8 +377,27 @@ def service_action(name: str, action: str) -> dict:
 
 
 def model_action(name: str, action: str) -> dict:
-    """模型加载/停止，name 做格式校验，命令用 shell=False 参数数组防注入。"""
-    if action not in ("load", "stop"):
+    """模型加载/卸载/查询，name 做格式校验，命令用 shell=False 参数数组防注入。
+
+    支持的 action:
+    - load: 加载模型（ollama run）
+    - stop / unload: 卸载模型（ollama stop）
+    - list / ps: 查询已加载模型列表（含显存占用）
+    - info: 查询单个模型信息
+    """
+    # list/ps 不需要 name
+    if action in ("list", "ps"):
+        try:
+            from services.ollama import ollama_ps
+            result = ollama_ps()
+            return {"ok": result.get("ok", False), "action": action,
+                    "models": result.get("models", []),
+                    "count": len(result.get("models", [])),
+                    "total_vram_gb": round(sum(m.get("size_gb", 0) for m in result.get("models", [])), 1)}
+        except Exception as e:
+            return {"ok": False, "action": action, "error": str(e)}
+    # 其他操作需要 name
+    if action not in ("load", "stop", "unload", "info"):
         return {"ok": False, "error": "unknown action: " + str(action)}
     ok, checked = _safe_model_name(name)
     if not ok:
@@ -394,8 +413,22 @@ def model_action(name: str, action: str) -> dict:
                         gpu.get("free_mb", 0) / 1024, _free_target / 1024)}
         rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "run", checked,
                             "--keepalive", "30s"], 300)
-    else:
+    elif action in ("stop", "unload"):
         rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "stop", checked], 30)
+    else:  # info
+        try:
+            from services.ollama import ollama_ps
+            result = ollama_ps()
+            models = result.get("models", [])
+            matched = [m for m in models if m.get("name", "") == checked]
+            if matched:
+                return {"ok": True, "name": checked, "action": action,
+                        "loaded": True, "vram_gb": matched[0].get("size_gb", 0),
+                        "until": matched[0].get("until", "")}
+            else:
+                return {"ok": True, "name": checked, "action": action, "loaded": False}
+        except Exception as e:
+            return {"ok": False, "name": checked, "action": action, "error": str(e)}
     return {"ok": rc == 0, "name": checked, "action": action, "rc": rc, "output": out[-300:]}
 
 

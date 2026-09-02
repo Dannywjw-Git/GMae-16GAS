@@ -11,14 +11,16 @@ GMae 状态汇总模块（应用服务层）
 import json
 import time
 import urllib.request
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from core.logger import log_error, log_event
 from core.config import (REGISTRY, get_threshold_value, VRAM_BASELINE_NOISE_MB,
                          COMFY_MODEL_RESIDENT_THRESHOLD_MB, VRAM_DIFF_THRESHOLD_MB,
                          VRAM_LOADING_SPEED_MB_PER_S, VRAM_LOADING_OVERHEAD_MB)
 from core.registry import registry
+from core.status_cache import status_cache
 from gpu.monitor import gpu_status, gpu_processes
 from engine.eviction_guard import gpu_guard_check
+from engine.alert_manager import alert_manager
 from services.docker import docker_containers, infer_scene
 from services.ollama import ollama_ps, ollama_tags
 from services.comfy import comfy_system_stats, comfy_queue
@@ -136,9 +138,14 @@ def comfy_loaded_models() -> dict:
 
 def invalidate_status_cache() -> None:
     """POST 操作（切换场景/释放/驱逐）成功后调用，强制下次 status 重新采集。"""
+    # 同时失效 registry 旧缓存和 StatusCache 对象
     cache = registry.get("status_cache", {})
     cache["ts"] = 0
     registry.set("status_cache", cache)
+    try:
+        status_cache.invalidate()
+    except Exception:
+        pass
 
 
 def _safe_call(fn, default=None):
@@ -151,7 +158,11 @@ def _safe_call(fn, default=None):
 
 
 def _fetch_parallel_status() -> dict:
-    """并行采集所有子系统状态。"""
+    """并行采集所有子系统状态，带 15 秒超时保护（S1.3）。
+
+    使用 as_completed 让先完成的任务先处理；单个任务超时（15s）或异常
+    不影响其他任务，超时/异常的任务返回 None，由 _assemble_status_data 兜底。
+    """
     tasks = {
         "gpu": gpu_status,
         "ops": ollama_ps,
@@ -167,9 +178,16 @@ def _fetch_parallel_status() -> dict:
     results = {}
     with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
         future_map = {executor.submit(_safe_call, fn): key for key, fn in tasks.items()}
-        for future in future_map:
+        for future in as_completed(future_map):
             key = future_map[future]
-            results[key] = future.result()
+            try:
+                results[key] = future.result(timeout=15)
+            except TimeoutError:
+                log_error("status_parallel_fetch_timeout", func=key, timeout_s=15)
+                results[key] = None
+            except Exception as e:
+                log_error("status_parallel_fetch_future_error", func=key, error=e)
+                results[key] = None
     return results
 
 
@@ -189,13 +207,28 @@ def _infer_scene_from_containers(names: set) -> str:
     return scene
 
 
-def _build_vram_ledger(gpu: dict, ops: dict, comfy_models: dict) -> dict:
-    """构建显存账本：双源一致性检查 + 危险等级 + 加载/释放进度。"""
+def _build_vram_ledger(gpu: dict, ops: dict, comfy_models: dict, gpu_procs: dict = None) -> dict:
+    """构建显存账本：双源一致性检查 + 危险等级 + 加载/释放进度。
+
+    底噪动态计算：桌面进程 + 系统基线 + 未知进程（替代固定 1200MB）
+    """
     ollama_models_list = ops.get("models", []) if ops else []
     ollama_loaded_mb = sum(int(float(m.get("size_gb", 0)) * 1024) for m in ollama_models_list)
     comfy_torch_mb = int((comfy_models or {}).get("torch_vram_used_mb", 0) or 0)
     comfy_loaded_mb = comfy_torch_mb if comfy_torch_mb > COMFY_MODEL_RESIDENT_THRESHOLD_MB else 0
-    noise_mb = VRAM_BASELINE_NOISE_MB
+
+    # 动态底噪计算：优先使用 gpu_processes 的实时数据，回退到固定值
+    if gpu_procs and gpu_procs.get("ok"):
+        desktop_mb = int(gpu_procs.get("desktop_used_mb", 0) or 0)
+        system_baseline_mb = int(gpu_procs.get("system_baseline_mb", 0) or 0)
+        unknown_mb = int(gpu_procs.get("unknown_mb", 0) or 0)
+        noise_mb = desktop_mb + system_baseline_mb + unknown_mb
+    else:
+        desktop_mb = 0
+        system_baseline_mb = VRAM_BASELINE_NOISE_MB
+        unknown_mb = 0
+        noise_mb = VRAM_BASELINE_NOISE_MB
+
     actual_used_mb = gpu.get("used_mb", 0) if gpu else 0
     expected_used_mb = noise_mb + ollama_loaded_mb + comfy_loaded_mb
     diff_mb = actual_used_mb - expected_used_mb
@@ -214,6 +247,7 @@ def _build_vram_ledger(gpu: dict, ops: dict, comfy_models: dict) -> dict:
         "state": ledger_state, "note": ledger_note,
         "actual_used_mb": actual_used_mb, "expected_used_mb": expected_used_mb,
         "diff_mb": diff_mb, "noise_mb": noise_mb,
+        "desktop_mb": desktop_mb, "system_baseline_mb": system_baseline_mb, "unknown_mb": unknown_mb,
         "ollama_loaded_mb": ollama_loaded_mb, "ollama_model_count": len(ollama_models_list),
         "comfy_loaded_mb": comfy_loaded_mb,
     }
@@ -233,6 +267,32 @@ def _build_vram_ledger(gpu: dict, ops: dict, comfy_models: dict) -> dict:
         danger_level = "safe"
     vram_ledger["danger_level"] = danger_level
     vram_ledger["free_mb"] = free_mb
+
+    # P0.3: 显存告警自动提交/解决（对接 AlertManager）
+    try:
+        _cache = registry.get("status_cache", {})
+        _last_danger = _cache.get("last_vram_danger_level", "safe")
+        if danger_level != _last_danger:
+            # 解决之前的告警
+            for _old_type in ("vram_critical", "vram_danger", "vram_warning"):
+                alert_manager.resolve(_old_type)
+            # 提交新告警
+            if danger_level == "critical":
+                alert_manager.submit("vram_critical", "critical",
+                    f"显存严重不足！空闲仅 {free_mb//1024}GB，随时可能死机",
+                    {"free_mb": free_mb, "used_mb": actual_used_mb, "total_mb": gpu.get("total_mb", 16384)})
+            elif danger_level == "danger":
+                alert_manager.submit("vram_danger", "error",
+                    f"显存危险！空闲仅 {free_mb//1024}GB，建议立即释放",
+                    {"free_mb": free_mb, "used_mb": actual_used_mb, "total_mb": gpu.get("total_mb", 16384)})
+            elif danger_level == "warning":
+                alert_manager.submit("vram_warning", "warning",
+                    f"显存警告！空闲 {free_mb//1024}GB，注意控制并发",
+                    {"free_mb": free_mb, "used_mb": actual_used_mb, "total_mb": gpu.get("total_mb", 16384)})
+            _cache["last_vram_danger_level"] = danger_level
+            registry.set("status_cache", _cache)
+    except Exception as _e:
+        log_error("vram_alert_submit_failed", error=_e)
 
     if danger_level == "critical" and not registry.get("status_cache", {}).get("last_danger_critical"):
         log_event("vram_danger_critical", free_mb=free_mb, used_mb=actual_used_mb,
@@ -302,7 +362,11 @@ def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
 
 
 def current_status() -> dict:
-    """并行采集所有子系统状态，带 2.5s 缓存。"""
+    """并行采集所有子系统状态，带 2.5s 缓存。
+
+    注意：StatusCache 集成在 api/endpoints/status.py 的 get_status 中，
+    这里只做简单的 registry 缓存，避免双重缓存。
+    """
     # 1. 缓存命中
     now = time.time()
     cache = registry.get("status_cache", {})
@@ -317,7 +381,7 @@ def current_status() -> dict:
     results = _fetch_parallel_status()
     names = results["names"] or set()
     scene = _infer_scene_from_containers(names)
-    vram_ledger = _build_vram_ledger(results["gpu"] or {}, results["ops"] or {}, results["comfy_models"])
+    vram_ledger = _build_vram_ledger(results["gpu"] or {}, results["ops"] or {}, results["comfy_models"], results.get("gpu_procs"))
     data = _assemble_status_data(results, scene, vram_ledger)
 
     # 3. 存入缓存

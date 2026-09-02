@@ -19,6 +19,7 @@ from services.comfy import comfy_free
 from services.docker import docker_containers, docker_action, infer_scene
 from engine.reaper import service_activity
 from gpu.monitor import gpu_status
+from engine.event_bus import event_bus
 
 # 兼容旧引用
 _get_threshold_value = get_threshold_value
@@ -47,6 +48,45 @@ if _qos_state is None:
 _qos_lock = threading.Lock()
 
 
+def _record_qos_transition(old_level: str, new_level: str, free_mb: int, reason: str = "") -> None:
+    """QoS 状态跃迁时记录事件到 event_bus（S2.2）。
+
+    Args:
+        old_level: 旧状态（ok/warning/emergency）
+        new_level: 新状态（ok/warning/emergency）
+        free_mb: 当前空闲显存（MB）
+        reason: 跃迁原因（可选）
+    """
+    if old_level == new_level:
+        return
+    # 事件级别：emergency→critical, warning→warning, ok→info
+    if new_level == "emergency":
+        event_level = "critical"
+    elif new_level == "warning":
+        event_level = "warning"
+    else:
+        event_level = "info"
+    try:
+        event_bus.record(
+            category="vram",
+            level=event_level,
+            source="qos_engine",
+            event="vram_state_{}_to_{}".format(old_level, new_level),
+            message="显存状态从 {} 变为 {}（空闲 {}MB）{}".format(
+                old_level, new_level, free_mb,
+                "，原因：{}".format(reason) if reason else ""
+            ),
+            metadata={
+                "old_state": old_level,
+                "new_state": new_level,
+                "vram_free_mb": free_mb,
+                "reason": reason,
+            }
+        )
+    except Exception:
+        pass  # 事件记录失败不影响 QoS 功能
+
+
 def qos_check():
     """QoS 检查：按显存水位分级，危急时触发自动防死机。"""
     if not QOS_CFG["enabled"]:
@@ -56,6 +96,7 @@ def qos_check():
         return {"level": "unknown", "error": "nvidia-smi unavailable"}
     free_mb = gpu.get("free_mb", 99999)
     now = time.time()
+    old_level = _qos_state.get("level", "ok")
     if free_mb < QOS_CFG["emergency_threshold_mb"]:
         auto_result = _auto_protect_run(free_mb)
         if auto_result:
@@ -63,10 +104,12 @@ def qos_check():
                       "actions": auto_result.get("actions", []),
                       "message": "显存危急（%.1fGB），已按自动防死机策略执行分级释放。" % (free_mb / 1024)}
             _qos_state["last_emergency_ts"] = now
+            _record_qos_transition(old_level, "emergency", free_mb, "auto_protect")
             _qos_state["level"] = "emergency"
             _qos_state["last_action"] = result
             _qos_state["history"].append({"ts": now, "level": "emergency", "free_mb": free_mb})
             return result
+        _record_qos_transition(old_level, "emergency", free_mb, "threshold_crossed")
         _qos_state["level"] = "emergency"
         return {"level": "emergency", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
                 "auto_protect": _auto_protect_cfg().get("enabled"),
@@ -75,12 +118,14 @@ def qos_check():
                             else "显存危急（%.1fGB）！自动防死机未开启，请立即手动释放。" % (free_mb / 1024))}
     elif free_mb < QOS_CFG["warning_threshold_mb"]:
         suggestions = _qos_build_suggestions(free_mb)
+        _record_qos_transition(old_level, "warning", free_mb, "threshold_crossed")
         _qos_state["level"] = "warning"
         _qos_state["suggestions"] = suggestions
         return {"level": "warning", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
                 "suggestions": suggestions,
                 "message": "显存紧张（%.1fGB 空闲），建议释放以下资源：" % (free_mb / 1024)}
     else:
+        _record_qos_transition(old_level, "ok", free_mb, "recovered")
         _qos_state["level"] = "ok"
         _qos_state["suggestions"] = []
         return {"level": "ok", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1)}

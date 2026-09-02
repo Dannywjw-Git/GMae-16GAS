@@ -10,6 +10,7 @@ GMae GPU 监控模块
 - 进程生命周期追踪
 """
 import time
+import threading
 from collections import deque
 from core.logger import log_event, log_error
 from core.registry import registry
@@ -18,9 +19,41 @@ from clients.nvidia_smi import (query_gpu_memory, query_compute_apps,
 from clients.docker_client import list_running_containers
 
 
-def gpu_status() -> dict:
-    """查询 GPU 显存状态。"""
-    return query_gpu_memory()
+# === nvidia-smi 缓存（S1.4）===
+# 5 秒 TTL，危险状态（free_mb < 2048MB）时缩短为 2 秒
+_gpu_status_cache = {"data": None, "timestamp": 0}
+_gpu_status_lock = threading.Lock()
+_GPU_STATUS_TTL = 5.0  # 秒（正常状态）
+_GPU_STATUS_DANGER_TTL = 2.0  # 秒（危险状态，free_mb < 阈值）
+_GPU_STATUS_DANGER_FREE_MB = 2048  # free_mb 低于此值视为危险状态
+
+
+def gpu_status(force_refresh: bool = False) -> dict:
+    """查询 GPU 显存状态，带 5 秒 TTL 缓存（S1.4）。
+
+    危险状态（free_mb < 2048MB）时 TTL 缩短为 2 秒，确保危险时数据更实时。
+    force_refresh=True 时跳过缓存，强制执行 nvidia-smi 查询。
+
+    Returns:
+        dict: {"ok": bool, "total_mb": int, "used_mb": int, "free_mb": int, "utilization": int}
+    """
+    global _gpu_status_cache
+    with _gpu_status_lock:
+        now = time.time()
+        if not force_refresh and _gpu_status_cache["data"] is not None:
+            data = _gpu_status_cache["data"]
+            # 根据 free_mb 判断危险状态，决定 TTL
+            if data.get("ok") and data.get("free_mb", 99999) < _GPU_STATUS_DANGER_FREE_MB:
+                ttl = _GPU_STATUS_DANGER_TTL
+            else:
+                ttl = _GPU_STATUS_TTL
+            if now - _gpu_status_cache["timestamp"] < ttl:
+                return data
+        # 执行 nvidia-smi 查询（原有逻辑）
+        data = query_gpu_memory()
+        _gpu_status_cache["data"] = data
+        _gpu_status_cache["timestamp"] = now
+        return data
 
 
 def _container_pids(cont):
@@ -119,59 +152,145 @@ def _find_pid_container(pid):
 
 
 def gpu_processes() -> dict:
-    """进程级显存账本。"""
+    """进程级显存账本（重构版 v2：混合方案）。
+
+    重构要点：
+    - ollama: 使用 ollama_ps() 获取已加载模型和显存占用（按模型分配）
+    - comfyui: 使用 comfy_system_stats() 获取 torch_vram_used_mb
+    - fooocus: 尝试容器内 nvidia-smi，失败则估算
+    - 桌面进程: 设为 0（不再倒推，WSL2 环境下无法准确获取）
+    - unknown_mb = 实际已用 - 已知进程总和 - 系统底噪（400MB）
+    - 保留进程生命周期跟踪和事件发布（S2 EventBus）
+    """
     from services.ollama import ollama_ps
     from services.comfy import comfy_system_stats
+    from clients.nvidia_smi import query_container_compute_apps
 
     gpu = gpu_status()
     names = list_running_containers()
-    cont_pids = {}
-    for cont, app in (("comfyui", "comfyui"), ("ollama", "ollama"), ("fooocus", "fooocus")):
-        if cont in names:
-            for pid, comm in _container_pids(cont).items():
-                cont_pids[pid] = (app, comm)
-    gpu_pids, src = _gpu_app_pids(names)
-    if not gpu_pids:
-        gpu_pids = [pid for pid, (app, comm) in cont_pids.items()
-                    if (app == "ollama" and "llama-server" in comm.lower())
-                    or (app == "comfyui" and ("python" in comm.lower() or "comfy" in comm.lower()))
-                    or (app == "fooocus" and "python" in comm.lower())]
-        src = "ps_fallback" if gpu_pids else None
-    ollama_models = ollama_ps().get("models", [])
-    ollama_used_mb = sum(int(m.get("size_gb", 0) * 1024) for m in ollama_models)
-    comfy_stat = comfy_system_stats()
-    comfy_used_mb = comfy_stat.get("torch_vram_used_mb", 0) or 0
     processes = []
-    for pid in gpu_pids:
-        if pid not in cont_pids:
-            continue
-        app, comm = cont_pids[pid]
-        if app == "ollama":
-            used = ollama_used_mb if ("llama" in comm.lower() or comm.lower() == "ollama") else 0
-        elif app == "comfyui":
-            used = comfy_used_mb if ("python" in comm.lower() or "comfy" in comm.lower()) else 0
-        elif app == "fooocus":
-            used = int(6.9 * 1024)
-        else:
-            used = 0
-        processes.append({"pid": pid, "name": comm, "app": app, "used_mb": used, "known": True})
-    known_pids = {p["pid"] for p in processes}
-    unknown_pids = [pid for pid in gpu_pids if pid not in known_pids]
+    src = "hybrid_estimate"
+
+    # ===== 1. ollama: 使用 ollama_ps() 获取已加载模型和显存占用 =====
+    if "ollama" in names:
+        ollama_models = ollama_ps().get("models", [])
+        for m in ollama_models:
+            model_name = m.get("name", "")
+            size_gb = m.get("size_gb", 0)
+            used_mb = int(size_gb * 1024)
+            if used_mb > 0:
+                processes.append({
+                    "pid": f"ollama-{model_name}",
+                    "name": f"ollama: {model_name}",
+                    "app": "ollama",
+                    "used_mb": used_mb,
+                    "known": True,
+                    "model": model_name,
+                    "container": "ollama",
+                    "until": m.get("until", ""),
+                })
+
+    # ===== 2. comfyui: 使用 comfy_system_stats() 获取 torch_vram_used_mb + 已加载模型 =====
+    if "comfyui" in names:
+        try:
+            comfy_stat = comfy_system_stats()
+            comfy_used_mb = comfy_stat.get("torch_vram_used_mb", 0) or 0
+            # 获取已加载模型（从 /history 推断）
+            comfy_models = []
+            try:
+                from services.comfy import comfy_loaded_models
+                clm = comfy_loaded_models()
+                if clm.get("ok"):
+                    comfy_models = clm.get("models", [])
+            except Exception:
+                pass
+            if comfy_used_mb > 0:
+                model_str = ", ".join(comfy_models[:2]) if comfy_models else "torch"
+                if len(comfy_models) > 2:
+                    model_str += f" 等{len(comfy_models)}个"
+                processes.append({
+                    "pid": "comfyui-torch",
+                    "name": f"comfyui: {model_str}",
+                    "app": "comfyui",
+                    "used_mb": comfy_used_mb,
+                    "known": True,
+                    "container": "comfyui",
+                    "models": comfy_models,
+                })
+        except Exception as e:
+            log_error("gpu_processes_comfy_stats_failed", error=e)
+
+    # ===== 3. fooocus: 尝试容器内 nvidia-smi，失败则估算 =====
+    if "fooocus" in names:
+        fooocus_used = 0
+        try:
+            result = query_container_compute_apps("fooocus")
+            if result.get("ok") and result.get("processes"):
+                for p in result.get("processes", []):
+                    if p.get("used_mb", 0) > 0:
+                        processes.append({
+                            "pid": str(p["pid"]),
+                            "name": f"fooocus: {p.get('name', 'python')}",
+                            "app": "fooocus",
+                            "used_mb": p.get("used_mb", 0),
+                            "known": True,
+                            "container": "fooocus",
+                        })
+                        fooocus_used += p.get("used_mb", 0)
+        except Exception:
+            pass
+        # 如果容器内 nvidia-smi 失败，使用估算（fooocus 通常占用约 6-7GB）
+        if fooocus_used == 0:
+            estimated = int(6.5 * 1024)
+            processes.append({
+                "pid": "fooocus-est",
+                "name": "fooocus: python (estimated)",
+                "app": "fooocus",
+                "used_mb": estimated,
+                "known": True,
+                "estimated": True,
+                "container": "fooocus",
+            })
+
+    # ===== 4. 计算统计数据 =====
     known_total = sum(p["used_mb"] for p in processes)
+    unknown_pids = []
     unknown_mb = 0
+    system_baseline = 400  # 系统底噪（WSL2/Docker 开销）
     if gpu.get("ok"):
-        unknown_mb = max(0, gpu["used_mb"] - 1536 - known_total)
+        unknown_mb = max(0, gpu["used_mb"] - known_total - system_baseline)
+
+    # ===== 5. 进程生命周期跟踪和事件发布（S2 EventBus）=====
+    gpu_pids = set(p["pid"] for p in processes if p["pid"].isdigit())
     _update_process_lifecycle(gpu_pids, processes)
     for p in processes:
-        lc = _proc_lifecycle.get(p["pid"])
-        if lc:
-            p["first_seen"] = lc["first_seen"]
-            p["first_used_mb"] = lc["first_used_mb"]
-            p["exit_seen"] = lc.get("exit_seen")
+        if p["pid"].isdigit():
+            lc = _proc_lifecycle.get(p["pid"])
+            if lc:
+                p["first_seen"] = lc["first_seen"]
+                p["first_used_mb"] = lc["first_used_mb"]
+                p["exit_seen"] = lc.get("exit_seen")
+
+    # ===== 6. 桌面进程（使用 PowerShell 性能计数器获取 Windows 进程显存）=====
+    # 注意：排除 vmwp（WSL2 虚拟机进程），因为它的显存已被 nvidia-smi 统计在 GPU 已用中
     desktop = desktop_gpu_processes()
     desktop_used_mb = 0
-    if gpu.get("ok"):
-        desktop_used_mb = max(0, gpu["used_mb"] - known_total - 400)
+    try:
+        from services.helper import get_windows_gpu_processes
+        win_gpu = get_windows_gpu_processes()
+        if win_gpu.get("ok"):
+            # 排除 vmwp（WSL2 虚拟机进程）和 vmmem，避免与 nvidia-smi 重复计算
+            desktop_procs = [p for p in win_gpu.get("processes", [])
+                             if p.get("name", "").lower() not in ("vmwp", "vmmem", "vmmemwsl")]
+            desktop_used_mb = int(sum(p.get("used_mb", 0) for p in desktop_procs))
+            # 把 Windows 进程添加到 desktop_processes（如果原来为空）
+            if not desktop.get("processes") or all(p.get("used_mb") is None for p in desktop.get("processes", [])):
+                desktop["processes"] = [{"name": p["name"], "pid": p["pid"],
+                                          "used_mb": p["used_mb"]} for p in desktop_procs[:20]]
+                desktop["count"] = len(desktop["processes"])
+    except Exception as e:
+        log_error("gpu_processes_windows_gpu_failed", error=str(e))
+
     return {
         "ok": True, "processes": processes,
         "unknown_pids": unknown_pids, "unknown_mb": unknown_mb,
@@ -179,7 +298,7 @@ def gpu_processes() -> dict:
         "desktop_processes": desktop.get("processes", []),
         "desktop_count": desktop.get("count", 0),
         "desktop_used_mb": desktop_used_mb,
-        "system_baseline_mb": 400,
+        "system_baseline_mb": system_baseline,
         "gpu_pid_source": src,
         "events": list(_proc_events),
     }

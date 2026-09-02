@@ -207,13 +207,67 @@ def helper_stop() -> dict:
     return {"ok": True, "running": False, "msg": "Helper 已停止"}
 
 
+def get_windows_gpu_processes() -> dict:
+    """获取 Windows 进程级 GPU 显存占用（直接调用 PowerShell 性能计数器，参考 Helper 原理）。
+
+    原理：使用 Get-Counter '\\GPU Process Memory(*)\\Dedicated Usage' 性能计数器
+    - 多实例计数器用 (*) 通配语法
+    - 实例名格式 pid_<pid>_luid_...，需提取 pid
+    - 值单位是字节，需 /1MB 转 MB
+    - 用 Get-Process 映射 pid 到进程名
+
+    注意：不需要 UAC 提权（性能计数器普通用户可读），但某些系统进程可能
+    无法获取进程名。与 Helper 的区别：不启动独立提权进程，直接在主服务
+    中调用 PowerShell，简单轻量。
+
+    Returns:
+        dict: {"ok": bool, "processes": [{"name": str, "pid": int, "used_mb": float}],
+               "count": int, "total_mb": float}
+    """
+    import subprocess
+    ps = ("$procMap=@{}; Get-Process -ErrorAction SilentlyContinue | ForEach-Object { $procMap[$_.Id]=$_.ProcessName }; "
+          "Get-Counter '\\GPU Process Memory(*)\\Dedicated Usage' -ErrorAction SilentlyContinue "
+          "| Select-Object -ExpandProperty CounterSamples "
+          "| Where-Object { $_.CookedValue -gt 0 } "
+          "| ForEach-Object { "
+          "$p=0; if ($_.InstanceName -match 'pid_(\\d+)_') { $p=[int]$Matches[1] }; "
+          "[PSCustomObject]@{ Name=$(if($procMap.ContainsKey($p)){$procMap[$p]}else{'unknown'}); Pid=$p; MB=[math]::Round($_.CookedValue/1MB,1) } } "
+          "| Where-Object { $_.Pid -gt 0 } "
+          "| Sort-Object MB -Descending "
+          "| ConvertTo-Json -Compress")
+    try:
+        p = subprocess.run(["powershell", "-NoProfile", "-NonInteractive", "-Command", ps],
+                           capture_output=True, text=True, timeout=15)
+        out = p.stdout.strip()
+        if not out:
+            return {"ok": False, "processes": [], "count": 0, "total_mb": 0, "error": "no counter data"}
+        data = json.loads(out)
+        if isinstance(data, dict):
+            data = [data]
+        # 过滤掉显存占用过小的进程（<10MB），减少噪音
+        processes = [{"name": p.get("Name", "unknown"), "pid": p.get("Pid", 0),
+                      "used_mb": float(p.get("MB", 0))} for p in data if p.get("MB", 0) >= 10]
+        total_mb = sum(p["used_mb"] for p in processes)
+        return {"ok": True, "processes": processes, "count": len(processes), "total_mb": round(total_mb, 1)}
+    except Exception as e:
+        return {"ok": False, "processes": [], "count": 0, "total_mb": 0, "error": str(e)}
+
+
 def desktop_vram_detail() -> dict:
-    """桌面逐进程显存明细：经 Helper 代理。"""
+    """桌面逐进程显存明细：优先直接调用 PowerShell，失败则经 Helper 代理。"""
+    # 优先直接调用 PowerShell（不需要提权，简单轻量）
+    direct = get_windows_gpu_processes()
+    if direct.get("ok"):
+        direct["helper"] = False
+        direct["source"] = "powershell_direct"
+        return direct
+    # 失败则回退到 Helper 代理（需要 UAC 提权）
     if not _helper_health():
         return {"ok": False, "processes": [], "count": 0, "error": "helper not running", "helper": False}
     ok, r = _helper_req("/api/desktop_vram")
     if ok:
         r["helper"] = True
+        r["source"] = "helper_proxy"
     return r
 
 

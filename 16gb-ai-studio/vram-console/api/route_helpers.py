@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae HTTP 路由辅助函数
@@ -34,12 +34,16 @@ MIME_TYPES = {
 
 
 def serve_static_file(handler, path: str) -> None:
-    """服务 web/ 目录下的静态文件（CSS/JS/图片/字体）"""
-    rel_path = path[5:] if path.startswith("/web/") else path
+    """服务 web/ 目录下的静态文件（CSS/JS/图片/字体）。支持 /web/ /css/ /js/ /assets/ 前缀。"""
+    rel_path = path
+    if rel_path.startswith("/web/"):
+        rel_path = rel_path[5:]
+    elif rel_path.startswith("/css/") or rel_path.startswith("/js/") or rel_path.startswith("/assets/"):
+        rel_path = rel_path.lstrip("/")
     rel_path = rel_path.replace("..", "").lstrip("/")
     full_path = os.path.join(WEB_DIR, rel_path)
     if not os.path.isfile(full_path):
-        handler._json({"ok": False, "error": "file not found"}, 404)
+        handler._json({"ok": False, "error": "file not found (frontend archived)"}, 404)
         return
     ext = os.path.splitext(full_path)[1].lower()
     content_type = MIME_TYPES.get(ext, "application/octet-stream")
@@ -116,6 +120,15 @@ def read_logs(limit: int = 150) -> dict:
 def registry_view() -> dict:
     """模型登记台：registry 元数据 × 实际环境自动同步。"""
     reg = REGISTRY
+    # 获取已加载模型（含实际显存占用）
+    loaded_models = []
+    try:
+        from services.ollama import ollama_ps
+        ps_result = ollama_ps()
+        if ps_result.get("ok"):
+            loaded_models = ps_result.get("models", [])
+    except Exception:
+        pass
     return {
         "ok": True,
         "version": reg.get("version", ""),
@@ -124,6 +137,9 @@ def registry_view() -> dict:
         "ollama_models": _sync_ollama_models(),
         "ollama_combos": reg.get("ollama", {}).get("combos", {}),
         "comfyui_models": _sync_comfyui_models(),
+        "loaded_models": loaded_models,
+        "loaded_models_count": len(loaded_models),
+        "loaded_vram_gb": round(sum(m.get("size_gb", 0) for m in loaded_models), 1),
         "containers": reg.get("containers", []),
         "scenes": reg.get("scenes", {}),
         "system": reg.get("system", {}),
@@ -131,82 +147,114 @@ def registry_view() -> dict:
     }
 
 
+# === 前端重构中占位页（2026-09-01：v1/v2 前端全部存档停用，后续重做）===
+PLACEHOLDER_HTML = """<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GMae 指挥家 — API 服务运行中</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       background:#0f172a;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{background:#1e293b;border-radius:16px;padding:40px;max-width:680px;width:100%;
+        box-shadow:0 4px 24px rgba(0,0,0,0.3)}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .logo{width:40px;height:40px;background:linear-gradient(135deg,#0d9488,#0891b2);
+        border-radius:10px;display:flex;align-items:center;justify-content:center;
+        font-weight:700;font-size:18px;color:#fff}
+  h1{font-size:22px;color:#f1f5f9}
+  .subtitle{color:#94a3b8;font-size:14px;margin-bottom:24px}
+  .status{display:inline-flex;align-items:center;gap:8px;background:#0f2e22;color:#4ade80;
+          padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500;margin-bottom:24px}
+  .status-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .notice{background:#1e293b;border-left:3px solid #0d9488;padding:14px 18px;
+          border-radius:0 8px 8px 0;margin-bottom:24px;font-size:14px;color:#cbd5e1;line-height:1.6}
+  .notice strong{color:#0d9488}
+  .notice code{background:#0f172a;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:12px}
+  h2{font-size:13px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;margin-top:8px;font-weight:600}
+  .api-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:20px}
+  .api-item{display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 10px;
+            background:#0f172a;border-radius:6px;font-family:monospace}
+  .method{font-weight:700;font-size:10px;padding:2px 6px;border-radius:4px;min-width:40px;text-align:center}
+  .method.get{background:#1e3a5f;color:#60a5fa}
+  .method.post{background:#3b1f3f;color:#c084fc}
+  .api-path{color:#cbd5e1}
+  .cli-hint{background:#0f172a;border-radius:8px;padding:14px 18px;font-size:13px;
+            color:#94a3b8;line-height:1.9;margin-bottom:20px}
+  .cli-hint code{background:#1e293b;padding:2px 6px;border-radius:4px;color:#0d9488;font-family:monospace}
+  .footer{text-align:center;color:#475569;font-size:12px;margin-top:24px;padding-top:16px;border-top:1px solid #334155}
+  .footer a{color:#0d9488;text-decoration:none}
+  .footer span{margin:0 6px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">
+    <div class="logo">G</div>
+    <div>
+      <h1>GPU Maestro · 显存指挥家</h1>
+      <div class="subtitle">Prism Engine (P-Eng) · 16G-AI-Studio 调度中心</div>
+    </div>
+  </div>
+  <div class="status"><span class="status-dot"></span>API 服务运行中 · 端口 8787</div>
+  <div class="notice">
+    <strong>前端重构中</strong> — Web UI 已全部存档停用（v1 单文件版 + v2 模块化版均已移入 <code>legacy/</code>）。
+    全新前端正在规划中，后续将以更清晰的信息架构和组件化体系重做。
+    在此期间，所有 API 端点和 <code>gmae-cli</code> 命令行工具正常可用。
+  </div>
+  <h2>常用 API 端点</h2>
+  <div class="api-list">
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/health</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/status</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/registry</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/budget</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/queue</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/logs</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/scan</span></div>
+    <div class="api-item"><span class="method get">GET</span><span class="api-path">/api/advice</span></div>
+    <div class="api-item"><span class="method post">POST</span><span class="api-path">/api/scene</span></div>
+    <div class="api-item"><span class="method post">POST</span><span class="api-path">/api/free</span></div>
+    <div class="api-item"><span class="method post">POST</span><span class="api-path">/api/queue</span></div>
+    <div class="api-item"><span class="method post">POST</span><span class="api-path">/api/guard</span></div>
+  </div>
+  <h2>命令行工具（gmae-cli）</h2>
+  <div class="cli-hint">
+    <code>gmae status</code> — 全景状态（显存/场景/模型/QoS）<br>
+    <code>gmae vram free</code> — 一键释放显存<br>
+    <code>gmae scene switch comfyui</code> — 切换场景<br>
+    <code>gmae model list</code> — 模型登记台<br>
+    <code>gmae queue submit sdxl --prompt "a cat"</code> — 提交生成任务<br>
+    <code>gmae logs -n 20</code> — 最近日志<br>
+    共 10 个命令组，覆盖全部 30+ API。安装：<code>pip install -e .</code>
+  </div>
+  <div class="footer">
+    GMae-16GAS · vram-console API · 前端存档日期 2026-09-01
+    <span>·</span>
+    <a href="/api/health">健康检查</a>
+    <span>·</span>
+    <a href="/api/status">状态查询</a>
+  </div>
+</div>
+</body>
+</html>""".encode("utf-8")
+
+
 def read_html() -> bytes:
-    """根据 FRONTEND_VERSION 返回对应版本的前端 HTML。"""
-    if FRONTEND_VERSION == "v1":
-        path = LEGACY_HTML
-    else:
-        path = os.path.join(WEB_DIR, "index.html")
+    """返回新前端 SPA 入口（web/index.html）。S4 前端重做。"""
+    index_path = os.path.join(WEB_DIR, "index.html")
     try:
-        with open(path, "rb") as f:
+        with open(index_path, "rb") as f:
             return f.read()
     except Exception:
-        try:
-            with open(LEGACY_HTML, "rb") as f:
-                return f.read()
-        except Exception:
-            return b"index.html not found"
+        return PLACEHOLDER_HTML
 
 
 def read_login_html() -> bytes:
-    """读取登录页 HTML，不存在时返回内置最小登录页。"""
-    path = os.path.join(BASE_DIR, "login.html")
-    try:
-        with open(path, "rb") as f:
-            return f.read()
-    except Exception:
-        return ("""<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>GMae 登录</title>
-<style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-.box{background:#1e293b;padding:32px;border-radius:12px;width:320px}
-h1{color:#0d9488;margin:0 0 24px;font-size:24px}
-input{width:100%;padding:10px;margin:8px 0;border:1px solid #334155;border-radius:6px;background:#0f172a;color:#e2e8f0;box-sizing:border-box}
-button{width:100%;padding:12px;background:#0d9488;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-top:16px;font-size:16px}
-button:hover{background:#0f766e}
-.msg{margin-top:12px;font-size:14px;min-height:20px}
-.err{color:#f87171}.ok{color:#4ade80}
-a{color:#0d9488;text-decoration:none;cursor:pointer}
-.tab{display:flex;margin-bottom:16px;border-bottom:1px solid #334155}
-.tab div{padding:8px 16px;cursor:pointer;color:#94a3b8}
-.tab div.active{color:#0d9488;border-bottom:2px solid #0d9488}
-.hidden{display:none}
-</style></head><body>
-<div class="box">
-<h1>GMae 调度中心</h1>
-<div class="tab"><div class="active" onclick="showTab('login')">登录</div><div onclick="showTab('setup')">首次设置</div><div onclick="showTab('forgot')">忘记密码</div></div>
-<div id="login">
-<input id="login-email" placeholder="邮箱" type="email">
-<input id="login-password" placeholder="密码" type="password">
-<label style="font-size:14px;color:#94a3b8"><input type="checkbox" id="login-remember" style="width:auto;margin-right:6px">记住我 30 天</label>
-<button type="button" onclick="doLogin()">登录</button>
-</div>
-<div id="setup" class="hidden">
-<input id="setup-email" placeholder="管理员邮箱" type="email">
-<input id="setup-password" placeholder="设置密码（至少6位）" type="password">
-<input id="setup-password2" placeholder="确认密码" type="password">
-<button type="button" onclick="doSetup()">创建管理员账户</button>
-</div>
-<div id="forgot" class="hidden">
-<input id="forgot-email" placeholder="注册邮箱" type="email">
-<button type="button" onclick="doForgot()">发送验证码</button>
-<div id="reset-step" class="hidden" style="margin-top:16px">
-<input id="reset-code" placeholder="6位验证码" maxlength="6">
-<input id="reset-password" placeholder="新密码（至少6位）" type="password">
-<button type="button" onclick="doReset()">重置密码</button>
-</div>
-</div>
-<div class="msg" id="msg"></div>
-</div>
-<script>
-function showTab(t){document.querySelectorAll('.tab div').forEach((e,i)=>e.classList.toggle('active',['login','setup','forgot'][i]===t));['login','setup','forgot'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==t));document.getElementById('msg').textContent='';}
-function msg(t,c){var e=document.getElementById('msg');e.textContent=t;e.className='msg '+(c||'');}
-async function api(url,data){var r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});return await r.json();}
-async function doLogin(){var e=document.getElementById('login-email').value,p=document.getElementById('login-password').value,r=document.getElementById('login-remember').checked;if(!e||!p)return msg('请输入邮箱和密码','err');var d=await api('/api/auth/login',{email:e,password:p,remember:r});if(d.ok){msg('登录成功，正在跳转...','ok');setTimeout(()=>location.href='/',800);}else msg(d.error||'登录失败','err');}
-window.addEventListener('DOMContentLoaded',function(){var ei=document.getElementById('login-email');if(ei){ei.focus();}['login-email','login-password'].forEach(function(id){var el=document.getElementById(id);if(el){el.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();doLogin();}});}});if(window.location.search.indexOf('setup=1')>=0||document.body.dataset.setup==='1'){showTab('setup');}});
-async function doSetup(){var e=document.getElementById('setup-email').value,p=document.getElementById('setup-password').value,p2=document.getElementById('setup-password2').value;if(!e||!p)return msg('请输入邮箱和密码','err');if(p!==p2)return msg('两次密码不一致','err');var d=await api('/api/auth/setup',{email:e,password:p});if(d.ok){msg('创建成功，请登录','ok');showTab('login');}else msg(d.message||'创建失败','err');}
-async function doForgot(){var e=document.getElementById('forgot-email').value;if(!e)return msg('请输入邮箱','err');var d=await api('/api/auth/forgot',{email:e});msg(d.message,d.ok?'ok':'err');if(d.ok)document.getElementById('reset-step').classList.remove('hidden');}
-async function doReset(){var e=document.getElementById('forgot-email').value,c=document.getElementById('reset-code').value,p=document.getElementById('reset-password').value;var d=await api('/api/auth/reset',{email:e,code:c,password:p});if(d.ok){msg('密码重置成功，请登录','ok');showTab('login');}else msg(d.message||'重置失败','err');}
-</script></body></html>""").encode("utf-8")
+    """登录页返回新前端 SPA（登录功能由前端 JS 处理）。"""
+    return read_html()
 
 
 def build_gate_context():

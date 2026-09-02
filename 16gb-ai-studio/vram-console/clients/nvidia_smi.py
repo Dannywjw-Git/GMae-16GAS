@@ -105,3 +105,103 @@ def query_container_processes(container_name: str) -> dict:
         if len(parts) == 2 and parts[0].isdigit():
             pmap[parts[0]] = parts[1]
     return pmap
+
+
+def query_container_compute_apps(container_name: str) -> dict:
+    """查询容器内 GPU 计算进程的详细信息（pid + process_name + used_memory）。
+
+    通过 docker exec 在容器内运行 nvidia-smi，获取容器内进程的实际显存占用。
+
+    Args:
+        container_name: Docker 容器名
+
+    Returns:
+        dict: {"ok": bool, "processes": [{"pid": int, "name": str, "used_mb": int}], "count": int}
+    """
+    rc, out = run_args([
+        "docker", "exec", container_name,
+        "nvidia-smi",
+        "--query-compute-apps=pid,process_name,used_memory",
+        "--format=csv,noheader,nounits"
+    ], 15)
+    processes = []
+    if rc == 0:
+        for line in out.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) < 3:
+                continue
+            pid_s, name, used_s = parts[0], parts[1], parts[2]
+            if not pid_s.isdigit():
+                continue
+            try:
+                used_mb = int(float(used_s))
+            except (ValueError, TypeError):
+                used_mb = 0
+            if name and name.lower() not in (
+                    "[insufficient permissions]", "[not found]", "n/a", "[n/a]"):
+                processes.append({
+                    "pid": int(pid_s),
+                    "name": os.path.basename(name.replace("\\", "/")),
+                    "used_mb": used_mb,
+                })
+    return {"ok": rc == 0, "processes": processes, "count": len(processes)}
+
+
+def query_container_process_cmdline(container_name: str, pid: str) -> str:
+    """查询容器内指定 PID 的完整命令行（用于识别具体加载的模型）。
+
+    Args:
+        container_name: Docker 容器名
+        pid: 进程 PID（字符串）
+
+    Returns:
+        str: 完整命令行，失败返回空字符串
+    """
+    rc, out = run_args([
+        "docker", "exec", container_name,
+        "cat", f"/proc/{pid}/cmdline"
+    ], 10)
+    if rc != 0:
+        return ""
+    # /proc/PID/cmdline 用 null 字节分隔参数
+    return out.replace("\x00", " ").strip()
+
+
+def query_compute_apps_with_memory() -> dict:
+    """查询宿主机 GPU 计算进程的详细信息（pid + process_name + used_memory）。
+
+    Returns:
+        dict: {"ok": bool, "processes": [{"pid": int, "name": str, "used_mb": int}], "count": int}
+    """
+    rc, out = run_args([
+        "nvidia-smi",
+        "--query-compute-apps=pid,process_name,used_memory",
+        "--format=csv,noheader,nounits"
+    ], 10)
+    processes = []
+    if rc == 0:
+        for line in out.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            parts = [p.strip() for p in line.split(",")]
+            if len(parts) < 3:
+                continue
+            pid_s, name, used_s = parts[0], parts[1], parts[2]
+            if not pid_s.isdigit():
+                continue
+            try:
+                used_mb = int(float(used_s))
+            except (ValueError, TypeError):
+                used_mb = 0
+            if name and name.lower() not in (
+                    "[insufficient permissions]", "[not found]", "n/a", "[n/a]"):
+                processes.append({
+                    "pid": int(pid_s),
+                    "name": os.path.basename(name.replace("\\", "/")),
+                    "used_mb": used_mb,
+                })
+    return {"ok": rc == 0, "processes": processes, "count": len(processes)}

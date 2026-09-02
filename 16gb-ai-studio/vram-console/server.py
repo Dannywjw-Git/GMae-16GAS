@@ -9,6 +9,7 @@ import os
 import sys
 import socket
 import time
+import threading
 from http.server import ThreadingHTTPServer
 
 # === 确保 Docker 命令在 PATH 中（Windows Docker Desktop 常见路径）===
@@ -46,6 +47,7 @@ from gpu.process_guard import gpu_guard_kick, PROTECT_COMMS
 from engine.reaper import service_activity, start_idle_reaper
 from engine.qos import (qos_check, qos_status, qos_execute_suggestion, start_qos,
     auto_protect_status, auto_protect_config, QOS_CFG)
+from engine.alert_manager import alert_manager
 from services.comfy_ws import ComfyWS, comfy_events, start_comfy_ws, _COMFY_EVENTS, _COMFY_EVENTS_LOCK
 from engine.budget import budget_engine, vram_advice
 from engine.eviction_guard import gpu_guard_check, gpu_guard_evict, GUARD_UNKNOWN_POLICY, GUARD_WARN_THRESHOLD
@@ -54,6 +56,8 @@ from engine.queue import queue_enqueue, queue_snapshot, queue_cancel
 from services.scene import (scene_switch, combo_switch, service_action, model_action,
     load_model_api, ollama_stop, _sync_ollama_models, _sync_comfyui_models)
 from services.status import current_status, comfy_loaded_models, invalidate_status_cache
+from core.status_cache import status_cache
+from core.docker_events import docker_events
 from api.routes import Handler
 
 # 兼容旧代码引用
@@ -96,6 +100,22 @@ if __name__ == "__main__":
         from observability.health_probe import health_probe
         health_probe.start()     # v2.0 服务健康探测引擎
 
+        # S3.5: 告警升级检查线程（每 60 秒检查持续未解决的告警并自动升级）
+        def _alert_escalation_loop():
+            while True:
+                try:
+                    alert_manager.check_escalation()
+                except Exception:
+                    pass
+                time.sleep(60)
+        _alert_esc_thread = threading.Thread(target=_alert_escalation_loop, daemon=True, name="alert-escalation")
+        _alert_esc_thread.start()
+
+        # S1.2 Docker Events 监听：容器状态变化时自动失效 status 缓存
+        docker_events.on_state_change = lambda name, action: status_cache.invalidate()
+        _docker_events_ok = docker_events.start()
+        log_event("docker_events_started", available=_docker_events_ok)
+
         auth_note = "session+token" if auth_mod.has_admin() else "setup-required"
         log_event("server_start", host=HOST, port=PORT, auth=auth_note, log_file=LOG_FILE,
                   admin_exists=auth_mod.has_admin(), smtp_configured=bool(auth_mod.SMTP_PASSWORD))
@@ -108,3 +128,9 @@ if __name__ == "__main__":
     except Exception as e:
         log_error("server_crash", error=e)
         raise
+    finally:
+        # 优雅停止 Docker Events 监听
+        try:
+            docker_events.stop()
+        except Exception:
+            pass

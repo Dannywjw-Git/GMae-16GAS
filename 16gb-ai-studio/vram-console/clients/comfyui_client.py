@@ -128,6 +128,55 @@ def free_memory(unload_models: bool = True, free_memory: bool = True) -> dict:
     return {"ok": True, "http": http_code}
 
 
+def history(max_items: int = 5) -> dict:
+    """ComfyUI /history：获取最近执行的工作流历史。
+
+    Args:
+        max_items: 最多返回的历史记录数
+
+    Returns:
+        dict: {"ok": bool, "items": [{"prompt_id": str, "models": [str], "nodes": dict}], "count": int}
+    """
+    ok, d, err = _get("/history", timeout=5)
+    if not ok:
+        return {"ok": False, "items": [], "count": 0, "error": err}
+    items = []
+    # /history 返回 {prompt_id: {prompt: [...], outputs: {...}}}
+    for prompt_id, hist in list(d.items())[-max_items:]:
+        models = []
+        nodes = {}
+        # prompt 是一个列表，第二个元素是节点 dict
+        if isinstance(hist, dict) and "prompt" in hist:
+            prompt = hist["prompt"]
+            if isinstance(prompt, list) and len(prompt) > 1:
+                node_dict = prompt[1]
+                if isinstance(node_dict, dict):
+                    for node_id, node_data in node_dict.items():
+                        if isinstance(node_data, dict):
+                            class_type = node_data.get("class_type", "")
+                            nodes[node_id] = class_type
+                            # 提取模型名
+                            inputs = node_data.get("inputs", {})
+                            if class_type in ("CheckpointLoaderSimple", "CheckpointLoader", "UNETLoader"):
+                                ckpt = inputs.get("ckpt_name", "") or inputs.get("unet_name", "")
+                                if ckpt and ckpt not in models:
+                                    models.append(ckpt)
+                            elif class_type == "LoraLoader":
+                                lora = inputs.get("lora_name", "")
+                                if lora and lora not in models:
+                                    models.append(lora)
+                            elif class_type in ("VAELoader", "ControlNetLoader"):
+                                name = inputs.get("vae_name", "") or inputs.get("control_net_name", "")
+                                if name and name not in models:
+                                    models.append(name)
+        items.append({
+            "prompt_id": str(prompt_id)[:8],
+            "models": models,
+            "nodes": nodes,
+        })
+    return {"ok": True, "items": items, "count": len(items)}
+
+
 def is_online() -> bool:
     """检查 ComfyUI 服务是否在线。
 

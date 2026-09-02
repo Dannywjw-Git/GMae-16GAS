@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GPU Maestro 看门狗 - 监控 server.py 进程，崩溃后自动重启
@@ -12,7 +12,7 @@ import datetime
 import urllib.request
 import json
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # vram-console 根目录（v2.0 模块化后脚本位于 engine/）
 SERVER_SCRIPT = os.path.join(BASE_DIR, "server.py")
 LOG_FILE = os.path.join(BASE_DIR, "logs", "watchdog.log")
 RESTART_DELAY = 5  # 秒

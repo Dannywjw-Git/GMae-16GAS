@@ -45,10 +45,23 @@ def comfy_free() -> dict:
 
 
 def comfy_loaded_models() -> dict:
-    """ComfyUI 已加载模型列表（从 /system_stats 解析）。"""
-    stats = comfy_system_stats()
-    if not stats.get("ok"):
-        return {"ok": False, "models": [], "error": stats.get("error")}
-    # ComfyUI /system_stats 没有直接的已加载模型列表，这里返回空
-    # 实际实现需要从 ComfyUI 内部 API 获取，暂用占位
-    return {"ok": True, "models": []}
+    """ComfyUI 已加载模型列表（从 /history 最近工作流解析）。
+
+    原理：ComfyUI 没有直接的"已加载模型"API，但模型在执行工作流后会
+    保留在显存中（取决于设置）。通过解析最近的 /history 工作流，提取
+    使用的 Checkpoint/LoRA/VAE 等模型，作为"可能已加载"的模型列表。
+    """
+    from clients.comfyui_client import history
+    if not is_running("comfyui"):
+        return {"ok": False, "models": [], "error": "comfyui not running"}
+    hist = history(max_items=3)
+    if not hist.get("ok"):
+        return {"ok": False, "models": [], "error": hist.get("error")}
+    # 合并最近工作流使用的所有模型
+    all_models = []
+    for item in hist.get("items", []):
+        for m in item.get("models", []):
+            if m not in all_models:
+                all_models.append(m)
+    return {"ok": True, "models": all_models, "count": len(all_models),
+            "source": "history_inference", "note": "从最近工作流推断，非实时已加载状态"}

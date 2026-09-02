@@ -29,4 +29,4 @@ if not defined PYTHON (
 
 :found
 echo Using Python: %PYTHON% >> logs\watchdog.log
-"%PYTHON%" watchdog.py
+"%PYTHON%" engine\watchdog.py
