@@ -16,7 +16,8 @@ import urllib.request
 from core.logger import log_event, log_error
 from core.config import REGISTRY, BASE_DIR
 from core.utils import run_args
-from services.ollama import ollama_tags
+# 注意：本模块的自动扫描器后台线程需要 ollama_tags，通过依赖注入传入（tags_provider），
+# 默认值在函数内部延迟导入，避免 engine 层模块级依赖 services 层。
 
 # ComfyUI 登记模型 → 实际文件关键词映射
 COMFY_FILE_MAP = {
@@ -235,14 +236,17 @@ def _auto_register_ollama_model(name):
     return True
 
 
-def _auto_scanner_loop():
-    """自动扫描器后台线程：每60s轮询ollama list，新模型自动登记；每5min完整扫描。"""
+def _auto_scanner_loop(tags_provider):
+    """自动扫描器后台线程：每60s轮询ollama list，新模型自动登记；每5min完整扫描。
+    Args:
+        tags_provider: callable -> set[str]，返回当前 ollama 模型标签集合（由调用方注入）
+    """
     global _last_ollama_tags, _auto_scanner_running
     _auto_scanner_running = True
     full_scan_counter = 0
     while _auto_scanner_running:
         try:
-            current = ollama_tags()
+            current = tags_provider()
             if current:
                 if _last_ollama_tags:
                     new_models = current - _last_ollama_tags
@@ -277,10 +281,16 @@ def _auto_scanner_loop():
         time.sleep(60)
 
 
-def start_auto_scanner():
-    """启动自动扫描器后台线程（daemon）。"""
+def start_auto_scanner(tags_provider=None):
+    """启动自动扫描器后台线程（daemon）。
+    Args:
+        tags_provider: callable -> set[str]，返回当前 ollama 模型标签集合。
+                       为 None 时默认使用 services.ollama.ollama_tags（延迟导入）。
+    """
     global _last_ollama_tags
-    _last_ollama_tags = ollama_tags()
-    t = threading.Thread(target=_auto_scanner_loop, daemon=True, name="auto-scanner")
+    if tags_provider is None:
+        from services.ollama import ollama_tags as tags_provider
+    _last_ollama_tags = tags_provider()
+    t = threading.Thread(target=_auto_scanner_loop, args=(tags_provider,), daemon=True, name="auto-scanner")
     t.start()
     log_event("auto_scanner_start", interval_s=60, baseline_models=len(_last_ollama_tags))

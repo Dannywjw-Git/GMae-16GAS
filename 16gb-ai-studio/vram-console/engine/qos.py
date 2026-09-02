@@ -13,13 +13,10 @@ from core.logger import log_event, log_error, toast_notify
 from core.config import get_threshold_value
 from core.registry import registry
 from core.utils import run_args
-from services.helper import _auto_protect_cfg, _auto_protect_save
-from services.ollama import ollama_ps, ollama_stop
-from services.comfy import comfy_free
-from services.docker import docker_containers, docker_action, infer_scene
 from engine.reaper import service_activity
 from gpu.monitor import gpu_status
 from core.event_bus import event_bus
+# 注意：本模块的 services 依赖采用函数内延迟导入，避免 engine 层模块级依赖 services 层。
 
 # 兼容旧引用
 _get_threshold_value = get_threshold_value
@@ -89,6 +86,7 @@ def _record_qos_transition(old_level: str, new_level: str, free_mb: int, reason:
 
 def qos_check():
     """QoS 检查：按显存水位分级，危急时触发自动防死机。"""
+    from services.helper import _auto_protect_cfg
     if not QOS_CFG["enabled"]:
         return {"level": "disabled"}
     gpu = gpu_status()
@@ -133,6 +131,9 @@ def qos_check():
 
 def _qos_build_suggestions(free_mb):
     """构建降级建议列表。"""
+    from services.ollama import ollama_ps, ollama_stop
+    from services.comfy import comfy_free
+    from services.docker import docker_containers
     suggestions = []
     try:
         ollama_loaded = ollama_ps().get("models", [])
@@ -174,6 +175,9 @@ def _qos_build_suggestions(free_mb):
 
 def qos_execute_suggestion(suggestion_id):
     """执行用户选择的降级建议。"""
+    from services.ollama import ollama_stop
+    from services.comfy import comfy_free
+    from services.docker import docker_action
     suggestions = _qos_state.get("suggestions", [])
     target = next((s for s in suggestions if s["id"] == suggestion_id), None)
     if not target:
@@ -248,6 +252,10 @@ _AUTO_PROTECT_MODE_PLAN = {
 
 def _auto_protect_run(free_mb):
     """自动防死机主逻辑：由 qos_check 每周期调用。"""
+    from services.helper import _auto_protect_cfg
+    from services.ollama import ollama_ps, ollama_stop
+    from services.comfy import comfy_free
+    from services.docker import docker_containers, docker_action, infer_scene
     ap = _auto_protect_cfg()
     if not ap.get("enabled"):
         return None
@@ -316,6 +324,7 @@ def _auto_protect_run(free_mb):
 
 def auto_protect_status():
     """GET /api/auto-protect/status：当前配置 + 最近触发记录。"""
+    from services.helper import _auto_protect_cfg
     ap = _auto_protect_cfg()
     st = _AUTO_PROTECT_STATE
     return {
@@ -336,6 +345,7 @@ def auto_protect_status():
 
 def auto_protect_config(data):
     """POST /api/auto-protect/config：{enabled?, mode?} 保存并审计。"""
+    from services.helper import _auto_protect_cfg, _auto_protect_save
     if not isinstance(data, dict):
         return {"ok": False, "error": "invalid payload"}
     if "enabled" not in data and "mode" not in data:

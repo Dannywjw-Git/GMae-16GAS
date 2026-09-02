@@ -8,9 +8,7 @@ GMae 显存门卫模块
 import time
 from core.logger import log_event
 from gpu.monitor import gpu_status, gpu_processes
-from services.docker import docker_containers, docker_action
-from services.ollama import ollama_stop_all
-from services.comfy import comfy_free
+# 注意：本模块的 services 依赖采用函数内延迟导入，避免 engine 层模块级依赖 services 层。
 
 # 门卫配置
 GUARD_UNKNOWN_POLICY = "warn"      # unknown 进程策略：warn（默认）/ evict
@@ -25,6 +23,7 @@ def _guard_level(cur, new):
 def gpu_guard_check():
     """门卫检查（只读）：显存水位 + 场景违规 + 未登记占用 → 告警与建议驱逐清单。
     驱逐是事后执法 + 用户触发（L0 warn 默认），绝不自动杀（防误伤正在跑的任务）。"""
+    from services.docker import docker_containers
     gpu = gpu_status()
     procs = gpu_processes()
     names = docker_containers()
@@ -66,6 +65,9 @@ def gpu_guard_evict():
     """门卫驱逐（L2，仅对登记簿 managed 中可安全重启的服务，按优先级）：
     ollama 已加载模型 → comfyui /free → fooocus 容器。
     仅由用户显式触发（POST /api/guard evict=true），不自动执行。"""
+    from services.docker import docker_containers, docker_action
+    from services.ollama import ollama_stop_all
+    from services.comfy import comfy_free
     results = []
     gpu = gpu_status()
     rc, out = ollama_stop_all()

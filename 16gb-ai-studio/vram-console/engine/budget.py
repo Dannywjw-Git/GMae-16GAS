@@ -10,16 +10,15 @@ from core.logger import log_event
 from core.config import (REGISTRY, VRAM_BASELINE_NOISE_MB, COMFY_MODEL_RESIDENT_THRESHOLD_MB,
                          VRAM_DESKTOP_PROCESS_MIN_MB, VRAM_UNKNOWN_MIN_MB)
 from gpu.monitor import gpu_status, gpu_processes, desktop_gpu_processes
-from services.docker import docker_containers, infer_scene
-from services.ollama import ollama_ps
-from services.comfy import comfy_loaded_models
-from services.helper import _helper_health, _helper_req
 from engine.reaper import service_activity
 from engine.gen_stats import load_gen_stats
+# 注意：本模块的 services 依赖采用函数内延迟导入，避免 engine 层模块级依赖 services 层。
 
 
 def _calc_vram_breakdown(used_mb: int) -> dict:
     """计算显存占用分解（与 current_status 的 vram_ledger 口径一致）。"""
+    from services.ollama import ollama_ps
+    from services.comfy import comfy_loaded_models
     ollama_loaded = (ollama_ps().get("models", []) or [])
     ollama_used_mb = 0
     for m in ollama_loaded:
@@ -43,6 +42,7 @@ def _calc_vram_breakdown(used_mb: int) -> dict:
 
 def _diagnose_desktop_processes(unattributed_mb: int) -> dict:
     """未归因显存诊断：helper 逐进程显存优先，nvidia-smi 进程名兜底。"""
+    from services.helper import _helper_health, _helper_req
     desktop = []
     helper_on = _helper_health()
     has_vram = False
@@ -177,6 +177,7 @@ def vram_advice() -> dict:
     2) 智能建议：场景活跃度感知 + 释放收益排序——列出当前可释放项（停止模型 / ComfyUI /free /
        停容器 / 结束桌面进程），按可回收显存降序，供用户在显存紧张时快速决策。
     """
+    from services.docker import docker_containers, infer_scene
     gpu = gpu_status()
     if not gpu.get("ok"):
         return {"ok": False, "error": "nvidia-smi unavailable"}
@@ -220,6 +221,8 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
          能跑 = 请求模型标称 + 不可释放占用 ≤ total − reserve
     决策四选一（6.2）：ok / free_L1 / free_L2 / reject（连释放都不够 → 差多少 GB）
     独占硬约束（6.4）：exclusive 模型加载前须释放所有其他受管模型（L1/L2 可释放）。"""
+    from services.ollama import ollama_ps
+    from services.comfy import comfy_loaded_models
     sys_cfg = REGISTRY.get("system", {})
     total_mb = int(float(sys_cfg.get("gpu_vram_total_gb", 16)) * 1024)
     noise_mb = int(float(sys_cfg.get("gpu_base_noise_gb", 1.0)) * 1024)

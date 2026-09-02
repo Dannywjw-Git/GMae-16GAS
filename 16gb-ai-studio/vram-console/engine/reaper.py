@@ -12,8 +12,8 @@ from core.logger import log_event, log_error
 from core.config import OLLAMA_CONTAINER
 from core.registry import registry
 from core.utils import run_args
-from services.ollama import ollama_ps
-from services.comfy import comfy_free, comfy_queue
+# 注意：本模块的 services 依赖（ollama_ps / comfy_free / comfy_queue）采用函数内延迟导入，
+# 避免 engine 层模块级依赖 services 层，保证模块可独立导入和测试。
 
 # === 服务活跃度追踪 — 已迁移到 registry ===
 registry.set("last_busy", {})
@@ -27,6 +27,8 @@ def _mark_busy(svc):
 
 def service_activity():
     """服务活跃度：观测式记录各服务最后忙碌时间 → 空闲时长。"""
+    from services.ollama import ollama_ps
+    from services.comfy import comfy_queue
     now = int(time.time())
     om = ollama_ps().get("models", [])
     if om:
@@ -58,6 +60,8 @@ REAPER_CFG = {
 
 def _reap_service(svc, idle_s):
     """执行空闲回收：ollama 卸载空闲模型；comfyui 释放显存。"""
+    from services.ollama import ollama_ps
+    from services.comfy import comfy_free
     log_event("idle_reaper_reap", service=svc, idle_s=idle_s)
     if svc == "ollama":
         for m in ollama_ps().get("models", []):
