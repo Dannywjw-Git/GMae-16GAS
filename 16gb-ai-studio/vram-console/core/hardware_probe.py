@@ -12,11 +12,11 @@ GMae v0.3.1 — 硬件探测模块（HardwareProbe）
 
 import json
 import os
-import subprocess
 import time
 from dataclasses import dataclass, asdict
 from typing import Optional
 from core.logger import logger
+from clients.process_client import process_client
 
 
 @dataclass
@@ -42,12 +42,14 @@ class HardwareProfile:
 
 
 def _run_cmd(args: list, timeout: int = 10) -> tuple[int, str]:
-    """运行命令，返回 (returncode, stdout)。失败返回 (-1, "")。"""
-    try:
-        r = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
-        return r.returncode, (r.stdout or "").strip()
-    except Exception:
-        return -1, ""
+    """运行命令，返回 (returncode, stdout)。失败返回 (-1, "")。
+
+    【P1-3 改造】使用统一 process_client 封装，替代直接 subprocess 调用。
+    """
+    result = process_client.run(args, timeout=timeout)
+    if result.ok:
+        return result.returncode, (result.stdout or "").strip()
+    return -1, ""
 
 
 def probe_gpus() -> list:
