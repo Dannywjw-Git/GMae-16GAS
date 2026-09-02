@@ -42,7 +42,7 @@ def _load_registry():
             with open(reg_path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
-            pass
+            pass  # 合理忽略：registry.json 读取/解析失败，使用默认空字典
     return {}
 
 
@@ -175,8 +175,8 @@ def scan_register(source, name, vram_gb=None, category="image"):
     bak = reg_path + ".bak_scan"
     try:
         shutil.copyfile(reg_path, bak)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("scan_register_backup_failed", error=e, path=bak)
     models.append(entry)
     with open(reg_path, "w", encoding="utf-8") as f:
         json.dump(REGISTRY, f, ensure_ascii=False, indent=2)
@@ -193,8 +193,8 @@ def _estimate_ollama_vram(name):
         for m in d.get("models", []):
             if m.get("name") == name:
                 return round(m.get("size", 0) / 1e9 + 0.8, 1)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("estimate_ollama_vram_api_failed", error=e, model=name)
     n = name.lower()
     m = re.search(r'(\d+\.?\d*)b', n)
     params_b = float(m.group(1)) if m else 7.0

@@ -148,8 +148,8 @@ def _qos_build_suggestions(free_mb):
                 "action": "停止 %s（释放 %.1fGB）" % (model_name, size_gb),
                 "priority": "medium",
             })
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("qos_suggestion_ollama_failed", error=e)
     try:
         if "comfyui" in docker_containers():
             suggestions.append({
@@ -157,8 +157,8 @@ def _qos_build_suggestions(free_mb):
                 "action": "ComfyUI /free（释放生成模型显存，约 2-6GB）",
                 "priority": "low",
             })
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("qos_suggestion_comfy_failed", error=e)
     try:
         if "fooocus" in docker_containers():
             suggestions.append({
@@ -166,8 +166,8 @@ def _qos_build_suggestions(free_mb):
                 "action": "停止 Fooocus 容器（释放约 7GB）",
                 "priority": "high",
             })
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("qos_suggestion_fooocus_failed", error=e)
     priority_order = {"high": 0, "medium": 1, "low": 2}
     suggestions.sort(key=lambda x: priority_order.get(x.get("priority", "low"), 2))
     return suggestions
