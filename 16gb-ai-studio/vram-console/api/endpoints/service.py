@@ -35,8 +35,8 @@ def post_service(req: Request) -> Response:
             message="服务操作 {} {}（{}）".format(svc_name, svc_action, "成功" if ok else "失败"),
             metadata={"service": svc_name, "action": svc_action, "success": ok, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="service.py:38")
     return Response.success(result)
 
 
@@ -68,8 +68,8 @@ def post_model(req: Request) -> Response:
                 message="卸载模型 {}（{}）".format(model_name, "成功" if ok else "失败"),
                 metadata={"model_name": model_name, "success": ok, "result": str(result)[:200]}
             )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="service.py:71")
     return Response.success(result)
 
 
@@ -91,6 +91,6 @@ def post_container_stop(req: Request) -> Response:
             message="停止容器 {}（{}）".format(container_name, "成功" if ok else "失败"),
             metadata={"container_name": container_name, "success": ok, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="service.py:94")
     return Response.success(result)

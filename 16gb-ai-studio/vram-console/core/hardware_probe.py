@@ -185,8 +185,7 @@ def probe_ram() -> int:
                 if "=" in line:
                     try:
                         return int(int(line.split("=")[1].strip()) / (1024 * 1024))
-                    except ValueError:
-                        pass
+                    except ValueError: pass  # 合理忽略：值解析失败，使用默认值
     else:
         # Linux: /proc/meminfo
         try:
@@ -194,8 +193,8 @@ def probe_ram() -> int:
                 for line in f:
                     if line.startswith("MemTotal:"):
                         return int(line.split()[1]) // 1024
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="hardware_probe.py:197")
     return 0
 
 

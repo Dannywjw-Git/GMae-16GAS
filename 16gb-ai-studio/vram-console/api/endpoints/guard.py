@@ -37,8 +37,8 @@ def post_guard(req: Request) -> Response:
                 message="门卫强制结束进程 PID={}".format(pid),
                 metadata={"pid": pid, "result": str(result)[:200]}
             )
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="guard.py:40")
     elif action == "evict" or req.body_get("evict"):
         result = gpu_guard_evict()
         status_cache.invalidate()
@@ -50,8 +50,8 @@ def post_guard(req: Request) -> Response:
                 message="门卫驱逐未登记进程，驱逐 {} 个".format(len(evicted)),
                 metadata={"evicted_count": len(evicted), "result": str(result)[:200]}
             )
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="guard.py:53")
     else:
         result = gpu_guard_check()
     return Response.success(result)

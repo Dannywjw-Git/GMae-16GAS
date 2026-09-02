@@ -48,8 +48,8 @@ def _save_sessions() -> None:
     try:
         with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
             json.dump(SESSIONS, f, ensure_ascii=False, indent=2)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="auth.py:51")
 
 _load_sessions()  # 模块加载时恢复 session
 

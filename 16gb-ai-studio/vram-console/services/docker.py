@@ -194,8 +194,8 @@ def free_all() -> dict:
     try:
         invalidate_status_cache()
         status_cache.clear()
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="docker.py:197")
     after = gpu_status(force_refresh=True)  # 强制刷新，避免读取释放前的缓存数据
     # 构建 running 数组：释放后仍在运行且占用 GPU 的进程
     running = []

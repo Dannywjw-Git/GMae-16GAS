@@ -127,8 +127,8 @@ def registry_view() -> dict:
         ps_result = ollama_ps()
         if ps_result.get("ok"):
             loaded_models = ps_result.get("models", [])
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="route_helpers.py:130")
     return {
         "ok": True,
         "version": reg.get("version", ""),

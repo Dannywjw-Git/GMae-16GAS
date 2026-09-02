@@ -39,8 +39,8 @@ def post_free(req: Request) -> Response:
             message="显存释放执行，释放约 {}MB".format(freed),
             metadata={"freed_mb": freed, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="vram.py:42")
     return Response.success(result)
 
 
@@ -60,8 +60,7 @@ def get_budget(req: Request) -> Response:
                 mid, ctx = item.rsplit(":", 1)
                 try:
                     context_overrides[mid.strip()] = int(ctx.strip())
-                except ValueError:
-                    pass
+                except ValueError: pass  # 合理忽略：值解析失败，使用默认值
     return Response.success(budget_engine(context_overrides))
 
 

@@ -30,8 +30,7 @@ def _read_idle_timeout() -> int:
         i = sys.argv.index("--idle-timeout")
         if len(sys.argv) > i + 1:
             return int(sys.argv[i + 1])
-    except ValueError:
-        pass
+    except ValueError: pass  # 合理忽略：值解析失败，使用默认值
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             return int(json.load(f).get("helper_idle_timeout", 300))
@@ -57,8 +56,8 @@ def _idle_monitor() -> None:
             _log("idle {:.0f}s > timeout {}s -> auto-exit (安全增强，提权进程用完即走)".format(idle, IDLE_TIMEOUT))
             try:
                 os._exit(0)
-            except Exception:
-                pass
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="vram_helper.py:60")
             return
 
 
@@ -70,8 +69,8 @@ def _log(msg: str) -> None:
         os.makedirs(os.path.dirname(LOG_FILE), exist_ok=True)
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(line + "\n")
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="vram_helper.py:73")
 
 
 def _read_token() -> str:
@@ -80,8 +79,7 @@ def _read_token() -> str:
         i = sys.argv.index("--token")
         if len(sys.argv) > i + 1:
             return sys.argv[i + 1]
-    except ValueError:
-        pass
+    except ValueError: pass  # 合理忽略：值解析失败，使用默认值
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             return json.load(f).get("helper_token", "")
@@ -149,8 +147,8 @@ def desktop_kill(pid: int) -> dict:
              "(Get-Process -Id {} -ErrorAction SilentlyContinue).ProcessName".format(pid)],
             capture_output=True, text=True, timeout=8)
         name = (pr.stdout or "").strip()
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="vram_helper.py:152")
     if name.lower() in PROTECT:
         return {"ok": False, "error": "refuse: protected system process: " + name}
     try:

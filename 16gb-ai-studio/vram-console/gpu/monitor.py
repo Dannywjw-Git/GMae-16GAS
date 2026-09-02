@@ -202,8 +202,8 @@ def gpu_processes() -> dict:
                 clm = comfy_loaded_models()
                 if clm.get("ok"):
                     comfy_models = clm.get("models", [])
-            except Exception:
-                pass
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="monitor.py:205")
             if comfy_used_mb > 0:
                 model_str = ", ".join(comfy_models[:2]) if comfy_models else "torch"
                 if len(comfy_models) > 2:
@@ -237,8 +237,8 @@ def gpu_processes() -> dict:
                             "container": "fooocus",
                         })
                         fooocus_used += p.get("used_mb", 0)
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="monitor.py:240")
         # 如果容器内 nvidia-smi 失败，使用估算（fooocus 通常占用约 6-7GB）
         if fooocus_used == 0:
             estimated = int(6.5 * 1024)

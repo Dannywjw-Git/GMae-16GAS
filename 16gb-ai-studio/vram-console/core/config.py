@@ -115,6 +115,6 @@ def get_threshold_value(attr: str, fallback: int) -> int:
     if _dyn_thresholds is not None:
         try:
             return int(getattr(_dyn_thresholds, attr))
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="config.py:118")
     return fallback

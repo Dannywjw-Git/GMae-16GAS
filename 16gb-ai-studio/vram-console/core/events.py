@@ -143,8 +143,8 @@ class EventSystem:
             try:
                 from core.logger import logger
                 logger.error(f"[{service}] {event_type}: {message}")
-            except Exception:
-                pass
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="events.py:146")
 
         return event
 

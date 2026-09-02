@@ -104,8 +104,8 @@ class DockerEventsMonitor:
             except Exception:
                 try:
                     self._process.kill()
-                except Exception:
-                    pass
+                except Exception as e:
+                    log_error("exception_suppressed", error=e, context="docker_events.py:107")
             self._process = None
         self._thread = None
         self._available = False

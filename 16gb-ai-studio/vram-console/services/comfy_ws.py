@@ -154,8 +154,8 @@ def _comfy_ws_loop():
             try:
                 if ws.sock:
                     ws.sock.close()
-            except Exception:
-                pass
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="comfy_ws.py:157")
             time.sleep(backoff)
             backoff = min(backoff * 2, 30)
 

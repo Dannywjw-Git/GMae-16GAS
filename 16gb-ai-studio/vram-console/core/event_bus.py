@@ -84,8 +84,8 @@ class EventBus:
         # 确保日志目录存在
         try:
             self._log_file.parent.mkdir(parents=True, exist_ok=True)
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="event_bus.py:87")
 
         # 启动时从持久化文件加载最近的事件（最多 max_events 条）
         self._load_from_file()

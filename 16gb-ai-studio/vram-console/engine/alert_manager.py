@@ -204,8 +204,8 @@ class AlertManager:
                 self._silence_file.parent.mkdir(parents=True, exist_ok=True)
                 with open(self._silence_file, "w", encoding="utf-8") as f:
                     json.dump(self._silenced, f)
-            except Exception:
-                pass
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="alert_manager.py:207")
 
 
 # 全局单例

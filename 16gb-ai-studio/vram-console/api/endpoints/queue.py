@@ -40,8 +40,8 @@ def post_queue(req: Request) -> Response:
             message="提交任务 model={} id={}".format(task_model, task_id),
             metadata={"model": task_model, "task_id": task_id, "params_keys": list(task_params.keys()) if isinstance(task_params, dict) else [], "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="queue.py:43")
     return Response.success(result)
 
 
@@ -63,6 +63,6 @@ def post_queue_cancel(req: Request) -> Response:
             message="取消任务 id={}（{}）".format(task_id, "成功" if ok else "失败"),
             metadata={"task_id": task_id, "success": ok, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="queue.py:66")
     return Response.success(result)

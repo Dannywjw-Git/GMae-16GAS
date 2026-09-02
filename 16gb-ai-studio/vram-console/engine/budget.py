@@ -24,8 +24,7 @@ def _calc_vram_breakdown(used_mb: int) -> dict:
     for m in ollama_loaded:
         try:
             ollama_used_mb += int(float(m.get("size_gb", 0) or 0) * 1024)
-        except (TypeError, ValueError):
-            pass
+        except (TypeError, ValueError): pass  # 合理忽略：值解析失败，使用默认值
     comfy_torch_mb = int((comfy_loaded_models() or {}).get("torch_vram_used_mb", 0) or 0)
     comfy_used_mb = comfy_torch_mb if comfy_torch_mb > COMFY_MODEL_RESIDENT_THRESHOLD_MB else 0
     noise_mb = VRAM_BASELINE_NOISE_MB

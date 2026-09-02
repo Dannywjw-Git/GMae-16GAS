@@ -173,8 +173,8 @@ def _check_vram_budget(scene_config: dict) -> dict:
         loaded = comfy_loaded_models()
         for m in loaded.get("models", []):
             releasable += m.get("vram_mb", 0)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="scene.py:176")
     total_available = current_free + releasable
     ok = total_available >= required_mb * 0.9  # 允许10%余量
     return {

@@ -58,6 +58,6 @@ def post_scan_register(req: Request) -> Response:
                       "category": req.body_get("category", "image"),
                       "success": ok}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="registry.py:61")
     return Response.success(result)

@@ -45,8 +45,8 @@ def post_qos_execute(req: Request) -> Response:
             message="执行QoS建议",
             metadata={"endpoint": "/api/qos/execute"}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="qos.py:48")
 
     return Response.success(result)
 

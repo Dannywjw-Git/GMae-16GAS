@@ -31,8 +31,8 @@ def post_scene(req: Request) -> Response:
             message="切换场景到 {}（{}）".format(scene_name, "成功" if ok else "失败"),
             metadata={"to_scene": scene_name, "success": ok, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="scene.py:34")
     return Response.success(result)
 
 
@@ -54,6 +54,6 @@ def post_combo(req: Request) -> Response:
             message="切换组合到 {}（{}）".format(combo_name, "成功" if ok else "失败"),
             metadata={"combo_name": combo_name, "success": ok, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="scene.py:57")
     return Response.success(result)

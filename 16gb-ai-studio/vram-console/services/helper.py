@@ -30,15 +30,15 @@ def _config():
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             d = json.load(f)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="helper.py:33")
     if not d.get("helper_token"):
         d["helper_token"] = uuid.uuid4().hex
         try:
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                 json.dump(d, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="helper.py:40")
     return d
 
 
@@ -119,8 +119,8 @@ def _helper_kill_processes():
             ["powershell", "-NoProfile", "-Command",
              "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | Where-Object { $_.CommandLine -match 'vram[_-]helper' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"],
             capture_output=True, text=True, timeout=10)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="helper.py:122")
 
 
 def helper_status() -> dict:

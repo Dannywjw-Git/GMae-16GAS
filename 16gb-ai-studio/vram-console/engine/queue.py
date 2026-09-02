@@ -145,8 +145,8 @@ def _queue_wait(prompt_id, task, timeout=3600):
                 if s == "error":
                     task["error"] = "comfy_error: " + json.dumps(st.get("messages", [])[-1:] if st.get("messages") else {})
                     return "failed"
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="queue.py:148")
         time.sleep(3)
     return "failed"
 
@@ -241,8 +241,7 @@ def queue_cancel(tid: str) -> dict:
         if task["status"] == "queued":
             try:
                 _task_queue.remove(tid)
-            except ValueError:
-                pass
+            except ValueError: pass  # 合理忽略：值解析失败，使用默认值
             task["status"] = "canceled"
             task["ended"] = int(time.time())
             log_event("queue_cancel", task=tid)

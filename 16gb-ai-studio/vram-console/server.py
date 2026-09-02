@@ -105,8 +105,8 @@ if __name__ == "__main__":
             while True:
                 try:
                     alert_manager.check_escalation()
-                except Exception:
-                    pass
+                except Exception as e:
+                    log_error("exception_suppressed", error=e, context="server.py:108")
                 time.sleep(60)
         _alert_esc_thread = threading.Thread(target=_alert_escalation_loop, daemon=True, name="alert-escalation")
         _alert_esc_thread.start()
@@ -132,5 +132,5 @@ if __name__ == "__main__":
         # 优雅停止 Docker Events 监听
         try:
             docker_events.stop()
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="server.py:135")

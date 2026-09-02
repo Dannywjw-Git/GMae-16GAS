@@ -26,13 +26,13 @@ def log(msg: str) -> None:
     line = "{} | {}".format(ts, msg)
     try:
         print(line, flush=True)
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="watchdog.py:29")
     try:
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(line + "\n")
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="watchdog.py:34")
 
 def _port_open() -> bool:
     """探测1：端口连通性（TCP 连接，检测端口是否在监听）"""

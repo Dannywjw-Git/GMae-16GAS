@@ -81,8 +81,8 @@ def post_alert_silence(req: Request) -> Response:
             message="静默告警 {}（{}分钟）".format(alert_type, duration),
             metadata={"alert_type": alert_type, "duration_minutes": duration, "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="alerts.py:84")
     return Response.success(result)
 
 
@@ -104,8 +104,8 @@ def post_alert_resolve(req: Request) -> Response:
             message="解决告警 {}（{}）".format(alert_type, "成功" if resolved else "未找到"),
             metadata={"alert_type": alert_type, "resolved": resolved}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="alerts.py:107")
     return Response.success({
         "alert_type": alert_type,
         "resolved": resolved,

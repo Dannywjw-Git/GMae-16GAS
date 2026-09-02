@@ -29,8 +29,8 @@ def load_config() -> dict:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 file_cfg = json.load(f)
             cfg.update({k: v for k, v in file_cfg.items() if k in DEFAULT_CONFIG})
-        except Exception:
-            pass
+        except Exception as e:
+            log_error("exception_suppressed", error=e, context="config.py:32")
     # 环境变量覆盖
     if os.environ.get("GMAE_SERVER"):
         cfg["server"] = os.environ["GMAE_SERVER"]
@@ -39,8 +39,7 @@ def load_config() -> dict:
     if os.environ.get("GMAE_TIMEOUT"):
         try:
             cfg["timeout"] = int(os.environ["GMAE_TIMEOUT"])
-        except ValueError:
-            pass
+        except ValueError: pass  # 合理忽略：值解析失败，使用默认值
     return cfg
 
 

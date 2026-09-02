@@ -49,8 +49,8 @@ def post_diagnose(req: Request) -> Response:
                       "matched_rules": len(getattr(result, 'matched_rules', [])),
                       "total_events": getattr(result, 'total_events', 0)}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="diagnose.py:52")
 
     return Response.success({
         "alert_type": result.alert_type,

@@ -41,6 +41,6 @@ def post_admission(req: Request) -> Response:
             message="准入检查 action={} decision={}".format(adm_action, decision),
             metadata={"action": adm_action, "decision": decision, "args": str(adm_args)[:200], "result": str(result)[:200]}
         )
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="admission.py:44")
     return Response.success(result)

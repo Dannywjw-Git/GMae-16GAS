@@ -144,8 +144,8 @@ def invalidate_status_cache() -> None:
     registry.set("status_cache", cache)
     try:
         status_cache.invalidate()
-    except Exception:
-        pass
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="status.py:147")
 
 
 def _safe_call(fn, default=None):
