@@ -113,13 +113,30 @@ async function updateHeader() {
     const total = gpu.total_mb || 16384;
     const used = gpu.used_mb || 0;
     const pct = Math.round((used / total) * 100);
-    const fill = Utils.$('#header-vram-fill');
     const text = Utils.$('#header-vram-text');
     const freeMb = gpu.free_mb || total - used;
-    if (fill) { fill.style.width = pct + '%'; fill.style.background = pct > 85 ? 'var(--color-danger)' : pct > 70 ? 'var(--color-warning)' : 'var(--color-brand-500)'; }
+    // 分类进度条（顶部共享，所有页面一致）
+    const gp = status.gpu_processes || {};
+    const baseMb = gp.baseline_mb || gp.system_baseline_mb || 800;
+    const knownMb = gp.known_total_mb || 0;
+    const desktopMb = gp.desktop_used_mb || 0;
+    const otherMb = Math.max(0, used - baseMb - knownMb - desktopMb);
+    const segs = [
+      { type: 'base', mb: baseMb },
+      { type: 'known', mb: knownMb },
+      { type: 'desktop', mb: desktopMb },
+      { type: 'other', mb: otherMb },
+      { type: 'free', mb: Math.max(0, total - used) },
+    ];
+    segs.forEach(s => {
+      const el = Utils.$('.header__vram-seg--' + s.type);
+      if (el) el.style.width = ((s.mb / total) * 100) + '%';
+    });
     if (text) text.textContent = Utils.formatMB(used) + '/' + Utils.formatMB(total) + ' · ' + pct + '%';
     const wrap = Utils.$('#header-vram-wrap');
-    if (wrap) wrap.title = '已用 ' + Utils.formatMB(used) + ' / 总量 ' + Utils.formatMB(total) + ' / 空闲 ' + Utils.formatMB(freeMb) + ' / 使用率 ' + pct + '%';
+    if (wrap) wrap.title = '已用 ' + Utils.formatMB(used) + ' / 总量 ' + Utils.formatMB(total) + ' / 空闲 ' + Utils.formatMB(freeMb) + '\n' +
+      '底噪 ' + Utils.formatMB(baseMb) + ' · 已知进程 ' + Utils.formatMB(knownMb) + ' · 桌面 ' + Utils.formatMB(desktopMb) + ' · 未登记 ' + Utils.formatMB(otherMb) + '\n' +
+      '（点击跳转到显存账本页查看明细）';
     // 更新数据新鲜度指示器
     const meta = status._meta || {};
     const freshnessEl = Utils.$('#data-freshness');
