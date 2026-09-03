@@ -5,6 +5,62 @@
  * ============================================================ */
 
 const Pages = {
+  // ===== 事件说明字典 =====
+  // 将常见事件类型映射到中文说明，让用户明白发生了什么
+  _eventDescriptions: {
+    // ComfyUI 相关
+    'comfy ws connected': 'ComfyUI WebSocket 连接成功，可实时接收生成进度',
+    'comfy ws error': 'ComfyUI WebSocket 连接异常，可能影响实时进度显示',
+    'comfy ws disconnected': 'ComfyUI WebSocket 断开连接',
+    'comfy model loaded': 'ComfyUI 模型加载完成',
+    'comfy model unloaded': 'ComfyUI 模型已卸载，释放显存',
+    'comfy queue empty': 'ComfyUI 任务队列已清空',
+    'comfy prompt queued': 'ComfyUI 任务已加入队列',
+    'comfy prompt completed': 'ComfyUI 任务完成',
+    'comfy prompt failed': 'ComfyUI 任务失败',
+    // Ollama 相关
+    'ollama model loaded': 'Ollama 模型加载完成，可进行对话',
+    'ollama model unloaded': 'Ollama 模型已卸载，释放显存',
+    'ollama running': 'Ollama 正在运行推理',
+    'ollama idle': 'Ollama 空闲，模型仍在显存中',
+    'ollama stopped': 'Ollama 服务已停止',
+    // 显存相关
+    'vram warning': '显存使用率超过 70%，注意监控',
+    'vram critical': '显存使用率超过 85%，可能触发 OOM',
+    'vram recovered': '显存已恢复正常水平',
+    'vram released': '显存已释放，可安全加载新模型',
+    'vram auto cleanup': '自动显存清理已执行',
+    // 容器相关
+    'container started': '容器已启动',
+    'container stopped': '容器已停止',
+    'container crashed': '容器异常崩溃，建议检查日志',
+    'container restarted': '容器已重启',
+    // 系统相关
+    'api request': 'API 请求已处理',
+    'api error': 'API 请求出错',
+    'auto scan full': '自动扫描完成，更新了资源状态',
+    'service started': '服务已启动',
+    'service stopped': '服务已停止',
+    'watchdog restart': '看门狗检测到服务异常，已自动重启',
+    // 用户操作
+    'user login': '用户登录',
+    'user logout': '用户登出',
+    'scene changed': '场景已切换，显存配置已更新',
+    'manual release': '用户手动执行显存释放',
+  },
+
+  // 获取事件的中文说明
+  _getEventDescription(event) {
+    const key = (event || '').toLowerCase().trim();
+    // 精确匹配
+    if (this._eventDescriptions[key]) return this._eventDescriptions[key];
+    // 模糊匹配（包含关键词）
+    for (const [k, desc] of Object.entries(this._eventDescriptions)) {
+      if (key.includes(k) || k.includes(key)) return desc;
+    }
+    return null;
+  },
+
   // ===== Dashboard 总览页 =====
   async dashboard() {
     const container = Utils.$('#app-content');
@@ -197,8 +253,8 @@ const Pages = {
           ${events.length > 0 ? `
             <div style="padding:12px 16px">
               ${events.slice(0, 8).map(e => `
-                <div class="flex items-center gap-3" style="padding:6px 0;border-bottom:1px solid var(--color-border-light)">
-                  <span class="text-mono text-tertiary" style="font-size:11px;min-width:60px">${Utils.formatTime(e.timestamp)}</span>
+                <div class="flex items-start gap-3" style="padding:8px 0;border-bottom:1px solid var(--color-border-light)">
+                  <span class="text-mono text-tertiary" style="font-size:11px;min-width:60px;padding-top:2px">${Utils.formatTime(e.timestamp)}</span>
                   <span class="badge badge--${(() => {
                     const cat = e.category || '';
                     if (cat === 'vram' || cat === 'gpu') return 'danger';
@@ -206,8 +262,14 @@ const Pages = {
                     if (cat === 'model' || cat === 'service') return 'info';
                     if (cat === 'user_action' || cat === 'system') return 'success';
                     return 'neutral';
-                  })()}" style="font-size:10px">${Utils.escapeHtml(e.category || '')}</span>
-                  <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.escapeHtml(e.message || e.event || '')}</span>
+                  })()}" style="font-size:10px;flex-shrink:0;margin-top:1px">${Utils.escapeHtml(e.category || '')}</span>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.escapeHtml(e.message || e.event || '')}</div>
+                    ${(() => {
+                      const desc = Pages._getEventDescription(e.message || e.event || '');
+                      return desc ? `<div style="font-size:11px;color:var(--color-text-tertiary);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${desc}</div>` : '';
+                    })()}
+                  </div>
                 </div>
               `).join('')}
             </div>
