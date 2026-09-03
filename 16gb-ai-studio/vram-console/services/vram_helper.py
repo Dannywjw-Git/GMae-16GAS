@@ -1,11 +1,25 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-vram-helper.py — 最小提权 Helper（方案A，2026-08-28）
-能力仅两项：读 Windows 性能计数器（逐进程 GPU 显存明细）+ taskkill 结束桌面进程。
-只在用户需要查看/管理 Windows 进程显存时经 UAC 启动，默认不运行、不参与容器管理。
-监听 127.0.0.1:8788（仅本机），独立 token 认证（X-API-Key）。
-用法：python vram-helper.py --token <token>   （通常由调度中心 ShellExecute runas 启动）
+GMae 桌面 Helper 服务端脚本（services/vram_helper.py）
+
+【职责边界 - P2-2 明确】
+本文件是独立的 Helper **服务端**可执行脚本，负责：
+- 启动 HTTP 服务器（8788端口），提供桌面进程显存探测 API
+- 实际执行系统操作（taskkill / PowerShell 性能计数器）
+- 空闲监控（自动退出，节省资源）
+- UAC 提权运行（需要管理员权限）
+
+【与 helper.py 的关系】
+- services/helper.py 是主服务中的 Helper **客户端**
+- helper.py 通过 HTTP API 调用本文件提供的服务
+- 两者是客户端-服务端架构，不是职责重叠，不可合并
+- desktop_kill() 在 helper.py 是 API 代理，在本文件是实际执行
+
+【启动方式】
+- 由 services/helper.py 的 helper_start() 函数启动
+- 也可手动运行：python vram_helper.py --token <token>
+- 独立运行，不依赖主服务进程
 """
 import json
 import os

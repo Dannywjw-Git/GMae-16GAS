@@ -1,10 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-GMae 桌面 Helper 服务模块
-- Windows 桌面进程显存探测（经 Helper 代理，UAC 提权）
+GMae 桌面 Helper 客户端模块（services/helper.py）
+
+【职责边界 - P2-2 明确】
+本文件是主服务（vram-console）中的 Helper **客户端**，负责：
 - Helper 进程管理（启动/停止/状态探测）
+- 调用 Helper HTTP API（经代理，UAC 提权）
 - 自动防死机配置
+- Windows GPU 进程数据获取（经 Helper 代理）
+
+【与 vram_helper.py 的关系】
+- services/vram_helper.py 是独立的 Helper **服务端**脚本（可执行）
+- 本文件通过 HTTP API 调用 vram_helper.py 提供的服务
+- 两者是客户端-服务端架构，不是职责重叠，不可合并
+- desktop_kill() 在本文件是 API 代理，在 vram_helper.py 是实际执行
+
+【P1-3 改造说明】
+- HTTP 调用应逐步迁移到 clients/helper_client.py
+- subprocess 调用应逐步迁移到 clients/process_client.py
 """
 import json
 import os
