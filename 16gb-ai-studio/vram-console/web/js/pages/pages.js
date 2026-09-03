@@ -55,7 +55,7 @@ const Pages = {
     const loadedModels = status.ollama?.models || [];
     const loadedModelCount = loadedModels.length || status.vram_ledger?.ollama_model_count || 0;
     const loadedModelNames = loadedModels.slice(0, 2).map(m => m.name || m.model || '').filter(Boolean).join(', ') || '无';
-    const baseNoise = status.gpu_processes?.system_baseline_mb || status.vram_ledger?.noise_mb || 400;
+    const baseNoise = status.gpu_processes?.baseline_mb || status.gpu_processes?.system_baseline_mb || status.vram_ledger?.noise_mb || 400;
 
     // 显存分段
     const segments = this._calcVramSegments(status);
@@ -236,10 +236,12 @@ const Pages = {
 
     // 已知进程显存（进程明细之和，优先用 known_total_mb）
     const knownMb = gp.known_total_mb || (gp.processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
-    // 桌面进程显存
-    const desktopMb = gp.desktop_used_mb || 0;
-    // 系统底噪
-    const baseMb = gp.system_baseline_mb || (status.vram_ledger?.noise_mb) || 400;
+    // 桌面进程显存（从 desktop_processes 数组计算总和）
+    const desktopMb = gp.desktop_used_mb || (gp.desktop_processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
+    // 系统底噪（后端字段名是 baseline_mb，不是 system_baseline_mb）
+    const baseMb = gp.baseline_mb || gp.system_baseline_mb || (status.vram_ledger?.noise_mb) || 400;
+    // 未登记显存（后端返回 unknown_mb）
+    const unknownMb = gp.unknown_mb || 0;
 
     // 确保分类之和不超过 used（数据可能有重叠，按比例缩放）
     const accounted = knownMb + desktopMb + baseMb;
@@ -250,11 +252,13 @@ const Pages = {
       other = 0;
     }
 
+    // 未登记显存 = max(unknown_mb, used - base - known - desktop)
+    const calcOther = Math.max(unknownMb, used - baseMb - knownMb - desktopMb);
     const segs = [
       { type: 'base', name: '底噪', mb: Math.round(baseMb), colorIdx: 1 },
       { type: 'known', name: '已知进程', mb: Math.round(knownMb), colorIdx: 2 },
       { type: 'desktop', name: '桌面', mb: Math.round(desktopMb), colorIdx: 3 },
-      { type: 'other', name: '未登记', mb: Math.round(other), colorIdx: 7 },
+      { type: 'other', name: '未登记', mb: Math.round(calcOther), colorIdx: 7 },
       { type: 'free', name: '空闲', mb: Math.round(free), colorIdx: 0 },
     ].filter(s => s.mb > 0);
     segs.forEach(s => s.pct = (s.mb / total) * 100);
@@ -973,9 +977,9 @@ const Pages = {
     const segments = this._calcVramSegments(status);
     const processes = gp.processes || [];
     // 前端自己计算预期已用和差异，确保和分布条一致（不依赖后端 vram_ledger 的错误计算）
-    const baseNoise = gp.system_baseline_mb || ledger.noise_mb || 400;
+    const baseNoise = gp.baseline_mb || gp.system_baseline_mb || ledger.noise_mb || 400;
     const knownMb = gp.known_total_mb || processes.reduce((sum, p) => sum + (p.used_mb || 0), 0);
-    const desktopMb = gp.desktop_used_mb || 0;
+    const desktopMb = gp.desktop_used_mb || (gp.desktop_processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0) || 0;
     const expectedUsed = baseNoise + knownMb + desktopMb;
     const diffMb = Math.max(0, used - expectedUsed);
 
