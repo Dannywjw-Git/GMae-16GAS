@@ -1,0 +1,40 @@
+/* ============================================================
+ * base.css
+ * 从 main.css 拆分：文件头 + 样式重置
+ * 原行范围: 第1-34行
+ * ============================================================ */
+
+/* ============================================================
+ * 16GAS 前端主样式
+ * 包含：重置 + 布局 + 组件 + 页面 + 响应式
+ * ============================================================ */
+
+/* ===== 样式重置 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 13px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background: var(--color-bg-0);
+  overflow: hidden;
+  height: 100vh;
+}
+a { color: var(--color-brand-400); text-decoration: none; }
+a:hover { color: var(--color-brand-300); }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+ul, ol { list-style: none; }
+img { max-width: 100%; display: block; }
+code, pre, .mono { font-family: var(--font-mono); }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bg-1); }
+::-webkit-scrollbar-thumb { background: var(--color-bg-3); border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: var(--color-bg-hover); }
+
+/* 选中 */
+::selection { background: rgba(13,148,136,0.3); color: var(--color-text-primary); }
+

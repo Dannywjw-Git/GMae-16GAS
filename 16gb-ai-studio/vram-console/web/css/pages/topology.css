@@ -1,0 +1,436 @@
+/* ============================================================
+ * pages/topology.css
+ * 从 main.css 拆分：S5拓扑图与健康度特定样式
+ * 原行范围: 第1589-2018行
+ * ============================================================ */
+
+/* ===== S5 拓扑图与健康度 ===== */
+.health-score-card {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.health-score-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.health-score-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.health-score-overall {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+.health-score-ring {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+}
+.health-score-ring svg {
+  transform: rotate(-90deg);
+}
+.health-score-ring__bg {
+  fill: none;
+  stroke: var(--color-bg-3);
+  stroke-width: 8;
+}
+.health-score-ring__fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease;
+}
+.health-score-ring__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.health-score-ring__number {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+.health-score-ring__label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 4px;
+}
+.health-score-info {
+  flex: 1;
+}
+.health-score-status {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.health-score-summary {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+.health-dimensions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.health-dimension {
+  background: var(--color-bg-1);
+  border-radius: 8px;
+  padding: 14px;
+  border-left: 3px solid var(--color-brand-500);
+}
+.health-dimension--excellent { border-left-color: var(--color-success); }
+.health-dimension--good { border-left-color: var(--color-brand-500); }
+.health-dimension--fair { border-left-color: var(--color-warning); }
+.health-dimension--poor { border-left-color: var(--color-orange); }
+.health-dimension--critical { border-left-color: var(--color-danger); }
+.health-dimension__name {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+.health-dimension__score {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.health-dimension__desc {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+.health-issues {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+.health-issues__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+}
+.health-issue-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+.health-issue-item__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* 拓扑图区域 */
+.topology-container {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.topology-container__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.topology-container__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.topology-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.topology-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.topology-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.topology-svg-wrap {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.topology-svg {
+  display: block;
+  min-width: 900px;
+}
+.topology-layer-label {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.topology-node {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.topology-node:hover {
+  opacity: 0.85;
+}
+.topology-node__rect {
+  rx: 8;
+  ry: 8;
+  stroke-width: 1.5;
+  transition: stroke-width 0.2s, filter 0.2s;
+}
+.topology-node:hover .topology-node__rect {
+  stroke-width: 2.5;
+  filter: brightness(1.15);
+}
+.topology-node--selected .topology-node__rect {
+  stroke-width: 3;
+  filter: brightness(1.2);
+}
+.topology-node__icon {
+  font-size: 16px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.topology-node__name {
+  font-size: 12px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: var(--color-text-primary);
+}
+.topology-node__meta {
+  font-size: 10px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: var(--color-text-secondary);
+}
+.topology-node__status-dot {
+  cx: 0;
+  cy: 0;
+  r: 4;
+}
+.topology-link {
+  fill: none;
+  stroke-width: 1.5;
+  opacity: 0.5;
+  transition: opacity 0.2s, stroke-width 0.2s;
+}
+.topology-link:hover {
+  opacity: 0.9;
+  stroke-width: 2.5;
+}
+.topology-link--runs { stroke: var(--color-brand-500); }
+.topology-link--loads { stroke: var(--color-purple); }
+.topology-link--executes { stroke: var(--color-orange); }
+
+/* 节点详情面板 */
+.topology-detail {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.topology-detail__empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+}
+.topology-detail__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.topology-detail__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.topology-detail__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.topology-detail__subtitle {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+.topology-detail__status {
+  margin-left: auto;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.topology-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.topology-detail__item {
+  background: var(--color-bg-1);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.topology-detail__label {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 4px;
+}
+.topology-detail__value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.topology-detail__connections {
+  margin-top: 16px;
+}
+.topology-detail__connections-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+.topology-detail__connection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--color-bg-1);
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.topology-detail__connection-type {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ===== S5 紧凑版健康度卡片 ===== */
+.health-score-card--compact {
+  padding: 14px 18px;
+  margin-bottom: 12px;
+}
+.health-score-compact {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.health-score-compact__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+  min-width: 240px;
+}
+.health-score-compact__info {
+  flex: 1;
+}
+.health-score-compact__right {
+  flex: 1;
+  min-width: 0;
+}
+.health-score-ring--sm {
+  width: 72px;
+  height: 72px;
+}
+.health-dimensions--grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.health-dimension--compact {
+  background: var(--color-bg-1);
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--color-brand-500);
+}
+.health-dimension--compact.health-dimension--excellent { border-left-color: var(--color-success); }
+.health-dimension--compact.health-dimension--good { border-left-color: var(--color-brand-500); }
+.health-dimension--compact.health-dimension--fair { border-left-color: var(--color-warning); }
+.health-dimension--compact.health-dimension--poor { border-left-color: var(--color-orange); }
+.health-dimension--compact.health-dimension--critical { border-left-color: var(--color-danger); }
+.health-dimension__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.health-dimension--compact .health-dimension__name {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 0;
+}
+.health-dimension--compact .health-dimension__score {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+.health-dimension--compact .health-dimension__desc {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+.health-issues--compact {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border-light);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.health-issue-tag {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-1);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* 响应式：窄屏时上下布局 */
+@media (max-width: 1200px) {
+  .health-score-compact {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .health-dimensions--grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
