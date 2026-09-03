@@ -11,6 +11,7 @@ import time
 import datetime
 import logging
 import subprocess
+from clients.process_client import process_client
 import inspect
 from logging.handlers import TimedRotatingFileHandler
 from core.registry import registry
@@ -229,10 +230,11 @@ def toast_notify(title: str, message: str, event_type: str = "general", cooldown
     try:
         import base64 as _b64
         ps = _b64.b64decode(_TOAST_PS_B64).decode('utf-16-le')
-        subprocess.run(
+        # 【P1-3 改造】使用统一 process_client 封装
+        process_client.run(
             ["powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps,
              str(title), str(message)],
-            capture_output=True, timeout=10, check=False
+            timeout=10
         )
         log_event("toast_sent", title=title, message=message, toast_event_type=event_type)
         return True
