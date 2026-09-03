@@ -143,11 +143,23 @@ const Pages = {
         </div>
         <div class="card__body">
           <div class="vram-bar vram-bar--lg">
-            ${segments.map(s => `<div class="vram-bar__segment vram-bar__segment--${s.type}" style="width:${s.pct}%" title="${s.name}: ${Utils.formatMB(s.mb)}">${s.pct > 5 ? `<span class="vram-bar__label" title="${s.type === 'other' ? '未登记显存：无法归因到具体进程的显存占用，可能是驱动/WDDM/未知进程。点击显存账本查看进程明细。' : s.name + ': ' + Utils.formatMB(s.mb)}" style="${s.type === 'other' ? 'cursor:help' : ''}">${s.name} ${Utils.formatMB(s.mb)}</span>` : ''}</div>`).join('')}
+            ${segments.map(s => `<div class="vram-bar__segment vram-bar__segment--${s.type}" style="width:${s.pct}%" title="${s.name}: ${Utils.formatMB(s.mb)}">${s.pct > 3 ? `<span class="vram-bar__label" title="${
+    s.type === 'base' ? '系统底噪：GPU驱动 + WDDM + WSL2/Docker基础开销（动态测量，随系统状态变化）' :
+    s.type === 'known' ? '已知进程：受管AI服务的显存占用（Ollama/ComfyUI/Fooocus等，运行在WSL2 Docker容器中）' :
+    s.type === 'desktop' ? '桌面进程：Windows桌面应用的GPU显存（浏览器/微信/dwm等，通过性能计数器采集）' :
+    s.type === 'other' ? '未登记显存：无法归因到具体进程的显存，可能包含WSL2中未追踪的进程、驱动开销、计算误差等。点击显存账本查看进程明细。' :
+    s.name + ': ' + Utils.formatMB(s.mb)
+}" style="cursor:help">${s.name} ${Utils.formatMB(s.mb)}</span>` : ''}</div>`).join('')}
           </div>
           <div class="flex items-center gap-4 mt-3 flex-wrap">
             <span class="badge badge--${qosColor}"><span class="status-dot status-dot--${qosColor}"></span> QoS ${qosLevel.toUpperCase()}</span>
-            ${segments.filter(s => s.type !== 'free').map(s => `<span class="vram-mini-tag" ${s.type === 'other' ? 'style="cursor:help" title="未登记显存：无法归因到具体进程的显存占用。点击显存账本查看进程明细。"' : ''}><span class="vram-mini-tag__dot vram-mini-tag__dot--${s.type}"></span>${s.name} <b>${Utils.formatMB(s.mb)}</b></span>`).join('')}
+            ${segments.filter(s => s.type !== 'free').map(s => `<span class="vram-mini-tag" style="cursor:help" title="${
+    s.type === 'base' ? '系统底噪：GPU驱动 + WDDM + WSL2/Docker基础开销（动态测量）' :
+    s.type === 'known' ? '已知进程：受管AI服务显存（Ollama/ComfyUI/Fooocus，运行在WSL2 Docker中）' :
+    s.type === 'desktop' ? '桌面进程：Windows桌面应用GPU显存（浏览器/微信/dwm等）' :
+    s.type === 'other' ? '未登记显存：无法归因的显存，可能包含WSL2中未追踪的进程。点击显存账本查看明细。' :
+    s.name
+}"><span class="vram-mini-tag__dot vram-mini-tag__dot--${s.type}"></span>${s.name} <b>${Utils.formatMB(s.mb)}</b></span>`).join('')}
             <span class="vram-mini-tag" style="margin-left:auto"><span class="vram-mini-tag__dot vram-mini-tag__dot--free"></span>空闲 <b>${Utils.formatMB(vramFree)}</b></span>
           </div>
         </div>

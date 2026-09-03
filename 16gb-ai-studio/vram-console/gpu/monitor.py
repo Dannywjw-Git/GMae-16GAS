@@ -151,6 +151,38 @@ def _find_pid_container(pid):
     return None
 
 
+def _get_dynamic_baseline(used_mb: int, known_total: int, desktop_used_mb: int) -> int:
+    """动态测量系统底噪（GPU驱动 + WDDM + WSL2/Docker基础开销）。
+
+    测量逻辑：
+    - 当已知AI进程=0 且 桌面进程<500MB 时，当前已用显存 ≈ 系统底噪
+    - 记录最小值到 registry，避免异常值
+    - 无历史数据时使用默认值 800MB
+    """
+    from core.registry import registry
+    DEFAULT_BASELINE = 800  # 默认底噪（介于旧的400和1536之间）
+    MEASURE_THRESHOLD = 500  # 桌面进程小于此值时才测量
+
+    # 从 registry 获取历史底噪
+    baseline_history = registry.get("system_baseline_history", {})
+    baseline_mb = baseline_history.get("baseline_mb", DEFAULT_BASELINE)
+
+    # 测量条件：已知进程=0 且 桌面进程<500MB
+    if known_total == 0 and desktop_used_mb < MEASURE_THRESHOLD and used_mb > 0:
+        measured = used_mb - desktop_used_mb  # 减去桌面进程，剩下的就是底噪
+        if measured > 100 and measured < 4096:  # 合理范围：100MB - 4GB
+            # 取最小值，避免异常值
+            if measured < baseline_mb or baseline_mb == DEFAULT_BASELINE:
+                baseline_mb = measured
+                baseline_history["baseline_mb"] = baseline_mb
+                baseline_history["last_measured_at"] = int(time.time())
+                baseline_history["measured_used_mb"] = used_mb
+                baseline_history["measured_desktop_mb"] = desktop_used_mb
+                registry.set("system_baseline_history", baseline_history)
+
+    return baseline_mb
+
+
 def gpu_processes() -> dict:
     """进程级显存账本（重构版 v2：混合方案）。
 
@@ -252,13 +284,40 @@ def gpu_processes() -> dict:
                 "container": "fooocus",
             })
 
-    # ===== 4. 计算统计数据 =====
+    # ===== 4. 计算统计数据（动态底噪测量） =====
     known_total = sum(p["used_mb"] for p in processes)
     unknown_pids = []
+    # 先获取桌面进程显存（用于动态底噪测量）
+    _desktop_for_baseline = 0
+    try:
+        from services.helper import get_windows_gpu_processes
+        _win_gpu = get_windows_gpu_processes()
+        if _win_gpu.get("ok"):
+            _desktop_procs = [p for p in _win_gpu.get("processes", [])
+                             if p.get("name", "").lower() not in ("vmwp", "vmmem", "vmmemwsl")]
+            _desktop_for_baseline = int(sum(p.get("used_mb", 0) for p in _desktop_procs))
+    except Exception:
+        pass
+    # 动态测量系统底噪（GPU驱动 + WDDM + WSL2/Docker基础开销）
+    system_baseline = _get_dynamic_baseline(
+        gpu.get("used_mb", 0) if gpu.get("ok") else 0,
+        known_total,
+        _desktop_for_baseline
+    )
     unknown_mb = 0
-    system_baseline = 400  # 系统底噪（WSL2/Docker 开销）
+    known_estimated = False
     if gpu.get("ok"):
-        unknown_mb = max(0, gpu["used_mb"] - known_total - system_baseline)
+        # 已知进程可用显存 = 已用 - 底噪 - 桌面（确保分类之和不超过已用）
+        available_for_known = max(0, gpu["used_mb"] - system_baseline - _desktop_for_baseline)
+        # 如果已知进程显存超过可用范围（如Ollama size_gb是模型文件大小而非实际显存），按比例缩放
+        if known_total > available_for_known and known_total > 0:
+            scale = available_for_known / known_total
+            for p in processes:
+                p["used_mb"] = int(p["used_mb"] * scale)
+                p["estimated"] = True
+            known_total = sum(p["used_mb"] for p in processes)
+            known_estimated = True
+        unknown_mb = max(0, gpu["used_mb"] - known_total - system_baseline - _desktop_for_baseline)
 
     # ===== 5. 进程生命周期跟踪和事件发布（S2 EventBus）=====
     gpu_pids = set(p["pid"] for p in processes if p["pid"].isdigit())
@@ -294,11 +353,14 @@ def gpu_processes() -> dict:
     return {
         "ok": True, "processes": processes,
         "unknown_pids": unknown_pids, "unknown_mb": unknown_mb,
-        "baseline_mb": 1536, "known_total_mb": known_total,
+        "baseline_mb": system_baseline,  # 动态测量的系统底噪（不再硬编码1536）
+        "known_total_mb": known_total,
         "desktop_processes": desktop.get("processes", []),
         "desktop_count": desktop.get("count", 0),
         "desktop_used_mb": desktop_used_mb,
-        "system_baseline_mb": system_baseline,
+        "system_baseline_mb": system_baseline,  # 与 baseline_mb 统一
+        "baseline_dynamic": True,  # 标记为动态测量
+        "known_estimated": known_estimated,  # 已知进程显存是否被缩放（模型文件大小vs实际显存）
         "gpu_pid_source": src,
         "events": list(_proc_events),
     }
