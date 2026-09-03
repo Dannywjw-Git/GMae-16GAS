@@ -289,42 +289,80 @@ const Pages = {
   },
 
   _calcVramSegments(status) {
-    // 使用 gpu_processes 中的准确数据，确保所有数字逻辑自洽
+    // 【统一显存帐本】全系统唯一的显存分类计算函数
+    // 数据源：status.gpu（权威）+ status.gpu_processes（分类明细）
+    // 计算逻辑：已用 = 底噪 + 已知进程 + 桌面 + 未登记；空闲 = 总量 - 已用
+    // 约束：分类之和 = 已用；已用 + 空闲 = 总量
     const gpu = status.gpu || {};
     const gp = status.gpu_processes || {};
     const total = gpu.total_mb || 16384;
     const used = gpu.used_mb || 0;
-    const free = gpu.free_mb || Math.max(0, total - used);
+    // 空闲以总量-已用为准（不依赖后端返回的free_mb，避免不一致）
+    const free = Math.max(0, total - used);
 
-    // 已知进程显存（进程明细之和，优先用 known_total_mb）
-    const knownMb = gp.known_total_mb || (gp.processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
-    // 桌面进程显存（从 desktop_processes 数组计算总和）
-    const desktopMb = gp.desktop_used_mb || (gp.desktop_processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
-    // 系统底噪（后端字段名是 baseline_mb，不是 system_baseline_mb）
+    // 已知分类（从 gpu_processes 提取，字段名兼容）
     const baseMb = gp.baseline_mb || gp.system_baseline_mb || (status.vram_ledger?.noise_mb) || 400;
-    // 未登记显存（后端返回 unknown_mb）
-    const unknownMb = gp.unknown_mb || 0;
+    const knownMb = gp.known_total_mb || (gp.processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
+    const desktopMb = gp.desktop_used_mb || (gp.desktop_processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0);
 
-    // 确保分类之和不超过 used（数据可能有重叠，按比例缩放）
-    const accounted = knownMb + desktopMb + baseMb;
-    let other = Math.max(0, used - accounted);
-    // 如果分类之和超过 used，按比例缩减 known/desktop/base
+    // 未登记 = 已用 - 底噪 - 已知进程 - 桌面（确保不为负）
+    // 注意：不使用后端返回的 unknown_mb，因为它的定义可能与前端计算不一致
+    const accounted = baseMb + knownMb + desktopMb;
+    let otherMb = Math.max(0, used - accounted);
+
+    // 如果已知分类之和超过已用，按比例缩放（确保分类之和 = 已用）
+    let scaledBase = baseMb, scaledKnown = knownMb, scaledDesktop = desktopMb;
     if (accounted > used && accounted > 0) {
       const scale = used / accounted;
-      other = 0;
+      scaledBase = Math.round(baseMb * scale);
+      scaledKnown = Math.round(knownMb * scale);
+      scaledDesktop = Math.round(desktopMb * scale);
+      otherMb = 0;
     }
 
-    // 未登记显存 = max(unknown_mb, used - base - known - desktop)
-    const calcOther = Math.max(unknownMb, used - baseMb - knownMb - desktopMb);
     const segs = [
-      { type: 'base', name: '底噪', mb: Math.round(baseMb), colorIdx: 1 },
-      { type: 'known', name: '已知进程', mb: Math.round(knownMb), colorIdx: 2 },
-      { type: 'desktop', name: '桌面', mb: Math.round(desktopMb), colorIdx: 3 },
-      { type: 'other', name: '未登记', mb: Math.round(calcOther), colorIdx: 7 },
+      { type: 'base', name: '底噪', mb: scaledBase, colorIdx: 1 },
+      { type: 'known', name: '已知进程', mb: scaledKnown, colorIdx: 2 },
+      { type: 'desktop', name: '桌面', mb: scaledDesktop, colorIdx: 3 },
+      { type: 'other', name: '未登记', mb: Math.round(otherMb), colorIdx: 7 },
       { type: 'free', name: '空闲', mb: Math.round(free), colorIdx: 0 },
     ].filter(s => s.mb > 0);
     segs.forEach(s => s.pct = (s.mb / total) * 100);
     return segs;
+  },
+
+  // 【统一显存帐本】获取显存分类的详细数据（供所有页面使用，避免重复计算）
+  _getVramBreakdown(status) {
+    const segs = this._calcVramSegments(status);
+    const find = (type) => (segs.find(s => s.type === type) || { mb: 0, pct: 0 });
+    return {
+      total: status.gpu?.total_mb || 16384,
+      used: status.gpu?.used_mb || 0,
+      free: Math.max(0, (status.gpu?.total_mb || 16384) - (status.gpu?.used_mb || 0)),
+      base: find('base'),
+      known: find('known'),
+      desktop: find('desktop'),
+      other: find('other'),
+      segments: segs,
+      // 问题归因：未登记显存占比过高时标记
+      hasUnknownIssue: find('other').mb > (status.gpu?.total_mb || 16384) * 0.1,
+      // 处置建议：根据显存状态给出统一的处置建议
+      getSuggestions: function() {
+        const suggestions = [];
+        if (this.used / this.total > 0.85) {
+          suggestions.push({ type: 'critical', action: 'release', text: '显存危险，建议立即一键释放' });
+        } else if (this.used / this.total > 0.7) {
+          suggestions.push({ type: 'warning', action: 'release', text: '显存较高，建议释放空闲模型' });
+        }
+        if (this.hasUnknownIssue) {
+          suggestions.push({ type: 'info', action: 'inspect', text: '未登记显存较多，建议检查进程明细' });
+        }
+        if (this.known.mb > 0) {
+          suggestions.push({ type: 'info', action: 'models', text: `已加载 ${Math.round(this.known.mb / 1024)}G 模型，可卸载释放显存` });
+        }
+        return suggestions;
+      }
+    };
   },
 
   async _serviceAction(name, action) {
@@ -1028,22 +1066,23 @@ const Pages = {
       status = res;
       State.set('status', status);
     }
+    // 【统一显存帐本】使用统一的 _getVramBreakdown，确保所有页面数据一致
+    const breakdown = this._getVramBreakdown(status);
     const gpu = status.gpu || {};
     const gp = status.gpu_processes || {};
-    const ledger = status.vram_ledger || {};
-    const total = gpu.total_mb || 16384;
-    const used = gpu.used_mb || 0;
-    const free = gpu.free_mb || Math.max(0, total - used);
+    const total = breakdown.total;
+    const used = breakdown.used;
+    const free = breakdown.free;
     // 可释放显存 = 真实空闲 - 2G安全余量（如果空闲<2G则为0）
     const releasable = Math.max(0, free - 2048);
-    const segments = this._calcVramSegments(status);
+    const segments = breakdown.segments;
     const processes = gp.processes || [];
-    // 前端自己计算预期已用和差异，确保和分布条一致（不依赖后端 vram_ledger 的错误计算）
-    const baseNoise = gp.baseline_mb || gp.system_baseline_mb || ledger.noise_mb || 400;
-    const knownMb = gp.known_total_mb || processes.reduce((sum, p) => sum + (p.used_mb || 0), 0);
-    const desktopMb = gp.desktop_used_mb || (gp.desktop_processes || []).reduce((sum, p) => sum + (p.used_mb || 0), 0) || 0;
+    // 使用统一计算结果，避免重复计算导致不一致
+    const baseNoise = breakdown.base.mb;
+    const knownMb = breakdown.known.mb;
+    const desktopMb = breakdown.desktop.mb;
     const expectedUsed = baseNoise + knownMb + desktopMb;
-    const diffMb = Math.max(0, used - expectedUsed);
+    const diffMb = breakdown.other.mb;  // 未登记显存 = 差异
 
     const body = Utils.$('#vram-body');
     // 前端自己计算状态，不依赖后端 vram_ledger 的错误数据
