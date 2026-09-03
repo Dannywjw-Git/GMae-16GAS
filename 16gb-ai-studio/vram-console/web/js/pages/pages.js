@@ -143,11 +143,11 @@ const Pages = {
         </div>
         <div class="card__body">
           <div class="vram-bar vram-bar--lg">
-            ${segments.map(s => `<div class="vram-bar__segment vram-bar__segment--${s.type}" style="width:${s.pct}%" title="${s.name}: ${Utils.formatMB(s.mb)}">${s.pct > 10 ? `<span class="vram-bar__label">${s.name} ${Utils.formatMB(s.mb)}</span>` : ''}</div>`).join('')}
+            ${segments.map(s => `<div class="vram-bar__segment vram-bar__segment--${s.type}" style="width:${s.pct}%" title="${s.name}: ${Utils.formatMB(s.mb)}">${s.pct > 5 ? `<span class="vram-bar__label" title="${s.type === 'other' ? '未登记显存：无法归因到具体进程的显存占用，可能是驱动/WDDM/未知进程。点击显存账本查看进程明细。' : s.name + ': ' + Utils.formatMB(s.mb)}" style="${s.type === 'other' ? 'cursor:help' : ''}">${s.name} ${Utils.formatMB(s.mb)}</span>` : ''}</div>`).join('')}
           </div>
           <div class="flex items-center gap-4 mt-3 flex-wrap">
             <span class="badge badge--${qosColor}"><span class="status-dot status-dot--${qosColor}"></span> QoS ${qosLevel.toUpperCase()}</span>
-            ${segments.filter(s => s.type !== 'free').map(s => `<span class="vram-mini-tag"><span class="vram-mini-tag__dot vram-mini-tag__dot--${s.type}"></span>${s.name} <b>${Utils.formatMB(s.mb)}</b></span>`).join('')}
+            ${segments.filter(s => s.type !== 'free').map(s => `<span class="vram-mini-tag" ${s.type === 'other' ? 'style="cursor:help" title="未登记显存：无法归因到具体进程的显存占用。点击显存账本查看进程明细。"' : ''}><span class="vram-mini-tag__dot vram-mini-tag__dot--${s.type}"></span>${s.name} <b>${Utils.formatMB(s.mb)}</b></span>`).join('')}
             <span class="vram-mini-tag" style="margin-left:auto"><span class="vram-mini-tag__dot vram-mini-tag__dot--free"></span>空闲 <b>${Utils.formatMB(vramFree)}</b></span>
           </div>
         </div>
@@ -168,7 +168,7 @@ const Pages = {
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.box}</span><span class="stat-card__label">已加载模型</span></div>
           <div class="stat-card__value">${loadedModelCount}</div>
-          <div class="stat-card__footer">${Utils.escapeHtml(loadedModelNames)}</div>
+          <div class="stat-card__footer" title="${Utils.escapeHtml(loadedModelNames)}">${Utils.escapeHtml(loadedModelNames.length > 20 ? loadedModelNames.substring(0, 18) + '...' : loadedModelNames)}</div>
         </div>
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.activity}</span><span class="stat-card__label">QoS 状态</span></div>
@@ -254,7 +254,14 @@ const Pages = {
             <div style="padding:12px 16px">
               ${events.slice(0, 8).map(e => `
                 <div class="flex items-start gap-3" style="padding:8px 0;border-bottom:1px solid var(--color-border-light)">
-                  <span class="text-mono text-tertiary" style="font-size:11px;min-width:60px;padding-top:2px">${Utils.formatTime(e.timestamp)}</span>
+                  <span class="text-mono text-tertiary" style="font-size:11px;min-width:70px;padding-top:2px" title="${Utils.formatTime(e.timestamp)}">${(() => {
+                        const t = e.timestamp ? new Date(e.timestamp * 1000).getTime() : Date.now();
+                        const diff = Math.floor((Date.now() - t) / 1000);
+                        if (diff < 60) return diff + '秒前';
+                        if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+                        if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+                        return Utils.formatTime(e.timestamp);
+                      })()}</span>
                   <span class="badge badge--${(() => {
                     const cat = e.category || '';
                     if (cat === 'vram' || cat === 'gpu') return 'danger';

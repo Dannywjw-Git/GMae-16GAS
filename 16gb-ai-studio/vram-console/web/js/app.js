@@ -128,21 +128,21 @@ async function updateHeader() {
     if (freshnessEl && freshnessDot && freshnessText) {
       if (meta.cached) {
         const cacheAge = Math.round((Date.now() / 1000 - (meta.cached_at || 0)));
-        const isStale = meta.stale || cacheAge > 15;
+        const isStale = meta.stale || cacheAge > 30;
         if (isStale) {
-          freshnessDot.style.background = 'var(--color-danger)';
-          freshnessText.textContent = '过期 ' + cacheAge + 's';
-          freshnessText.style.color = 'var(--color-danger)';
-          freshnessEl.title = '数据已过期 ' + cacheAge + ' 秒，请刷新';
-        } else {
           freshnessDot.style.background = 'var(--color-warning)';
-          freshnessText.textContent = '缓存 ' + cacheAge + 's';
+          freshnessText.textContent = '更新于 ' + cacheAge + '秒前';
           freshnessText.style.color = 'var(--color-warning)';
-          freshnessEl.title = '数据来自缓存，缓存时间 ' + cacheAge + ' 秒';
+          freshnessEl.title = '数据更新于 ' + cacheAge + ' 秒前，点击刷新获取最新数据';
+        } else {
+          freshnessDot.style.background = 'var(--color-success)';
+          freshnessText.textContent = '更新于 ' + cacheAge + '秒前';
+          freshnessText.style.color = 'var(--color-success)';
+          freshnessEl.title = '数据更新于 ' + cacheAge + ' 秒前';
         }
       } else {
         freshnessDot.style.background = 'var(--color-success)';
-        freshnessText.textContent = '实时';
+        freshnessText.textContent = '实时数据';
         freshnessText.style.color = 'var(--color-success)';
         freshnessEl.title = '数据实时获取';
       }
