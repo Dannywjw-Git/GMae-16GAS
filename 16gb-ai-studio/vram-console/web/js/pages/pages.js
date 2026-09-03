@@ -51,6 +51,10 @@ const Pages = {
     const vramUsed = gpu.used_mb || 0;
     const vramFree = gpu.free_mb || vramTotal - vramUsed;
     const vramPct = Math.round((vramUsed / vramTotal) * 100);
+    // 模型数量：优先用 ollama.models.length，其次用 vram_ledger.ollama_model_count
+    const loadedModels = status.ollama?.models || [];
+    const loadedModelCount = loadedModels.length || status.vram_ledger?.ollama_model_count || 0;
+    const loadedModelNames = loadedModels.slice(0, 2).map(m => m.name || m.model || '').filter(Boolean).join(', ') || '无';
     const baseNoise = status.gpu_processes?.system_baseline_mb || status.vram_ledger?.noise_mb || 400;
 
     // 显存分段
@@ -98,7 +102,7 @@ const Pages = {
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.cpu}</span><span class="stat-card__label">GPU 显存</span></div>
           <div class="stat-card__value">${vramPct}<span class="stat-card__unit">%</span></div>
-          <div class="stat-card__footer">空闲 ${Utils.formatMB(vramFree)}</div>
+          <div class="stat-card__footer">已用 ${Utils.formatMB(vramUsed)} · 空闲 ${Utils.formatMB(vramFree)}</div>
         </div>
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.layers}</span><span class="stat-card__label">当前场景</span></div>
@@ -107,8 +111,8 @@ const Pages = {
         </div>
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.box}</span><span class="stat-card__label">已加载模型</span></div>
-          <div class="stat-card__value">${status.vram_ledger?.ollama_model_count || 0}</div>
-          <div class="stat-card__footer">${Utils.escapeHtml((status.ollama?.models || []).slice(0,2).map(m => m.name || m.model || '').join(', ') || '无')}</div>
+          <div class="stat-card__value">${loadedModelCount}</div>
+          <div class="stat-card__footer">${Utils.escapeHtml(loadedModelNames)}</div>
         </div>
         <div class="col-3 stat-card">
           <div class="stat-card__header"><span class="stat-card__icon">${Icons.activity}</span><span class="stat-card__label">QoS 状态</span></div>
@@ -118,6 +122,20 @@ const Pages = {
       </div>
 
       <!-- 服务状态 + 快捷操作 -->
+      <!-- 服务显存映射：从 gpu_processes 中提取每个服务的显存 -->
+      ${(() => {
+        const gp = status.gpu_processes || {};
+        const procs = gp.processes || [];
+        const serviceVramMap = {};
+        procs.forEach(p => {
+          const app = p.app || p.name || '';
+          if (app) {
+            serviceVramMap[app] = (serviceVramMap[app] || 0) + (p.used_mb || 0);
+          }
+        });
+        window._serviceVramMap = serviceVramMap;
+        return '';
+      })()}
       <div class="grid mb-4">
         <div class="col-8">
           <div class="card">
@@ -138,7 +156,12 @@ const Pages = {
                     <tr>
                       <td>${Utils.escapeHtml(s.name)}</td>
                       <td><span class="status-dot status-dot--${s.running ? 'online' : 'offline'}"></span> ${s.running ? (s.busy ? '忙碌' : '在线') : '离线'}</td>
-                      <td class="table__num text-mono">${s.busy ? '使用中' : '空闲'}</td>
+                      <td class="table__num text-mono">${(() => {
+                        const sv = window._serviceVramMap || {};
+                        const v = sv[s.name] || 0;
+                        if (v > 0) return Utils.formatMB(v);
+                        return s.busy ? '使用中' : '<span class="text-tertiary">空闲</span>';
+                      })()}</td>
                       <td class="table__actions">
                         ${s.running
                           ? `<button class="btn btn--ghost btn--sm" onclick="Pages._serviceAction('${s.name}', 'stop')">停止</button>`
@@ -176,7 +199,14 @@ const Pages = {
               ${events.slice(0, 8).map(e => `
                 <div class="flex items-center gap-3" style="padding:6px 0;border-bottom:1px solid var(--color-border-light)">
                   <span class="text-mono text-tertiary" style="font-size:11px;min-width:60px">${Utils.formatTime(e.timestamp)}</span>
-                  <span class="badge badge--neutral" style="font-size:10px">${Utils.escapeHtml(e.category || '')}</span>
+                  <span class="badge badge--${(() => {
+                    const cat = e.category || '';
+                    if (cat === 'vram' || cat === 'gpu') return 'danger';
+                    if (cat === 'container' || cat === 'docker') return 'warning';
+                    if (cat === 'model' || cat === 'service') return 'info';
+                    if (cat === 'user_action' || cat === 'system') return 'success';
+                    return 'neutral';
+                  })()}" style="font-size:10px">${Utils.escapeHtml(e.category || '')}</span>
                   <span style="font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${Utils.escapeHtml(e.message || e.event || '')}</span>
                 </div>
               `).join('')}
