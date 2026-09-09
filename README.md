@@ -34,6 +34,19 @@ GPU Maestro **不是又一个 AI 生成工具**，而是管"AI 生成工具怎�
 
 ---
 
+
+## 📊 Benchmark 实测数据（16GB RTX 4060 Ti）
+
+| 测试项 | 结果 | 说明 |
+|--------|------|------|
+| 显存分解准确率 | **0.45% 误差** | GMae 估算 6656MB vs torch 实际 6686MB（SDXL 生成中） |
+| 场景切换耗时 | **平均 9.7s** | 6/6 成功，最快 4.2s（容器已运行），最慢 16.7s（含释放） |
+| auto_protect 响应 | **<10s 触发** | 空闲 834MB 时自动 L4 停止 Ollama，1s 内恢复到 11GB |
+| 9B LLM 推理速度 | **43.5 tok/s** | qwen3.5:9b，显存 10.3GB/15.0GB total |
+| 全模态能力矩阵 | SDXL 6.7GB / Flux 11.7GB / Wan2.2 10.9GB / Music3 14.5GB | 16GB 卡串行调度不翻车 |
+
+> 完整 Benchmark 报告见 [16gb-ai-studio/vram-console/benchmark/benchmark_report.md](16gb-ai-studio/vram-console/benchmark/benchmark_report.md)
+
 ## 🏗️ 系统架构
 
 ### 三层架构（感知 → 账本 → 执行）
@@ -68,12 +81,12 @@ GPU Maestro **不是又一个 AI 生成工具**，而是管"AI 生成工具怎�
 
 ### 安装步骤
 1. 克隆仓库：`git clone https://github.com/Dannywjw-Git/GMae-16GAS.git`
-2. 按 [vram-console/README.md](vram-console/README.md) 配置调度中心
+2. 按 [16gb-ai-studio/vram-console/README.md](16gb-ai-studio/vram-console/README.md) 配置调度中心
 3. 下载模型到对应目录（Ollama / ComfyUI）
-4. 启动调度中心：`vram-console/start.bat`
+4. 启动调度中心：`16gb-ai-studio/vram-console/start.bat`（Windows）或 `start.sh`（Linux）
 5. 访问 http://localhost:8787
 
-> 完整架构设计见 [docs/调度中心架构与交互设计.md](docs/调度中心架构与交互设计.md)
+> 完整架构设计见 [16gb-ai-studio/docs/调度中心架构与交互设计.md](16gb-ai-studio/docs/调度中心架构与交互设计.md)
 
 ---
 
@@ -81,27 +94,24 @@ GPU Maestro **不是又一个 AI 生成工具**，而是管"AI 生成工具怎�
 
 ```
 GMae-16GAS/
-├── vram-console/            # 调度中心（核心）
-│   ├── server.py            # 后端服务（Python 标准库，零依赖）
-│   ├── watchdog.py          # 看门狗自动重启
-│   ├── index.html           # 前端指挥台
-│   ├── resources/registry.json  # 资源注册表（配置驱动）
-│   ├── start.bat / stop.bat / status.bat / run_watchdog.bat
-│   └── WATCHDOGS.md         # 看门狗统一登记册
+├── 16gb-ai-studio/          # 16G-AI-Studio 子项目（参赛作品）
+│   ├── vram-console/        # 调度中心（P-Eng 核心引擎）
+│   │   ├── engine/          # 调度引擎（qos/budget/eviction/topology）
+│   │   ├── gpu/             # GPU 感知层（monitor/processes）
+│   │   ├── services/        # 服务适配层（docker/comfy/ollama）
+│   │   ├── api/             # REST API 路由
+│   │   ├── core/            # 基础层（config/logger/platform_detect）
+│   │   ├── benchmark/       # 系统级 Benchmark 套件
+│   │   ├── resources/       # 配置驱动（registry.json/hardware_profile.json）
+│   │   ├── start.bat/.sh    # 启动脚本（Windows + Linux）
+│   │   └── WATCHDOGS.md     # 看门狗统一登记册
+│   ├── docs/                # 子项目文档（蓝图/进度/开发日志）
+│   └── scripts/             # 子项目工具脚本
 ├── workflows/               # ComfyUI 工作流（可直接导入）
-│   ├── sdxl-t2i.json / flux-t2i.json
-│   ├── music3-t2audio.json
-│   └── h3-t2v.json / h3-i2v.json  # H3 已标记不可行，保留作参考
-├── scripts/                 # 工具脚本（显存释放 / 清理 / 游戏态切换）
-├── docs/                    # 精选文档
-│   ├── 调度中心架构与交互设计.md   # 架构设计框架
-│   ├── vram-governance.md         # 显存治理
-│   ├── 作品介绍.md                # 大赛作品介绍
-│   ├── 模型实测台帐.md            # 模型评测结果
-│   ├── article-16gb-ai-studio.md # 介绍文章
-│   ├── business-analysis.md       # 商业分析
-│   └── productization-roadmap.md  # 产品化路线图
-├── docker/compose-examples/  # Docker 部署示例
+├── scripts/                 # 全局工具脚本
+├── docs/                    # 项目级文档（总纲/显存指南/评测台帐）
+├── docker/                  # Docker 部署示例
+├── ROADMAP.md               # 项目路线图
 ├── CONTRIBUTING.md          # 贡献指南
 ├── CHANGELOG.md             # 变更日志
 └── LICENSE                  # MIT
@@ -123,7 +133,11 @@ GMae-16GAS/
 
 ---
 
-## 🗺️ 路线图（Step 0-8）
+## 🗺️ 路线图
+
+> 详细路线图见 [ROADMAP.md](ROADMAP.md)
+
+### Step 0-8
 
 ```
 Step 0 壳升级（多线程 + 桌面通知）
