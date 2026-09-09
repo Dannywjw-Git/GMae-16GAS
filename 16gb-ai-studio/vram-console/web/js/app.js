@@ -8,6 +8,21 @@
  * ============================================================ */
 
 async function initApp() {
+  // ===== 全局错误边界（捕获未处理异常，避免白屏） =====
+  window.addEventListener('error', (e) => {
+    console.error('[Global Error]', e.message, e.filename, e.lineno);
+    if (typeof Toast !== 'undefined') {
+      Toast.error('页面异常：' + (e.message || '未知错误') + '（已记录，可继续操作）');
+    }
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    console.error('[Unhandled Rejection]', e.reason);
+    if (typeof Toast !== 'undefined') {
+      Toast.error('异步异常：' + (e.reason?.message || e.reason || '未知错误'));
+    }
+    e.preventDefault();
+  });
+
   // 初始化组件
   Toast.init();
   Modal.init();
@@ -100,8 +115,8 @@ async function initApp() {
   // 启动路由
   Router.start();
 
-  // 启动全局数据轮询
-  startGlobalPolling();
+  // 启动 SSE 实时推送（失败自动降级到轮询）
+  startSSE();
 }
 
 // 全局更新顶部导航栏（显存+告警），供一键释放等操作后立即调用
@@ -132,6 +147,12 @@ async function updateHeader() {
       const el = Utils.$('.header__vram-seg--' + s.type);
       if (el) el.style.width = ((s.mb / total) * 100) + '%';
     });
+    // 单一进度条（header-vram-fill）
+    const fill = Utils.$('#header-vram-fill');
+    if (fill) {
+      fill.style.width = pct + '%';
+      fill.style.background = pct > 85 ? 'var(--color-danger)' : pct > 70 ? 'var(--color-warning)' : 'var(--color-brand-500)';
+    }
     if (text) text.textContent = Utils.formatMB(used) + '/' + Utils.formatMB(total) + ' · ' + pct + '%';
     const wrap = Utils.$('#header-vram-wrap');
     if (wrap) wrap.title = '已用 ' + Utils.formatMB(used) + ' / 总量 ' + Utils.formatMB(total) + ' / 空闲 ' + Utils.formatMB(freeMb) + '\n' +
@@ -171,7 +192,7 @@ async function updateHeader() {
     if (location.hash === '#/vram' && typeof Pages._loadVram === 'function') {
       Pages._loadVram();
     }
-  } catch (e) { /* 静默失败 */ }
+  } catch (e) { console.error("[updateHeader] status error:", e); }
   try {
     const alertRes = await API.getAlerts();
     const count = alertRes.count || alertRes.alerts?.length || 0;
@@ -179,12 +200,60 @@ async function updateHeader() {
     const sideBadge = Utils.$('#sidebar-alert-badge');
     if (badge) { badge.textContent = count; badge.classList.toggle('hidden', count === 0); }
     if (sideBadge) { sideBadge.textContent = count; sideBadge.classList.toggle('hidden', count === 0); }
-  } catch (e) { /* 静默失败 */ }
+  } catch (e) { console.error("[updateHeader] alerts error:", e); }
 }
 
-async function startGlobalPolling() {
+// SSE 实时推送（替代10秒轮询），连接失败时自动降级到轮询
+let _sseSource = null;
+let _sseFallbackTimer = null;
+
+function startSSE() {
+  // 先执行一次轮询确保初始数据
   updateHeader();
-  setInterval(updateHeader, 10000);
+  try {
+    _sseSource = new EventSource('/api/stream');
+    _sseSource.onmessage = (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        _applySSE(data);
+      } catch (err) { console.error('[SSE] parse error:', err); }
+    };
+    _sseSource.onerror = () => {
+      console.warn('[SSE] connection lost, fallback to polling');
+      if (_sseSource) { _sseSource.close(); _sseSource = null; }
+      if (!_sseFallbackTimer) _sseFallbackTimer = setInterval(updateHeader, 10000);
+    };
+  } catch (e) {
+    console.warn('[SSE] not supported, using polling');
+    _sseFallbackTimer = setInterval(updateHeader, 10000);
+  }
+}
+
+function _applySSE(data) {
+  // 更新顶部显存显示
+  const gpu = data.gpu || {};
+  const total = gpu.total_mb || 16384;
+  const used = gpu.used_mb || 0;
+  const pct = Math.round((used / total) * 100);
+  const text = Utils.$('#header-vram-text');
+  if (text) text.textContent = Utils.formatMB(used) + '/' + Utils.formatMB(total) + ' · ' + pct + '%';
+  // 更新告警 badge
+  const alertCount = (data.alerts && data.alerts.active_count) || 0;
+  const badge = Utils.$('#header-alert-count');
+  const sideBadge = Utils.$('#sidebar-alert-badge');
+  if (badge) { badge.textContent = alertCount; badge.classList.toggle('hidden', alertCount === 0); }
+  if (sideBadge) { sideBadge.textContent = alertCount; sideBadge.classList.toggle('hidden', alertCount === 0); }
+  // 更新全局状态（构造兼容对象）
+  const status = State.get('status') || {};
+  status.gpu = { ...status.gpu, ...gpu };
+  status._meta = { cached: false };
+  State.set('status', status);
+  // 记录显存历史
+  State.recordVram(used, gpu.free_mb || total - used, total);
+  // 显存账本页自动刷新
+  if (location.hash === '#/vram' && typeof Pages._loadVram === 'function') {
+    Pages._loadVram();
+  }
 }
 
 async function logout() {

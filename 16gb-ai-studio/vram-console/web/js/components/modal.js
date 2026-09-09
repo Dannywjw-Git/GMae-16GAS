@@ -39,4 +39,29 @@ const Modal = {
       if (onConfirm) onConfirm();
     };
   },
+  /** Promise 版确认框，用于 async/await 场景 */
+  confirmAsync(title, message, options = {}) {
+    return new Promise((resolve) => {
+      let resolved = false;
+      const doResolve = (val) => {
+        if (resolved) return;
+        resolved = true;
+        this.close();
+        resolve(val);
+      };
+      this.confirm({
+        title,
+        message,
+        confirmText: options.confirmText || '确认',
+        cancelText: options.cancelText || '取消',
+        danger: options.danger || false,
+        onConfirm: () => doResolve(true),
+      });
+      const cancelBtn = this.modal.querySelector('[data-action="cancel"]');
+      if (cancelBtn) cancelBtn.onclick = () => doResolve(false);
+      const closeBtn = this.modal.querySelector('.modal__close');
+      if (closeBtn) closeBtn.onclick = () => doResolve(false);
+      this.overlay.onclick = (e) => { if (e.target === this.overlay) doResolve(false); };
+    });
+  },
 };

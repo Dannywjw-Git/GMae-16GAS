@@ -157,6 +157,7 @@
 .table tbody tr { transition: background var(--transition-fast); }
 .table tbody tr:hover { background: var(--color-bg-hover); }
 .table tbody tr--selected { background: var(--color-bg-active); border-left: 2px solid var(--color-brand-600); }
+.table tbody tr.table__row--active { background: rgba(13, 148, 136, 0.06); border-left: 2px solid var(--color-brand-500); }
 .table__num { font-family: var(--font-mono); text-align: right; }
 .table__actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
 
