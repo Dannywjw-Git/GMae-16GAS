@@ -235,7 +235,12 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
     ol_loaded = set()
     for m in ollama_ps().get("models", []):
         ol_loaded.add(m.get("model") or m.get("name"))
-    cf_loaded = {m.get("id") or m.get("name") for m in comfy_loaded_models().get("models", [])}
+    cf_loaded = set()
+    for m in comfy_loaded_models().get("models", []):
+        if isinstance(m, dict):
+            cf_loaded.add(m.get("id") or m.get("name"))
+        elif isinstance(m, str):
+            cf_loaded.add(m)
 
     models = []
     for src_key, loaded_set in (("ollama", ol_loaded), ("comfyui", cf_loaded)):
