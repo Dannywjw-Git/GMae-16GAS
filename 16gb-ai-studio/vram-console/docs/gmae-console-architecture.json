@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "GMae 调度中心架构",
+    "subtitle": "16G-AI-Studio 显存编排系统 · vram-console",
+    "output": "gmae-console-architecture.html",
+    "quality_profile": "showcase",
+    "locale": "zh-CN",
+    "views": [
+      { "id": "request-path", "label": "请求主路径", "focus": ["web-ui", "api-layer", "engine", "services", "runtime"], "note": "从前端请求到 Docker 容器执行的完整链路。" },
+      { "id": "vram-governance", "label": "显存治理链", "focus": ["engine", "gpu", "runtime"], "note": "预算→QoS→准入→驱逐→监控的五级显存防护。" },
+      { "id": "event-driven", "label": "事件驱动中枢", "focus": ["event-bus", "core", "engine"], "note": "事件总线串联状态缓存、日志、Docker 事件与告警。" }
+    ]
+  },
+  "components": [
+    { "id": "web-ui", "type": "frontend", "label": "Web UI", "sublabel": "11 页动态前端", "pos": [410, 20], "size": [180, 56] },
+    { "id": "api-layer", "type": "backend", "label": "API 网关与认证", "sublabel": "server.py · 58 路由 · X-API-Key", "pos": [410, 110], "size": [180, 64], "tag": "ThreadingHTTPServer" },
+    { "id": "engine", "type": "backend", "label": "调度引擎", "sublabel": "budget/qos/admission/eviction/queue/monitor/scene", "pos": [60, 240], "size": [200, 84], "tag": "五级显存防护 + 5层拓扑" },
+    { "id": "event-bus", "type": "messagebus", "label": "事件总线与缓存", "sublabel": "event_bus/status_cache/docker_events", "pos": [320, 240], "size": [180, 84], "tag": "S2 事件关联引擎" },
+    { "id": "core", "type": "backend", "label": "核心基础设施", "sublabel": "config/logger/registry/system_info", "pos": [560, 240], "size": [180, 84], "tag": "结构化日志 + 资源注册表" },
+    { "id": "services", "type": "backend", "label": "服务适配层", "sublabel": "docker/comfy/ollama/helper + 6 clients", "pos": [60, 390], "size": [200, 84], "tag": "Docker exec + ComfyUI WS" },
+    { "id": "runtime", "type": "cloud", "label": "Docker 容器运行时", "sublabel": "ComfyUI / Ollama / OWUI / 15+ 容器", "pos": [320, 390], "size": [180, 84] },
+    { "id": "gpu", "type": "database", "label": "NVIDIA GPU", "sublabel": "RTX 4060 Ti 16GB", "pos": [560, 390], "size": [180, 84], "tag": "显存预算 <4GB 空闲" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "GMae 调度中心 (vram-console :8787)", "wraps": ["api-layer", "engine", "event-bus", "core", "services"] },
+    { "kind": "security-group", "label": "16GB 显存边界", "wraps": ["gpu"] }
+  ],
+  "connections": [
+    { "id": "web-to-api", "from": "web-ui", "to": "api-layer", "label": "HTTPS :8787", "variant": "emphasis", "labelDy": 22 },
+    { "id": "api-to-engine", "from": "api-layer", "to": "engine", "label": "API 请求分发", "labelDy": -16 },
+    { "id": "engine-to-eventbus", "from": "engine", "to": "event-bus", "label": "发布事件", "variant": "dashed", "fromSide": "right", "toSide": "left", "labelAt": [400, 210] },
+    { "id": "engine-to-services", "from": "engine", "to": "services", "label": "执行调度", "labelDy": 24 },
+    { "id": "eventbus-to-core", "from": "event-bus", "to": "core", "label": "日志/缓存落盘", "fromSide": "right", "toSide": "left", "labelDy": -60 },
+    { "id": "services-to-runtime", "from": "services", "to": "runtime", "label": "Docker/Comfy/Ollama API", "fromSide": "right", "toSide": "left", "labelDy": -60 },
+    { "id": "runtime-to-gpu", "from": "runtime", "to": "gpu", "label": "CUDA 显存占用", "fromSide": "right", "toSide": "left", "labelAt": [494, 500] }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "调度核心", "items": ["预算引擎→QoS→准入→驱逐→队列，五级显存防护", "16GB 单卡多模型分时复用，空闲 <4GB 触发回收"] },
+    { "dot": "emerald", "title": "多模型编排", "items": ["ComfyUI(文生图/视频) + Ollama(对话) + Fooocus", "统一显存账本，按模型分解 ComfyUI 占用"] },
+    { "dot": "rose", "title": "可观测与事件驱动", "items": ["事件总线 + 状态缓存 + Docker 事件监听", "健康探测 + 告警升级 + 诊断引擎，全链路可追溯"] }
+  ]
+}

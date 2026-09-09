@@ -55,8 +55,10 @@
 | 5.1 | **代码工程最高指南** | `docs\代码工程最高指南.md` | 工程权威 | 代码分层/状态/可测试性/并发安全的最高规则，**违反会代码腐烂**（与显存指南并列双最高指南） |
 | 6 | **调度中心架构与交互设计** | `16gb-ai-studio\docs\调度中心架构与交互设计.md` | 子项目权威 | 16GAS 的设计框架（架构+机制+交互），实施前必读 |
 | 7 | **进度跟踪** | `16gb-ai-studio\docs\项目进度跟踪.md` | 状态 | 当前任务状态，避免重复工作 |
-| 8 | **开发日志** | `16gb-ai-studio\docs\开发日志.md` | 历史 | 踩坑记录，避免重蹈覆辙 |
+| 8 | **开发日志** | `16gb-ai-studio\docs\开发日志.md` | 历史 | 近期踩坑记录（主文件仅留近期，历史按月归档在 `docs\devlog_archive\`，按需检索，勿全量读取） |
 | 9 | **模型评测台帐** | `docs\模型评测台帐.md` | 参考 | 全模态模型评测结果、评分、能力上限结论 |
+| 9.1 | **决策记录（ADR）** | `决策记录.md`（根目录） | 决策权威 | 已拍板决策及理由/否决方案，避免重复讨论或误推翻 |
+| 9.2 | **跨会话工程一致性方法论** | `docs\跨会话多Agent工程一致性方法论.md` | 协作规范 | 四段式交接、任务锁、日志归档、防上下文漂移，多 Agent 轮换接手必读 |
 
 ---
 
@@ -105,16 +107,18 @@
 | 子项目代码 | `16gb-ai-studio\` |
 | 调度中心 | `16gb-ai-studio\vram-console\` |
 | 文档目录 | `docs\` |
+| 决策记录（ADR） | `决策记录.md`（根目录） |
+| 跨会话一致性方法论 | `docs\跨会话多Agent工程一致性方法论.md` |
 | 安装包/备份 | `_installers\` |
 | 全局脚本 | `scripts_global\` |
 | 产出物（图/视频/音频） | `outputs\`（images/、videos/、audio/ 子目录） |
 
-## 🧩 Skill 资产（2026-08-31 登记，6 个项目级 Skill 已整合）
+## 🧩 Skill 资产（2026-09-04 登记，8 个项目级 Skill 已整合）
 
 | 资产 | 位置 | 说明 |
 |------|------|------|
 | 系统技能库 | `.skills`（约 100 个） | 平台预装标准 Skill，全部可直接调用（data-analysis / lark-doc / visualization 等） |
-| **项目级用户技能库** | `.user_skills/` | **本工作区自建 Skill，6 个（见下方清单），所有 GMae 相关任务优先使用** |
+| **项目级用户技能库** | `.user_skills/` | **本工作区自建 Skill，8 个（见下方清单），所有 GMae 相关任务优先使用** |
 | 模型评测方法论 | `docs/models/` | model-benchmark-suite 的方法论文档体系：模型评测台帐.md（10 分制）、模型测试计划_三层评测_v1.0.md、模型评测报告_多模态全栈、README（档案索引+建档模板）、9 个单模型档案 |
 | 协作工作契约 | `docs/与主公协作沟通要求.md` | 与主公协同的工作守则（称呼/风格/方式/汇报/安全/记忆），接手必读 |
 
@@ -128,8 +132,10 @@
 | **aria2-multithread-download** | 智能路由下载 | HF 自动走 hf-mirror、国内厂商走 ModelScope、国外源回退 VPS、16 线程断点续传、完整性验证 |
 | **vps-download-relay** | VPS 中转下载 | HTTP 文件中转 + Docker Registry 中转两种模式、大文件下载回退通道（ai-registry-jp 东京 52G） |
 | **creation-log** | 创作日志 | 记录每次生成的环境/参数/时长/显存/SageAttention/用户评分，JSONL 格式，支持统计和 SageAttention 性能对比 |
+| **ponytail** | 懒惰资深工程师模式 | 7级懒惰阶梯强制最简方案，YAGNI/标准库/原生优先，三档强度(lite/full/ultra)，含过度工程审查/全仓审计/技术债台账子模式，已适配GMae铁律 |
+| **archify** | 架构图生成器 | Node.js 架构/工作流/时序/数据流/生命周期图渲染校验系统，Agent 写 Typed JSON IR，CLI 校验并确定性编译为独立交互 HTML，支持 5 种图类型、4 套视觉预设、showcase 质量门、Delta 对比、多格式导出 |
 
-> **使用优先级**：涉及显存 → 先过 gmae-vram-governance；生成任务 → gmae-runtime-ops；模型评测 → model-benchmark-suite；下载模型 → aria2-multithread-download（回退 vps-download-relay）；生成完成 → creation-log 记录。
+> **使用优先级**：涉及显存 → 先过 gmae-vram-governance；生成任务 → gmae-runtime-ops；模型评测 → model-benchmark-suite；下载模型 → aria2-multithread-download（回退 vps-download-relay）；生成完成 → creation-log 记录；编码任务 → ponytail（强制最简方案，对抗过度工程）；架构图/系统可视化 → archify（JSON IR + validate + deliver 出交互 HTML）。
 ---
 
 ## 🌐 基础设施与 VPS
