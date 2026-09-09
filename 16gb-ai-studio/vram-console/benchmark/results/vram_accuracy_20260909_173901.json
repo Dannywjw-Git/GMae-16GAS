@@ -1,0 +1,82 @@
+{
+  "test_count": 1,
+  "avg_error_pct": null,
+  "max_error_pct": null,
+  "results": [
+    {
+      "model": "SDXL 1.0",
+      "workflow_model": "sd_xl_base_1.0.safetensors",
+      "sample_count": 7,
+      "peak": null,
+      "error_abs_mb": null,
+      "error_pct": null,
+      "all_samples": [
+        {
+          "t_sec": 0.1,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 4998
+        },
+        {
+          "t_sec": 2.2,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 9791
+        },
+        {
+          "t_sec": 4.3,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 11678
+        },
+        {
+          "t_sec": 6.3,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 11678
+        },
+        {
+          "t_sec": 8.4,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 11678
+        },
+        {
+          "t_sec": 10.5,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 11678
+        },
+        {
+          "t_sec": 12.6,
+          "torch_used_mb": 0,
+          "gmae_models_sum_mb": 6656.0,
+          "gmae_torch_field_mb": 8,
+          "gmae_likely_loaded": false,
+          "gpu_used_mb": 11486
+        }
+      ]
+    }
+  ],
+  "benchmark_name": "vram_accuracy",
+  "timestamp": "20260909_173901",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4874,
+    "free_mb": 11234,
+    "gpu_util_pct": 1,
+    "ts": 1788946741.3135467
+  }
+}

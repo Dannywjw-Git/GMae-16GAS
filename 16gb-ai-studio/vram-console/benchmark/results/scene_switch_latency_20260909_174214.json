@@ -1,0 +1,90 @@
+{
+  "test_count": 6,
+  "success_count": 0,
+  "avg_total_sec": null,
+  "max_total_sec": null,
+  "min_total_sec": null,
+  "results": [
+    {
+      "from": "game",
+      "to": "sdxl",
+      "label": "冷启动出图（加载SDXL）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.002,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4919,
+      "after_gpu_used_mb": 4921,
+      "vram_delta_mb": 2
+    },
+    {
+      "from": "sdxl",
+      "to": "game",
+      "label": "出图→游戏（释放SDXL）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.003,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4919,
+      "after_gpu_used_mb": 4916,
+      "vram_delta_mb": -3
+    },
+    {
+      "from": "game",
+      "to": "chat",
+      "label": "冷启动对话（加载9B）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.001,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4916,
+      "after_gpu_used_mb": 4914,
+      "vram_delta_mb": -2
+    },
+    {
+      "from": "chat",
+      "to": "game",
+      "label": "对话→游戏（释放LLM）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.001,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4914,
+      "after_gpu_used_mb": 4914,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "game",
+      "to": "sdxl",
+      "label": "第二次冷启动出图（验证一致性）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.003,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4914,
+      "after_gpu_used_mb": 4914,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "sdxl",
+      "to": "chat",
+      "label": "出图→对话（释放大模型+加载LLM）",
+      "api_ok": false,
+      "api_elapsed_sec": 0.015,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4914,
+      "after_gpu_used_mb": 4914,
+      "vram_delta_mb": 0
+    }
+  ],
+  "benchmark_name": "scene_switch_latency",
+  "timestamp": "20260909_174214",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4914,
+    "free_mb": 11194,
+    "gpu_util_pct": 11,
+    "ts": 1788946934.1634507
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "test_count": 1,
+  "avg_error_pct": null,
+  "max_error_pct": null,
+  "results": [
+    {
+      "model": "SDXL 1.0",
+      "workflow_model": "sd_xl_base_1.0.safetensors",
+      "generation_elapsed_sec": 0.0,
+      "generation_status": "success",
+      "baseline": {
+        "gpu_used_mb": 4751,
+        "torch_used_mb": 0
+      },
+      "gmae_models_sum_mb": 0,
+      "gmae_model_count": 1,
+      "gmae_models_detail": [
+        {
+          "id": "SDXL",
+          "name": "SDXL",
+          "vram_gb": 6.5,
+          "category": "image",
+          "exclusive": false
+        }
+      ],
+      "gmae_torch_field_mb": 6625,
+      "torch_actual_mb": 0,
+      "gpu_total_used_mb": 4697,
+      "error_abs_mb": null,
+      "error_pct": null
+    }
+  ],
+  "post_release": {
+    "gmae_mb": 0,
+    "torch_mb": 0
+  },
+  "benchmark_name": "vram_accuracy",
+  "timestamp": "20260909_173733",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4693,
+    "free_mb": 11415,
+    "gpu_util_pct": 11,
+    "ts": 1788946653.6726842
+  }
+}

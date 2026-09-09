@@ -1,0 +1,18 @@
+{
+  "triggered": false,
+  "trigger_wait_sec": 181.1,
+  "recovery_sec": 117.2,
+  "recovery_free_mb": 11404,
+  "total_response_sec": null,
+  "initial_mode": "standard",
+  "test_mode": "aggressive",
+  "benchmark_name": "auto_protect_response",
+  "timestamp": "20260909_175328",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4708,
+    "free_mb": 11399,
+    "gpu_util_pct": 0,
+    "ts": 1788947608.8191245
+  }
+}

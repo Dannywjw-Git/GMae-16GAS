@@ -1,0 +1,90 @@
+{
+  "test_count": 6,
+  "success_count": 6,
+  "avg_total_sec": 9.7,
+  "max_total_sec": 16.7,
+  "min_total_sec": 4.2,
+  "results": [
+    {
+      "from": "game",
+      "to": "comfyui",
+      "label": "冷启动出图（加载SDXL）",
+      "api_ok": true,
+      "api_elapsed_sec": 0.003,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4701,
+      "after_gpu_used_mb": 4701,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "comfyui",
+      "to": "game",
+      "label": "出图→游戏（释放SDXL）",
+      "api_ok": true,
+      "api_elapsed_sec": 12.534,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 16.7,
+      "before_gpu_used_mb": 4701,
+      "after_gpu_used_mb": 4706,
+      "vram_delta_mb": 5
+    },
+    {
+      "from": "game",
+      "to": "dialogue",
+      "label": "冷启动对话（加载9B）",
+      "api_ok": true,
+      "api_elapsed_sec": 4.162,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 8.3,
+      "before_gpu_used_mb": 4706,
+      "after_gpu_used_mb": 4706,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "dialogue",
+      "to": "game",
+      "label": "对话→游戏（释放LLM）",
+      "api_ok": true,
+      "api_elapsed_sec": 12.467,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 16.6,
+      "before_gpu_used_mb": 4706,
+      "after_gpu_used_mb": 4706,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "game",
+      "to": "comfyui",
+      "label": "第二次冷启动出图（验证一致性）",
+      "api_ok": true,
+      "api_elapsed_sec": 0.003,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 4.2,
+      "before_gpu_used_mb": 4706,
+      "after_gpu_used_mb": 4706,
+      "vram_delta_mb": 0
+    },
+    {
+      "from": "comfyui",
+      "to": "dialogue",
+      "label": "出图→对话（释放大模型+加载LLM）",
+      "api_ok": true,
+      "api_elapsed_sec": 4.178,
+      "stabilize_sec": 4.2,
+      "total_elapsed_sec": 8.3,
+      "before_gpu_used_mb": 4706,
+      "after_gpu_used_mb": 4706,
+      "vram_delta_mb": 0
+    }
+  ],
+  "benchmark_name": "scene_switch_latency",
+  "timestamp": "20260909_174535",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4706,
+    "free_mb": 11402,
+    "gpu_util_pct": 12,
+    "ts": 1788947135.8231115
+  }
+}
