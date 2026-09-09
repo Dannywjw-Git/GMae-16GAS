@@ -12,6 +12,7 @@ GPU Maestro **不是又一个 AI 生成工具**，而是管"AI 生成工具怎�
 **首个落地项目**：`GMae-16GAS`（GPU Maestro-16G-AI-Studio）— 16GB 单卡全模态工作站，参赛 2026 上海开源软件应用创新大赛 · 智算云赛道。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/workflows/ci.yml/badge.svg?branch=refactor/v2)](https://github.com/Dannywjw-Git/GMae-16GAS/actions/workflows/ci.yml)
 [![ComfyUI](https://img.shields.io/badge/ComfyUI-0.33.0+-blue)](https://docs.comfy.org/)
 [![GPU](https://img.shields.io/badge/GPU-8G~48G-green)]()
 [![Docker](https://img.shields.io/badge/Docker-Required-blue)]()
