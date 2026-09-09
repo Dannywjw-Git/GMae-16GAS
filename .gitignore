@@ -89,3 +89,10 @@ volumes/
 # === 用户数据（密码哈希，不入库） ===
 users.json
 config.json
+
+# === 用户级 Skill（不入库，本地环境资产） ===
+.user_skills/
+
+# === 运行时数据目录 ===
+16gb-ai-studio/vram-console/data/
+sessions.json
