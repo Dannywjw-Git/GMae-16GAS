@@ -26,6 +26,8 @@ _gpu_status_lock = threading.Lock()
 _GPU_STATUS_TTL = 5.0  # 秒（正常状态）
 _GPU_STATUS_DANGER_TTL = 2.0  # 秒（危险状态，free_mb < 阈值）
 _GPU_STATUS_DANGER_FREE_MB = 2048  # free_mb 低于此值视为危险状态
+# 上次成功查询的持久缓存（nvidia-smi 超时时回退使用，避免 auto_protect 被跳过）
+_last_good_gpu_status = None
 
 
 def gpu_status(force_refresh: bool = False) -> dict:
@@ -34,10 +36,14 @@ def gpu_status(force_refresh: bool = False) -> dict:
     危险状态（free_mb < 2048MB）时 TTL 缩短为 2 秒，确保危险时数据更实时。
     force_refresh=True 时跳过缓存，强制执行 nvidia-smi 查询。
 
+    容错：nvidia-smi 超时/失败时，回退到上次成功值并标记 stale=True，
+    确保 qos_check/auto_protect 在高显存压力下仍能触发（安全机制宁可信其有）。
+
     Returns:
-        dict: {"ok": bool, "total_mb": int, "used_mb": int, "free_mb": int, "utilization": int}
+        dict: {"ok": bool, "total_mb": int, "used_mb": int, "free_mb": int,
+               "utilization": int, "stale": bool(可选), "stale_age_s": float(可选)}
     """
-    global _gpu_status_cache
+    global _gpu_status_cache, _last_good_gpu_status
     with _gpu_status_lock:
         now = time.time()
         if not force_refresh and _gpu_status_cache["data"] is not None:
@@ -49,8 +55,23 @@ def gpu_status(force_refresh: bool = False) -> dict:
                 ttl = _GPU_STATUS_TTL
             if now - _gpu_status_cache["timestamp"] < ttl:
                 return data
-        # 执行 nvidia-smi 查询（原有逻辑）
+        # 执行 nvidia-smi 查询
         data = query_gpu_memory()
+        if data.get("ok"):
+            # 查询成功：更新持久缓存
+            _last_good_gpu_status = dict(data)
+            _last_good_gpu_status["stale"] = False
+            _gpu_status_cache["good_timestamp"] = now
+        elif _last_good_gpu_status is not None:
+            # 查询失败但有上次成功值：回退到 stale 数据（安全优先）
+            good_ts = _gpu_status_cache.get("good_timestamp", now)
+            stale_age = now - good_ts
+            data = dict(_last_good_gpu_status)
+            data["stale"] = True
+            data["stale_age_s"] = round(stale_age, 1)
+            data["error"] = "nvidia-smi failed, using last known good value"
+            log_error("gpu_status_stale_fallback", stale_age_s=stale_age,
+                      free_mb=data.get("free_mb"), used_mb=data.get("used_mb"))
         _gpu_status_cache["data"] = data
         _gpu_status_cache["timestamp"] = now
         return data

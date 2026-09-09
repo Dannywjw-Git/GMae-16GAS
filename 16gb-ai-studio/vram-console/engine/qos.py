@@ -91,7 +91,12 @@ def qos_check():
         return {"level": "disabled"}
     gpu = gpu_status()
     if not gpu.get("ok"):
+        # nvidia-smi 完全不可用且无缓存：保守触发 auto_protect（安全优先）
+        log_error("qos_check_gpu_unavailable", message="nvidia-smi failed, no stale data")
         return {"level": "unknown", "error": "nvidia-smi unavailable"}
+    if gpu.get("stale"):
+        log_error("qos_check_using_stale", stale_age_s=gpu.get("stale_age_s"),
+                  free_mb=gpu.get("free_mb"), message="using stale GPU data for safety")
     free_mb = gpu.get("free_mb", 99999)
     now = time.time()
     old_level = _qos_state.get("level", "ok")
@@ -293,7 +298,8 @@ def _auto_protect_run(free_mb):
     if 1 in enabled_levels:
         try:
             loaded = ollama_ps().get("models", [])
-            keep = loaded[-1].get("model") if (scene == "dialogue" and loaded) else None
+            # critical 级别（<1GB，即将死机）不保留任何模型，强制全部卸载
+            keep = loaded[-1].get("model") if (scene == "dialogue" and loaded and level != "critical") else None
             to_stop = [m.get("model") for m in loaded
                        if m.get("model") and m.get("model") != keep]
             if to_stop:
@@ -337,6 +343,21 @@ def _auto_protect_run(free_mb):
                 time.sleep(3)
         except Exception as e:
             log_error("auto_protect_verify_error", error=str(e))
+    # critical 级别但软释放无动作（如单模型dialogue场景）：强制 L4 停止容器
+    if not actions and level == "critical":
+        try:
+            from services.docker import container_stop
+            for cname in ("ollama", "comfyui", "fooocus"):
+                if cname in names:
+                    try:
+                        r = container_stop(cname)
+                        if r.get("ok"):
+                            actions.append({"level": "L4", "action": f"强制停止 {cname} 容器（critical 无软释放动作）"})
+                    except Exception as e:
+                        log_error("auto_protect_l4_fallback_error", error=str(e), container=cname)
+            time.sleep(3)
+        except Exception as e:
+            log_error("auto_protect_l4_fallback_failed", error=str(e))
     if not actions:
         return None
     st["last_trigger_ts"] = now

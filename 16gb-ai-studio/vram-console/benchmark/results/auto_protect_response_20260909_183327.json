@@ -1,0 +1,29 @@
+{
+  "triggered": true,
+  "trigger_wait_sec": 0.0,
+  "last_trigger": {
+    "ts": 1788949407.6038027,
+    "level": "critical",
+    "free_mb": 729,
+    "actions": [
+      {
+        "level": "L4",
+        "action": "强制停止 ollama 容器（critical 无软释放动作）"
+      }
+    ]
+  },
+  "recovery_sec": 0.0,
+  "recovery_free_mb": 11545,
+  "total_response_sec": 0.0,
+  "initial_mode": "standard",
+  "test_mode": "aggressive",
+  "benchmark_name": "auto_protect_response",
+  "timestamp": "20260909_183327",
+  "gpu_info": {
+    "total_mb": 16380,
+    "used_mb": 4582,
+    "free_mb": 11526,
+    "gpu_util_pct": 10,
+    "ts": 1788950007.6292453
+  }
+}

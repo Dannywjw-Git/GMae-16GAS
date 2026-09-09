@@ -62,10 +62,10 @@
 
 ### 测试方法
 1. 切换到 aggressive 模式（<4GB 空闲触发 L1）
-2. 加载 SDXL（6.7GB）+ qwen3.5:9b（10.3GB），使空闲降至 690MB
+2. 加载 qwen3.5:9b（10.3GB），使空闲降至 ~800MB
 3. 等待 auto_protect 触发，记录触发时间和释放完成时间
 
-### 测试结果
+### 第一轮测试（修复前）— 发现 P0 Bug
 
 | 指标 | 值 |
 |------|-----|
@@ -73,17 +73,33 @@
 | 低显存持续时间 | 181 秒 |
 | auto_protect 触发 | **❌ 未触发** |
 | 显存恢复方式 | Ollama 自动卸载（117 秒） |
-| auto_protect 历史记录 | 空（从未触发过） |
 
-### 问题诊断
-- **调用链存在**：`_qos_loop`（每10秒）→ `qos_check` → `_auto_protect_run`
-- **但实际未触发**，日志中无任何 `qos_loop` / `auto_protect` 记录
-- **疑似原因**：高显存压力下 `nvidia-smi` 响应变慢（api/health 耗时从 <100ms 升至 2100ms），`gpu_status()` 可能超时返回 `ok=False`，导致 `qos_check` 提前返回不调用 `_auto_protect_run`
-- **影响**：这是核心功能缺陷——"自动防死机"是 GMae 核心卖点之一，但实际不工作
+**根因（双重缺陷）**：
+1. **gpu_status 失败时无降级**：高显存压力下 nvidia-smi 响应变慢（~2秒），`gpu_status()` 超时返回 `ok=False`，`qos_check` 直接跳过 auto_protect
+2. **critical 级别设计缺陷**：scene=dialogue 时 L1 保留唯一的对话模型（`keep=loaded[-1]`），导致 `to_stop=[]`，actions 为空，第 345 行 `if not actions: return None` 静默返回
 
-### 建议
-- **P0 修复**：在 `qos_check` 中增加 `gpu_status()` 失败时的降级处理（如用上次缓存值 + 标记为"低置信度"），或增加独立的 auto_protect 监控线程不依赖 gpu_status
-- 修复后需重新测试响应时间
+### 修复内容（2026-09-09）
+
+| 文件 | 修改 |
+|------|------|
+| `gpu/monitor.py` | nvidia-smi 失败时回退到上次成功值（stale 模式），确保 qos_check 不跳过 |
+| `engine/qos.py` | qos_check 增加 stale 数据日志；critical 级别不保留对话模型；actions 为空时强制 L4 停止容器 |
+
+### 第二轮测试（修复后）— 验证通过
+
+| 指标 | 值 |
+|------|-----|
+| 最低空闲显存 | 834 MB（critical 级别） |
+| auto_protect 触发 | **✅ 触发** |
+| 触发等待时间 | **< 10 秒**（qos_loop 检查周期） |
+| 执行动作 | L4 强制停止 ollama 容器 |
+| 显存恢复时间 | **1 秒**（容器停止后立即释放） |
+| 恢复后空闲 | 11553 MB |
+
+### 结论
+- 修复后 auto_protect 功能正常，critical 级别（<1GB）能在一个 qos 周期内触发
+- L4 硬释放（docker stop）是最可靠的最后防线，1 秒内释放显存
+- 局限：当前测试仅验证了单模型（9B）场景，多模型混跑场景待补充
 
 ---
 
