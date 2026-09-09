@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import thresholds
+from core import thresholds
 
 
 class TestDynamicThresholds(unittest.TestCase):

@@ -1,4 +1,4 @@
-"""
+﻿"""
 GMae v0.3.1 — 准入闸门模块单元测试
 """
 import os
@@ -6,8 +6,8 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import admission_gate
-from admission_gate import GateContext
+from engine import admission_gate
+from engine.admission_gate import GateContext
 
 
 def make_ctx(**kwargs):
