@@ -314,6 +314,11 @@ Object.assign(Pages, {
       return { x, y, ...h };
     });
 
+    // 窗口内的峰值/谷值（用于图表标注，必须与 points 同索引）
+    const recentValues = recent.map(h => h.used);
+    const recentPeakVal = Math.max(...recentValues);
+    const recentMinVal = Math.min(...recentValues);
+
     const pathD = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
     const areaD = pathD + ` L${points[points.length-1].x.toFixed(1)},${(padding.top + chartH).toFixed(1)} L${points[0].x.toFixed(1)},${(padding.top + chartH).toFixed(1)} Z`;
 
@@ -364,29 +369,34 @@ Object.assign(Pages, {
     const avgLine = `<line x1="${padding.left}" y1="${avgY.toFixed(1)}" x2="${width - padding.right}" y2="${avgY.toFixed(1)}" stroke="var(--color-text-tertiary)" stroke-width="1" stroke-dasharray="2,4"/>
       <text x="${padding.left + 5}" y="${avgY - 4}" fill="var(--color-text-tertiary)" font-size="9">平均 ${Utils.formatMB(avgVal)}</text>`;
 
-    // 峰值标注
-    const peakIdx = values.indexOf(peakVal);
+    // 峰值标注（用窗口内数据，避免索引越界）
+    const peakIdx = recentValues.indexOf(recentPeakVal);
     const peakPoint = points[peakIdx];
-    // 如果峰值是最后一个点，标签向左偏移避免与当前值圆点重叠
-    const isLastPoint = peakIdx === points.length - 1;
-    const peakLabelX = isLastPoint ? peakPoint.x - 50 : peakPoint.x;
-    const peakLabelAnchor = isLastPoint ? 'end' : 'middle';
-    const peakMarker = `<g>
-      <circle cx="${peakPoint.x.toFixed(1)}" cy="${peakPoint.y.toFixed(1)}" r="5" fill="var(--color-warning)" stroke="var(--color-bg-2)" stroke-width="2"/>
-      <text x="${peakLabelX.toFixed(1)}" y="${(peakPoint.y - 10).toFixed(1)}" text-anchor="${peakLabelAnchor}" fill="var(--color-warning)" font-size="9" font-weight="600">峰值 ${Utils.formatMB(peakVal)}</text>
-    </g>`;
-
-    // 谷值标注（只在与峰值不同时显示）
-    let valleyMarker = '';
-    if (minVal < peakVal && minVal < avgVal) {
-      const valleyIdx = values.indexOf(minVal);
-      const valleyPoint = points[valleyIdx];
-      // 标签放在圆点上方，确保不被底部截断
-      const valleyLabelY = Math.max(valleyPoint.y - 12, padding.top + 10);
-      valleyMarker = `<g>
-        <circle cx="${valleyPoint.x.toFixed(1)}" cy="${valleyPoint.y.toFixed(1)}" r="5" fill="var(--color-success)" stroke="var(--color-bg-2)" stroke-width="2"/>
-        <text x="${valleyPoint.x.toFixed(1)}" y="${valleyLabelY.toFixed(1)}" text-anchor="middle" fill="var(--color-success)" font-size="9" font-weight="600">最低 ${Utils.formatMB(minVal)}</text>
+    let peakMarker = '';
+    if (peakPoint) {
+      // 如果峰值是最后一个点，标签向左偏移避免与当前值圆点重叠
+      const isLastPoint = peakIdx === points.length - 1;
+      const peakLabelX = isLastPoint ? peakPoint.x - 50 : peakPoint.x;
+      const peakLabelAnchor = isLastPoint ? 'end' : 'middle';
+      peakMarker = `<g>
+        <circle cx="${peakPoint.x.toFixed(1)}" cy="${peakPoint.y.toFixed(1)}" r="5" fill="var(--color-warning)" stroke="var(--color-bg-2)" stroke-width="2"/>
+        <text x="${peakLabelX.toFixed(1)}" y="${(peakPoint.y - 10).toFixed(1)}" text-anchor="${peakLabelAnchor}" fill="var(--color-warning)" font-size="9" font-weight="600">峰值 ${Utils.formatMB(recentPeakVal)}</text>
       </g>`;
+    }
+
+    // 谷值标注（只在与峰值不同时显示，用窗口内数据）
+    let valleyMarker = '';
+    if (recentMinVal < recentPeakVal && recentMinVal < avgVal) {
+      const valleyIdx = recentValues.indexOf(recentMinVal);
+      const valleyPoint = points[valleyIdx];
+      if (valleyPoint) {
+        // 标签放在圆点上方，确保不被底部截断
+        const valleyLabelY = Math.max(valleyPoint.y - 12, padding.top + 10);
+        valleyMarker = `<g>
+          <circle cx="${valleyPoint.x.toFixed(1)}" cy="${valleyPoint.y.toFixed(1)}" r="5" fill="var(--color-success)" stroke="var(--color-bg-2)" stroke-width="2"/>
+          <text x="${valleyPoint.x.toFixed(1)}" y="${valleyLabelY.toFixed(1)}" text-anchor="middle" fill="var(--color-success)" font-size="9" font-weight="600">最低 ${Utils.formatMB(recentMinVal)}</text>
+        </g>`;
+      }
     }
 
     // 悬停提示层
