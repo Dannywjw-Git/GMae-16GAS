@@ -221,34 +221,50 @@ def gpu_processes() -> dict:
                     "container": "ollama",
                     "until": m.get("until", ""),
                 })
-
-    # ===== 2. comfyui: 使用 comfy_system_stats() 获取 torch_vram_used_mb + 已加载模型 =====
+    # ===== 2. comfyui: torch 实测占用 + 模型级显存分解（对齐 ollama 粒度）=====
     if "comfyui" in names:
         try:
-            comfy_stat = comfy_system_stats()
-            comfy_used_mb = comfy_stat.get("torch_vram_used_mb", 0) or 0
-            # 获取已加载模型（从 /history 推断）
-            comfy_models = []
-            try:
-                from services.comfy import comfy_loaded_models
-                clm = comfy_loaded_models()
-                if clm.get("ok"):
-                    comfy_models = clm.get("models", [])
-            except Exception as e:
-                log_error("exception_suppressed", error=e, context="monitor.py:205")
+            from services.comfy import comfy_model_breakdown
+            bd = comfy_model_breakdown()
+            comfy_used_mb = bd.get("torch_used_mb", 0) or 0
             if comfy_used_mb > 0:
-                model_str = ", ".join(comfy_models[:2]) if comfy_models else "torch"
-                if len(comfy_models) > 2:
-                    model_str += f" 等{len(comfy_models)}个"
-                processes.append({
-                    "pid": "comfyui-torch",
-                    "name": f"comfyui: {model_str}",
-                    "app": "comfyui",
-                    "used_mb": comfy_used_mb,
-                    "known": True,
-                    "container": "comfyui",
-                    "models": comfy_models,
-                })
+                resident = bd.get("models", []) if bd.get("resident") else []
+                # 每个常驻模型一行（文件大小估算显存）
+                for m in resident:
+                    if (m.get("size_mb") or 0) > 0:
+                        processes.append({
+                            "pid": "comfyui-" + m["name"],
+                            "name": "comfyui: " + m["name"],
+                            "app": "comfyui",
+                            "used_mb": m["size_mb"],
+                            "known": True,
+                            "model": m["name"],
+                            "kind": m.get("kind", "model"),
+                            "container": "comfyui",
+                        })
+                overhead_mb = bd.get("overhead_mb", 0) or 0
+                if not resident:
+                    # 无活跃模型（刚启动/已释放）：torch 占用整体作为框架/缓存一行
+                    processes.append({
+                        "pid": "comfyui-torch",
+                        "name": "comfyui: 框架/CUDA/缓存（无活跃模型）",
+                        "app": "comfyui",
+                        "used_mb": comfy_used_mb,
+                        "known": True,
+                        "container": "comfyui",
+                        "overhead": True,
+                    })
+                elif overhead_mb >= 100:
+                    # 有模型时，无法归因到模型的差额（CUDA上下文/激活/缓存）单列一行
+                    processes.append({
+                        "pid": "comfyui-framework",
+                        "name": "comfyui: 框架/CUDA上下文/缓存",
+                        "app": "comfyui",
+                        "used_mb": overhead_mb,
+                        "known": True,
+                        "container": "comfyui",
+                        "overhead": True,
+                    })
         except Exception as e:
             log_error("gpu_processes_comfy_stats_failed", error=e)
 
@@ -331,24 +347,52 @@ def gpu_processes() -> dict:
                 p["exit_seen"] = lc.get("exit_seen")
 
     # ===== 6. 桌面进程（使用 PowerShell 性能计数器获取 Windows 进程显存）=====
-    # 注意：排除 vmwp（WSL2 虚拟机进程），因为它的显存已被 nvidia-smi 统计在 GPU 已用中
+    # 注意：排除 vmwp（WSL2 虚拟机进程）和 AI 推理进程，避免重复计算或错误分类
     desktop = desktop_gpu_processes()
     desktop_used_mb = 0
+    # AI 推理进程黑名单：这些进程占用 GPU 显存但不属于"桌面"，应归为已知进程
+    AI_PROCESS_NAMES = ("llama-server", "ollama", "ollama_llama_server", "python", "comfyui",
+                        "fooocus", "stable-diffusion", "invokeai", "kohya", "sd-webui",
+                        "text-generation-webui", "oobabooga", "kobold", "vllm", "tensorrt")
+    ai_procs_from_desktop = []  # 从桌面进程中识别出的 AI 进程
     try:
         from services.helper import get_windows_gpu_processes
         win_gpu = get_windows_gpu_processes()
         if win_gpu.get("ok"):
-            # 排除 vmwp（WSL2 虚拟机进程）和 vmmem，避免与 nvidia-smi 重复计算
-            desktop_procs = [p for p in win_gpu.get("processes", [])
-                             if p.get("name", "").lower() not in ("vmwp", "vmmem", "vmmemwsl")]
+            # 排除 vmwp/vmmem（WSL2）和 AI 推理进程
+            all_win_procs = win_gpu.get("processes", [])
+            desktop_procs = []
+            for p in all_win_procs:
+                pname = p.get("name", "").lower()
+                if pname in ("vmwp", "vmmem", "vmmemwsl"):
+                    continue  # WSL2 虚拟机进程，显存已在 nvidia-smi 统计中
+                if any(ai in pname for ai in AI_PROCESS_NAMES):
+                    ai_procs_from_desktop.append(p)  # AI 进程，移到已知进程
+                    continue
+                desktop_procs.append(p)
             desktop_used_mb = int(sum(p.get("used_mb", 0) for p in desktop_procs))
-            # 把 Windows 进程添加到 desktop_processes（如果原来为空）
-            if not desktop.get("processes") or all(p.get("used_mb") is None for p in desktop.get("processes", [])):
-                desktop["processes"] = [{"name": p["name"], "pid": p["pid"],
-                                          "used_mb": p["used_mb"]} for p in desktop_procs[:20]]
-                desktop["count"] = len(desktop["processes"])
+            # 把 Windows 桌面进程添加到 desktop_processes
+            desktop["processes"] = [{"name": p["name"], "pid": p["pid"],
+                                      "used_mb": p["used_mb"]} for p in desktop_procs[:20]]
+            desktop["count"] = len(desktop["processes"])
     except Exception as e:
         log_error("gpu_processes_windows_gpu_failed", error=str(e))
+
+    # 把从桌面进程中识别出的 AI 进程合并到已知进程列表（避免重复，按 PID 去重）
+    if ai_procs_from_desktop:
+        existing_pids = set(str(p.get("pid")) for p in processes)
+        for ap in ai_procs_from_desktop:
+            if str(ap.get("pid")) not in existing_pids:
+                processes.append({
+                    "name": ap.get("name", "unknown"),
+                    "app": ap.get("name", "unknown"),
+                    "pid": str(ap.get("pid", "")),
+                    "used_mb": int(ap.get("used_mb", 0)),
+                    "known": True,
+                    "kind": "ai_inference",
+                    "estimated": False,
+                })
+        known_total = sum(p["used_mb"] for p in processes)
 
     return {
         "ok": True, "processes": processes,

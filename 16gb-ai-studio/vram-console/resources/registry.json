@@ -489,6 +489,22 @@
         "release": "2025",
         "desc": "文生视频（480p 蒸馏 FP8），短视频",
         "detail": "腾讯混元 HunyuanVideo 1.5 480p 文生视频（CFG 蒸馏 FP8 版）。480p 短视频生成，FP8 量化省显存。已登记，工作流模板待导出。"
+      },
+      {
+        "id": "",
+        "name": "",
+        "vram_gb": 6.5,
+        "ctx": 0,
+        "exclusive": false,
+        "category": "image",
+        "full_name": "",
+        "vendor": "手动登记",
+        "release": "2026",
+        "desc": "一键登记，显存为默认值，待实测验证",
+        "detail": "由扫描器发现并手动登记",
+        "auto_registered": false,
+        "vram_verified": false,
+        "context_vram": {}
       }
     ]
   },

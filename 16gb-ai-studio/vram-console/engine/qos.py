@@ -264,7 +264,15 @@ def _auto_protect_run(free_mb):
     _crit = _get_threshold_value("emergency_free_mb", 2048) // 2
     _danger = _get_threshold_value("emergency_free_mb", 2048)
     _warn = _get_threshold_value("warning_free_mb", 4096)
-    if free_mb < _crit:
+    # 内存检查：内存>90%也触发 critical（内存打满时 docker exec 失效，必须硬释放）
+    try:
+        import psutil
+        mem_pct = psutil.virtual_memory().percent
+    except Exception:
+        mem_pct = 0
+    mem_critical = mem_pct > 90
+
+    if free_mb < _crit or mem_critical:
         level = "critical"
     elif free_mb < _danger:
         level = "danger"
@@ -307,6 +315,28 @@ def _auto_protect_run(free_mb):
             actions.append({"level": "L3", "action": "停止 Fooocus 容器"})
         except Exception as e:
             log_error("auto_protect_l3_error", error=str(e))
+    # === L4: 硬释放 — docker stop（WSL2 下 pause 不释放 GPU 内存，直接 stop） ===
+    # 注意：2026-09-05 实测 WSL2 + Docker Desktop 下 docker pause 不释放 GPU 内存
+    # （4040M -> 4025M，仅降 15M），因此 critical 时直接 stop，不经过 pause
+    if actions and level == "critical":
+        try:
+            time.sleep(5)
+            from gpu.monitor import gpu_status
+            from services.docker import container_stop
+            verify = gpu_status(force_refresh=True)
+            verify_free = verify.get("free_mb", 0)
+            if verify_free < 1024:
+                for cname in ("ollama", "comfyui", "fooocus"):
+                    if cname in names:
+                        try:
+                            r = container_stop(cname)
+                            if r.get("ok"):
+                                actions.append({"level": "L4", "action": f"强制停止 {cname} 容器（软释放无效）"})
+                        except Exception as e:
+                            log_error("auto_protect_l4_error", error=str(e), container=cname)
+                time.sleep(3)
+        except Exception as e:
+            log_error("auto_protect_verify_error", error=str(e))
     if not actions:
         return None
     st["last_trigger_ts"] = now

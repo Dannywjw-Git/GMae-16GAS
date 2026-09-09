@@ -124,6 +124,22 @@ def start_container(container_name: str, timeout: int = 30) -> tuple:
     return True, "started"
 
 
+def pause_container(container_name: str, timeout: int = 15) -> tuple:
+    """暂停容器（保留内存状态，unpause 秒级恢复）。"""
+    rc, out = run_args([_get_docker_cmd(), "pause", container_name], timeout)
+    if rc != 0:
+        return False, "pause failed: " + out[:200]
+    return True, "paused"
+
+
+def unpause_container(container_name: str, timeout: int = 15) -> tuple:
+    """恢复暂停的容器。"""
+    rc, out = run_args([_get_docker_cmd(), "unpause", container_name], timeout)
+    if rc != 0:
+        return False, "unpause failed: " + out[:200]
+    return True, "unpaused"
+
+
 def kill_process_in_container(container_name: str, pid: int, timeout: int = 10) -> tuple:
     """在容器内 kill 指定 PID 的进程。
 

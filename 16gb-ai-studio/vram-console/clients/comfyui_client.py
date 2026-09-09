@@ -12,6 +12,28 @@ from core.logger import log_error
 
 COMFY_BASE = "http://127.0.0.1:8188"
 
+# ComfyUI 模型加载节点 -> (模型类别, 取值字段)。覆盖标准/GGUF/多 CLIP 加载器。
+LOADER_SPEC = {
+    "CheckpointLoaderSimple": ("checkpoint", ["ckpt_name"]),
+    "CheckpointLoader": ("checkpoint", ["ckpt_name"]),
+    "UNETLoader": ("unet", ["unet_name"]),
+    "UnetLoaderGGUF": ("unet", ["unet_name"]),
+    "UnetLoaderGGUFAdvanced": ("unet", ["unet_name"]),
+    "VAELoader": ("vae", ["vae_name"]),
+    "CLIPLoader": ("clip", ["clip_name"]),
+    "CLIPLoaderGGUF": ("clip", ["clip_name"]),
+    "CLIPVisionLoader": ("clip_vision", ["clip_name"]),
+    "DualCLIPLoader": ("clip", ["clip_name1", "clip_name2"]),
+    "DualCLIPLoaderGGUF": ("clip", ["clip_name1", "clip_name2"]),
+    "TripleCLIPLoaderGGUF": ("clip", ["clip_name1", "clip_name2", "clip_name3"]),
+    "QuadrupleCLIPLoaderGGUF": ("clip", ["clip_name1", "clip_name2", "clip_name3", "clip_name4"]),
+    "LoraLoader": ("lora", ["lora_name"]),
+    "LoraLoaderModelOnly": ("lora", ["lora_name"]),
+    "ControlNetLoader": ("controlnet", ["control_net_name"]),
+    "UpscaleModelLoader": ("upscale", ["model_name"]),
+    "StyleModelLoader": ("style", ["style_model_name"]),
+}
+
 
 def _get(path: str, timeout: int = 5) -> tuple:
     """发送 GET 请求到 ComfyUI API。
@@ -64,7 +86,8 @@ def system_stats() -> dict:
     ok, d, err = _get("/system_stats", timeout=5)
     if not ok:
         return {"ok": False, "error": err}
-    dev = (d.get("devices") or [{}])[0]
+    devs = d.get("devices") or []
+    dev = devs[0] if isinstance(devs, list) and devs else {}
     torch_total = dev.get("torch_vram_total") or 0
     torch_free = dev.get("torch_vram_free") or 0
     return {
@@ -144,34 +167,42 @@ def history(max_items: int = 5) -> dict:
     # /history 返回 {prompt_id: {prompt: [...], outputs: {...}}}
     for prompt_id, hist in list(d.items())[-max_items:]:
         models = []
+        model_kinds = {}
         nodes = {}
-        # prompt 是一个列表，第二个元素是节点 dict
+        # prompt 为列表 [number, id, 节点dict, extra_data, ...]（版本不同下标不一），
+        # 健壮做法：dict 直接用；list 则找到“值含 class_type 的 dict”那个元素。
+        node_dict = None
         if isinstance(hist, dict) and "prompt" in hist:
             prompt = hist["prompt"]
-            if isinstance(prompt, list) and len(prompt) > 1:
-                node_dict = prompt[1]
-                if isinstance(node_dict, dict):
-                    for node_id, node_data in node_dict.items():
-                        if isinstance(node_data, dict):
-                            class_type = node_data.get("class_type", "")
-                            nodes[node_id] = class_type
-                            # 提取模型名
-                            inputs = node_data.get("inputs", {})
-                            if class_type in ("CheckpointLoaderSimple", "CheckpointLoader", "UNETLoader"):
-                                ckpt = inputs.get("ckpt_name", "") or inputs.get("unet_name", "")
-                                if ckpt and ckpt not in models:
-                                    models.append(ckpt)
-                            elif class_type == "LoraLoader":
-                                lora = inputs.get("lora_name", "")
-                                if lora and lora not in models:
-                                    models.append(lora)
-                            elif class_type in ("VAELoader", "ControlNetLoader"):
-                                name = inputs.get("vae_name", "") or inputs.get("control_net_name", "")
-                                if name and name not in models:
-                                    models.append(name)
+            if isinstance(prompt, dict):
+                node_dict = prompt
+            elif isinstance(prompt, list):
+                for el in prompt:
+                    if isinstance(el, dict) and any(
+                        isinstance(v, dict) and v.get("class_type") for v in el.values()
+                    ):
+                        node_dict = el
+                        break
+        if isinstance(node_dict, dict):
+            for node_id, node_data in node_dict.items():
+                if not isinstance(node_data, dict):
+                    continue
+                class_type = node_data.get("class_type", "")
+                nodes[node_id] = class_type
+                spec = LOADER_SPEC.get(class_type)
+                if not spec:
+                    continue
+                kind, fields = spec
+                inputs = node_data.get("inputs", {})
+                for fld in fields:
+                    val = inputs.get(fld, "")
+                    if isinstance(val, str) and val and val not in models:
+                        models.append(val)
+                        model_kinds[val] = kind
         items.append({
-            "prompt_id": str(prompt_id)[:8],
+            "prompt_id": str(prompt_id),
             "models": models,
+            "model_kinds": model_kinds,
             "nodes": nodes,
         })
     return {"ok": True, "items": items, "count": len(items)}

@@ -25,7 +25,7 @@ for _dp in _DOCKER_PATHS:
 # === 模块化导入（v2.0 重构）===
 from core.logger import logger, log_event, log_error, log_info, toast_notify, LOG_DIR, LOG_FILE
 from core.config import (
-    PORT, HOST, BASE_DIR, API_TOKEN, FRONTEND_VERSION, WEB_DIR, LEGACY_HTML,
+    PORT, HOST, BASE_DIR, API_TOKEN, FRONTEND_VERSION, WEB_DIR,
     REGISTRY_PATH, REGISTRY, OLLAMA_CONTAINER, BIG_MODELS,
     HARDWARE_PROFILE_PATH, get_dyn_thresholds, get_threshold_value,
     GPU_RELEASE_PS1, GAME_ON_PS1, _V031_MODULES
@@ -111,8 +111,75 @@ if __name__ == "__main__":
         _alert_esc_thread = threading.Thread(target=_alert_escalation_loop, daemon=True, name="alert-escalation")
         _alert_esc_thread.start()
 
-        # S1.2 Docker Events 监听：容器状态变化时自动失效 status 缓存
-        docker_events.on_state_change = lambda name, action: status_cache.invalidate()
+        # S3.6: 门卫告警同步线程（每 30 秒把门卫检查结果同步到 AlertManager）
+        def _guard_alert_sync_loop():
+            from engine.eviction_guard import gpu_guard_check
+            _guard_types = {
+                "scene_conflict": ("Fooocus", "ComfyUI"),
+                "unknown_gpu_process": ("未登记 GPU 进程",),
+                "vram_discrepancy": ("显存差量",),
+            }
+            _guard_msgs = {
+                "scene_conflict": "Fooocus 与 ComfyUI 同跑 = 显存叠加风险",
+                "unknown_gpu_process": "存在未登记 GPU 进程，白占显存",
+                "vram_discrepancy": "显存差量异常，可能有进程偷占显存",
+            }
+            while True:
+                try:
+                    guard = gpu_guard_check()
+                    alerts = guard.get("alerts", []) or []
+                    current = set()
+                    for atype, keywords in _guard_types.items():
+                        if any(any(kw in a for kw in keywords) for a in alerts):
+                            current.add(atype)
+                    active = {a["alert_type"] for a in alert_manager.get_active()}
+                    for atype in current - active:
+                        alert_manager.submit(atype, "warning", _guard_msgs[atype], {"source": "guard"})
+                    for atype in (set(_guard_types) & active) - current:
+                        alert_manager.resolve(atype)
+                except Exception as e:
+                    log_error("exception_suppressed", error=e, context="server.py:guard_sync")
+                time.sleep(30)
+        _guard_sync_thread = threading.Thread(target=_guard_alert_sync_loop, daemon=True, name="guard-alert-sync")
+        _guard_sync_thread.start()
+
+        # S6: 被暂停容器自动恢复线程（每60秒检查，显存宽松时自动恢复）
+        def _paused_recover_loop():
+            while True:
+                try:
+                    from services.docker import get_paused_containers, container_unpause
+                    from gpu.monitor import gpu_status
+                    paused = get_paused_containers()
+                    if paused:
+                        gpu = gpu_status()
+                        free_mb = gpu.get("free_mb", 0)
+                        # 显存空闲 > 8G 时，自动恢复被暂停的容器（按暂停时间顺序，先暂停的先恢复）
+                        if free_mb > 8192:
+                            for pname in sorted(paused.keys(), key=lambda k: paused[k]):
+                                r = container_unpause(pname)
+                                if r.get("ok"):
+                                    log_event("paused_auto_recover", container=pname,
+                                              free_before=free_mb, reason="vram free > 8G")
+                                    break  # 每次只恢复一个，避免瞬间占满
+                except Exception as e:
+                    log_error("exception_suppressed", error=e, context="server.py:paused_recover")
+                time.sleep(60)
+        _paused_recover_thread = threading.Thread(target=_paused_recover_loop, daemon=True, name="paused-recover")
+        _paused_recover_thread.start()
+
+        # S1.2 Docker Events 监听：容器状态变化时失效缓存 + 宕机告警
+        def _on_container_state_change(name, action):
+            status_cache.invalidate()
+            try:
+                if action in ("die", "kill", "destroy"):
+                    alert_manager.submit("container_down", "danger",
+                        f"容器 {name} 异常退出（{action}）",
+                        {"container": name, "action": action})
+                elif action in ("start", "restart"):
+                    alert_manager.resolve("container_down")
+            except Exception as e:
+                log_error("exception_suppressed", error=e, context="server.py:container_alert")
+        docker_events.on_state_change = _on_container_state_change
         _docker_events_ok = docker_events.start()
         log_event("docker_events_started", available=_docker_events_ok)
 

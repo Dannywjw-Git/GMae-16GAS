@@ -76,6 +76,15 @@ class Response:
         return resp
 
     @classmethod
+    def stream(cls, generator, content_type: str = "text/event-stream") -> "Response":
+        """流式响应（SSE）。generator  yields bytes 或 str。"""
+        resp = cls(body=generator, status_code=200, content_type=content_type)
+        resp.headers["Cache-Control"] = "no-cache"
+        resp.headers["Connection"] = "keep-alive"
+        resp.headers["X-Accel-Buffering"] = "no"
+        return resp
+
+    @classmethod
     def not_found(cls, message: str = "Not Found") -> "Response":
         """404 响应。"""
         return cls.error("NOT_FOUND", message, http_status=404)
@@ -98,12 +107,26 @@ class Response:
     # ---- 写入 handler ----
 
     def write_to(self, handler) -> None:
-        """将响应写入 BaseHTTPRequestHandler。"""
+        """将响应写入 BaseHTTPRequestHandler。支持 generator 流式写入。"""
         handler.send_response(self.status_code)
         handler.send_header("Content-Type", self.content_type)
-        handler.send_header("Content-Length", str(len(self.body)))
-        for key, value in self.headers.items():
-            handler.send_header(key, value)
-        handler.end_headers()
-        if self.body:
-            handler.wfile.write(self.body)
+        if hasattr(self.body, '__next__') or callable(self.body):
+            # 流式响应：不发 Content-Length
+            for key, value in self.headers.items():
+                handler.send_header(key, value)
+            handler.end_headers()
+            try:
+                for chunk in self.body:
+                    if isinstance(chunk, str):
+                        chunk = chunk.encode('utf-8')
+                    handler.wfile.write(chunk)
+                    handler.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                pass  # 客户端断开，正常
+        else:
+            handler.send_header("Content-Length", str(len(self.body)))
+            for key, value in self.headers.items():
+                handler.send_header(key, value)
+            handler.end_headers()
+            if self.body:
+                handler.wfile.write(self.body)

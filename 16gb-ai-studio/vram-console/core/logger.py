@@ -157,6 +157,9 @@ def _get_caller_source() -> str:
 
 def _publish_to_event_bus(event_type: str, kwargs: dict, is_error: bool = False) -> None:
     """发布事件到 EventBus（S2.1 对接）。失败静默，不影响日志记录。"""
+    # 过滤轮询噪音：api_request 只写日志文件，不进事件时间线
+    if event_type == "api_request":
+        return
     try:
         eb = _get_event_bus()
         if eb is None:

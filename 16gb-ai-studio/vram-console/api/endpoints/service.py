@@ -10,7 +10,7 @@ from api.router import router
 from api.request import Request
 from api.response import Response
 from services.scene import service_action, model_action
-from services.docker import container_stop
+from services.docker import container_stop, container_pause, container_unpause
 from core.status_cache import status_cache
 from core.event_bus import event_bus
 
@@ -93,4 +93,50 @@ def post_container_stop(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:94")
+    return Response.success(result)
+
+
+@router.post("/api/container/pause")
+def post_container_pause(req: Request) -> Response:
+    """暂停 Docker 容器（L2 分级释放，保留状态可秒级恢复）。
+
+    Body 参数：
+        name: 容器名称
+    """
+    container_name = req.body_get("name", "")
+    result = container_pause(container_name)
+    status_cache.invalidate()
+    try:
+        ok = result.get("ok", False) if isinstance(result, dict) else False
+        event_bus.record(
+            category="container", level="info", source="api_endpoint",
+            event="container_paused",
+            message="暂停容器 {}（{}）".format(container_name, "成功" if ok else "失败"),
+            metadata={"container_name": container_name, "success": ok, "result": str(result)[:200]}
+        )
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="service.py:pause")
+    return Response.success(result)
+
+
+@router.post("/api/container/unpause")
+def post_container_unpause(req: Request) -> Response:
+    """恢复暂停的 Docker 容器。
+
+    Body 参数：
+        name: 容器名称
+    """
+    container_name = req.body_get("name", "")
+    result = container_unpause(container_name)
+    status_cache.invalidate()
+    try:
+        ok = result.get("ok", False) if isinstance(result, dict) else False
+        event_bus.record(
+            category="container", level="info", source="api_endpoint",
+            event="container_unpaused",
+            message="恢复容器 {}（{}）".format(container_name, "成功" if ok else "失败"),
+            metadata={"container_name": container_name, "success": ok, "result": str(result)[:200]}
+        )
+    except Exception as e:
+        log_error("exception_suppressed", error=e, context="service.py:unpause")
     return Response.success(result)

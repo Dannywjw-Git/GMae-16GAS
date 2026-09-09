@@ -9,7 +9,7 @@ import os
 import time
 import urllib.request
 from core.logger import log_event, log_error, LOG_FILE
-from core.config import (WEB_DIR, LEGACY_HTML, FRONTEND_VERSION, BASE_DIR, REGISTRY)
+from core.config import (WEB_DIR, FRONTEND_VERSION, BASE_DIR, REGISTRY)
 from services.status import current_status
 from gpu.monitor import gpu_status
 from services.scene import _sync_ollama_models, _sync_comfyui_models
@@ -295,6 +295,9 @@ def build_gate_context():
         comfyui_running=comfyui_running,
         fooocus_running=fooocus_running,
         ollama_serve_count=1,
-        registry_models=REGISTRY.get("models", {}) if isinstance(REGISTRY, dict) else {},
+        registry_models={
+            "ollama": REGISTRY.get("ollama", {}).get("models", []),
+            "comfyui": REGISTRY.get("comfyui", {}).get("models", []),
+        },
         danger_thresholds={}
     )

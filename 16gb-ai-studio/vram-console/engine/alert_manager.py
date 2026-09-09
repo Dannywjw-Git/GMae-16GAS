@@ -38,13 +38,16 @@ MAX_ALERT_LEVEL = "critical"
 class AlertManager:
     """告警管理器。"""
 
-    def __init__(self, history_limit: int = 100, silence_file: Optional[str] = None):
+    def __init__(self, history_limit: int = 100, silence_file: Optional[str] = None,
+                 history_file: Optional[str] = None):
         self._active: Dict[str, Dict] = {}
         self._silenced: Dict[str, float] = {}  # alert_type -> silence_until (epoch)
         self._history: deque = deque(maxlen=history_limit)
         self._lock = threading.Lock()
         self._silence_file = Path(silence_file) if silence_file else None
+        self._history_file = Path(history_file) if history_file else None
         self._load_silenced()
+        self._load_history()
 
     def submit(self, alert_type: str, level: str, message: str,
                metadata: Optional[Dict] = None) -> Dict:
@@ -177,15 +180,38 @@ class AlertManager:
             self._active.clear()
 
     def _record_history(self, alert: Dict, action: str) -> None:
-        """记录告警历史（调用方需持有锁）。"""
-        self._history.append({
+        """记录告警历史（调用方需持有锁），并持久化到文件。"""
+        entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "action": action,  # new/aggregated/resolved/silenced/escalated
+            "action": action,
             "alert_type": alert["alert_type"],
             "level": alert["level"],
             "message": alert["message"],
             "count": alert.get("count", 1)
-        })
+        }
+        self._history.append(entry)
+        self._save_history()
+
+    def _load_history(self) -> None:
+        """从文件加载告警历史。"""
+        if self._history_file and self._history_file.exists():
+            try:
+                with open(self._history_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                for entry in data:
+                    self._history.append(entry)
+            except Exception:
+                pass
+
+    def _save_history(self) -> None:
+        """保存告警历史到文件（调用方需持有锁）。"""
+        if self._history_file:
+            try:
+                self._history_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(self._history_file, 'w', encoding='utf-8') as f:
+                    json.dump(list(self._history), f, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
 
     def _load_silenced(self) -> None:
         """从文件加载静默配置。"""
@@ -209,7 +235,9 @@ class AlertManager:
 
 
 # 全局单例
+_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 alert_manager = AlertManager(
     history_limit=100,
-    silence_file=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "alerts_silenced.json")
+    silence_file=os.path.join(_base_dir, "data", "alerts_silenced.json"),
+    history_file=os.path.join(_base_dir, "data", "alerts_history.json"),
 )

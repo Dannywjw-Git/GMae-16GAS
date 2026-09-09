@@ -42,10 +42,10 @@ def infer_scene(containers: list) -> str:
 
 
 def docker_action(name: str, action: str) -> tuple:
-    """启停 Docker 容器，白名单校验。"""
-    if name not in ("comfyui", "fooocus"):
+    """启停受管 GPU Docker 容器，白名单校验。"""
+    if name not in ("comfyui", "fooocus", "ollama"):
         return -1, "unsupported container: " + str(name)
-    if action not in ("start", "stop", "restart"):
+    if action not in ("start", "stop", "restart", "pause", "unpause"):
         return -1, "unsupported action: " + str(action)
     return container_action(name, action, 60)
 
@@ -79,6 +79,41 @@ def container_stop(name: str) -> dict:
     return {"ok": ok, "name": name, "message": msg[-200:]}
 
 
+# 被暂停的容器记录（用于自动恢复）
+_paused_containers = {}  # {name: paused_ts}
+
+
+def get_paused_containers() -> dict:
+    """获取被暂停的容器列表。"""
+    return dict(_paused_containers)
+
+
+def container_pause(name: str) -> dict:
+    """暂停容器（L2 分级释放，保留状态可秒级恢复）。"""
+    if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
+        return {"ok": False, "error": "invalid container name"}
+    if name not in docker_containers():
+        return {"ok": False, "error": "container not running: " + name}
+    from clients.docker_client import pause_container
+    ok, msg = pause_container(name, 15)
+    if ok:
+        _paused_containers[name] = time.time()
+    log_event("container_pause", name=name, ok=ok, message=msg[-200:])
+    return {"ok": ok, "name": name, "message": msg[-200:]}
+
+
+def container_unpause(name: str) -> dict:
+    """恢复暂停的容器。"""
+    if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
+        return {"ok": False, "error": "invalid container name"}
+    from clients.docker_client import unpause_container
+    ok, msg = unpause_container(name, 15)
+    if ok:
+        _paused_containers.pop(name, None)
+    log_event("container_unpause", name=name, ok=ok, message=msg[-200:])
+    return {"ok": ok, "name": name, "message": msg[-200:]}
+
+
 def _container_gpu_mb(name):
     """估算指定容器的 GPU 显存占用。"""
     if name == "ollama":
@@ -107,6 +142,29 @@ def wait_ready(port, timeout=90):
         except Exception:
             time.sleep(2)
     return False, timeout
+
+
+def _get_memory_percent() -> float:
+    """获取系统内存使用率（%），失败返回 0。"""
+    try:
+        import psutil
+        return psutil.virtual_memory().percent
+    except Exception:
+        try:
+            import subprocess
+            r = subprocess.run(['wmic', 'OS', 'get', 'TotalVisibleMemorySize,FreePhysicalMemory', '/value'],
+                             capture_output=True, text=True, timeout=5)
+            total = free = 0
+            for line in r.stdout.splitlines():
+                if 'TotalVisibleMemorySize' in line:
+                    total = int(line.split('=')[1])
+                elif 'FreePhysicalMemory' in line:
+                    free = int(line.split('=')[1])
+            if total:
+                return (1 - free / total) * 100
+        except Exception:
+            pass
+    return 0.0
 
 
 def free_all() -> dict:
@@ -192,14 +250,41 @@ def free_all() -> dict:
     # 最后等待5秒确保所有模型完全卸载，然后清除状态缓存
     time.sleep(5)
     try:
-        # 同时失效 registry 旧缓存和 status_cache 新缓存
         _cache = registry.get("status_cache", {})
         _cache["ts"] = 0
         registry.set("status_cache", _cache)
         status_cache.invalidate()
     except Exception as e:
         log_error("exception_suppressed", error=e, context="docker.py:free_all_cache_invalidate")
-    after = gpu_status(force_refresh=True)  # 强制刷新，避免读取释放前的缓存数据
+    after = gpu_status(force_refresh=True)
+
+    # === 释放后验证 + 软→硬升级 ===
+    escalated = []
+    freed_mb = max(0, after.get("free_mb", 0) - before.get("free_mb", 0))
+    # 检查系统内存：内存>90%时软释放必然失败，直接走硬释放
+    mem_pct = _get_memory_percent()
+    memory_critical = mem_pct > 90
+    # 如果软释放后显存未显著下降（<500MB），或内存打满，升级到 docker stop
+    if freed_mb < 500 or memory_critical:
+        time.sleep(1)
+        current_containers = docker_containers()
+        for item in managed:
+            cname = item.get("name", "")
+            if not cname or cname not in current_containers:
+                continue
+            # 已经软释放成功的跳过（ollama模型已卸但容器还在，需要stop容器才能真正释放）
+            try:
+                r = container_stop(cname)
+                ok = r.get("ok", False) if isinstance(r, dict) else False
+                escalated.append({"name": cname, "action": "docker stop (escalation)", "ok": ok})
+                if ok:
+                    stopped.append({"name": cname, "method": "docker_stop_escalated"})
+            except Exception as e:
+                log_error("free_all_escalation_failed", error=e, container=cname)
+        if escalated:
+            time.sleep(5)
+            after = gpu_status(force_refresh=True)
+            freed_mb = max(0, after.get("free_mb", 0) - before.get("free_mb", 0))
     # 构建 running 数组：释放后仍在运行且占用 GPU 的进程
     running = []
     try:
@@ -224,10 +309,12 @@ def free_all() -> dict:
         "ok": True,
         "free_mb_before": before.get("free_mb", 0),
         "free_mb_after": after.get("free_mb", 0),
-        "freed_mb": max(0, after.get("free_mb", 0) - before.get("free_mb", 0)),
+        "freed_mb": freed_mb,
         "actions": actions,
         "stopped": stopped,
         "running": running,
         "success_count": success_count,
         "total_count": total_count,
+        "escalated": escalated,
+        "memory_critical": memory_critical,
     }

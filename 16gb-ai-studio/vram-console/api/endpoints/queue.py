@@ -12,6 +12,7 @@ from api.response import Response
 from engine.queue import queue_snapshot, queue_enqueue, queue_cancel
 from core.status_cache import status_cache
 from core.event_bus import event_bus
+from core.logger import log_error
 
 
 @router.get("/api/queue")
@@ -22,7 +23,7 @@ def get_queue(req: Request) -> Response:
 
 @router.post("/api/queue")
 def post_queue(req: Request) -> Response:
-    """提交生成任务到队列。
+    """提交生成任务到队列（提交前预算预检）。
 
     Body 参数：
         model: 模型标识（sdxl / flux / music3 / wan2.2 等）
@@ -30,7 +31,33 @@ def post_queue(req: Request) -> Response:
     """
     task_model = req.body_get("model", "")
     task_params = req.body_get("params", {})
+    # 预算预检：检查当前显存是否够运行该模型
+    budget_warning = None
+    try:
+        from engine.budget import budget_engine
+        from gpu.monitor import gpu_status
+        budget = budget_engine()
+        gpu = gpu_status()
+        free_mb = gpu.get("free_mb", 0)
+        # 从预算结果中查找该模型的需求
+        model_vram = 0
+        for item in budget.get("models", []):
+            if task_model.lower() in str(item.get("id", "")).lower() or task_model.lower() in str(item.get("name", "")).lower():
+                model_vram = item.get("vram_gb", 0) * 1024
+                break
+        if model_vram > 0 and free_mb < model_vram * 0.8:
+            budget_warning = {
+                "model": task_model,
+                "required_mb": int(model_vram),
+                "current_free_mb": free_mb,
+                "message": "显存可能不足（需要 %.1fG，当前空闲 %.1fG），任务可能排队或触发自动释放" % (
+                    model_vram / 1024, free_mb / 1024)
+            }
+    except Exception as e:
+        log_error("budget_precheck_failed", error=str(e))
     result = queue_enqueue(model=task_model, params=task_params)
+    if budget_warning and isinstance(result, dict):
+        result["budget_warning"] = budget_warning
     status_cache.invalidate()
     try:
         task_id = result.get("task_id", result.get("id", "")) if isinstance(result, dict) else ""

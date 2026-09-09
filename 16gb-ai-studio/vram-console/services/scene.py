@@ -122,11 +122,33 @@ def _step_wait_ready(step: dict, context: dict) -> tuple:
 
 
 # 动作处理器映射
+def _step_docker_pause(step: dict, context: dict) -> tuple:
+    """暂停容器（L2 分级释放，保留状态可秒级恢复）。"""
+    from services.docker import container_pause
+    name = step.get("container", "")
+    if not name:
+        return -1, "skipped: no container"
+    r = container_pause(name)
+    return (0 if r.get("ok") else -1), r.get("message", r.get("error", ""))
+
+
+def _step_docker_unpause(step: dict, context: dict) -> tuple:
+    """恢复暂停的容器。"""
+    from services.docker import container_unpause
+    name = step.get("container", "")
+    if not name:
+        return -1, "skipped: no container"
+    r = container_unpause(name)
+    return (0 if r.get("ok") else -1), r.get("message", r.get("error", ""))
+
+
 _STEP_HANDLERS = {
     "pre_release_vram": _step_pre_release_vram,
     "ollama_stop_all": _step_ollama_stop_all,
     "docker_start": _step_docker_start,
     "docker_stop": _step_docker_stop,
+    "docker_pause": _step_docker_pause,
+    "docker_unpause": _step_docker_unpause,
     "vram_release": _step_vram_release,
     "game_on": _step_game_on,
     "wait_ready": _step_wait_ready,
@@ -250,6 +272,19 @@ def scene_switch(scene: str) -> dict:
         # 6. 状态持久化
         duration_ms = int((time.time() - start_time) * 1000)
         gpu_after = gpu_status()
+        # 6.5 场景感知：自动恢复新场景需要的被暂停容器
+        try:
+            from services.docker import get_paused_containers, container_unpause
+            paused = get_paused_containers()
+            scene_containers = [c.get("name") for c in scene_config.get("containers", [])]
+            for pname in list(paused.keys()):
+                if pname in scene_containers:
+                    r = container_unpause(pname)
+                    if r.get("ok"):
+                        results.append({"step": f"自动恢复 {pname}", "action": "docker_unpause",
+                                       "rc": 0, "output": "auto-recovered", "critical": False, "skipped": False})
+        except Exception as e:
+            log_error("scene_auto_recover_failed", error=str(e))
         if overall_ok:
             scene_state = registry.get("last_scene", {})
             scene_state["scene"] = scene
@@ -369,8 +404,8 @@ def combo_switch(combo: str) -> dict:
 # ============================================================
 
 def service_action(name: str, action: str) -> dict:
-    """服务启停（comfyui/fooocus）。"""
-    if name not in ("comfyui", "fooocus"):
+    """服务启停（受管 GPU 容器：comfyui/fooocus/ollama）。"""
+    if name not in ("comfyui", "fooocus", "ollama"):
         return {"ok": False, "error": "unsupported service: " + name}
     rc, out = docker_action(name, action)
     return {"ok": rc == 0, "name": name, "action": action, "rc": rc, "output": out[-300:]}

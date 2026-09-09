@@ -322,6 +322,15 @@ def _build_vram_ledger(gpu: dict, ops: dict, comfy_models: dict, gpu_procs: dict
     return vram_ledger
 
 
+def _get_paused_containers_list() -> list:
+    """获取被暂停的容器列表（从 services.docker._paused_containers）。"""
+    try:
+        from services.docker import get_paused_containers
+        return list(get_paused_containers().keys())
+    except Exception:
+        return []
+
+
 def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
     """组装最终状态数据。"""
     gpu = results["gpu"] or {}
@@ -345,9 +354,11 @@ def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
         "comfy_queue": comfy_q,
         "activity": activity,
         "containers": {
+            "ollama": "ollama" in names,
             "comfyui": "comfyui" in names,
             "fooocus": "fooocus" in names,
             "all": sorted(names),
+            "paused": _get_paused_containers_list(),
         },
         "scene": scene,
         "helper_running": helper,
@@ -356,9 +367,25 @@ def _assemble_status_data(results: dict, scene: str, vram_ledger: dict) -> dict:
                 "used_gb": None,
                 "msg": registry.get("qos_state", {}).get("last_action", {}).get("message", "") if registry.get("qos_state", {}).get("last_action") else ""},
         "vram_ledger": vram_ledger,
+        "system": _get_system_memory(),
         "ts": int(time.time()),
         "cached": False,
     }
+
+
+def _get_system_memory() -> dict:
+    """获取系统内存状态。"""
+    try:
+        import psutil
+        mem = psutil.virtual_memory()
+        return {
+            "total_mb": int(mem.total / 1024 / 1024),
+            "used_mb": int(mem.used / 1024 / 1024),
+            "free_mb": int(mem.available / 1024 / 1024),
+            "percent": round(mem.percent, 1),
+        }
+    except Exception:
+        return {"total_mb": 0, "used_mb": 0, "free_mb": 0, "percent": 0}
 
 
 def current_status() -> dict:

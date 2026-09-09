@@ -11,17 +11,19 @@ from api.response import Response
 from engine.topology import topology_builder
 from engine.health_score import health_engine
 from services.status import current_status
+from core.system_info import system_info
 
 
 @router.get("/api/topology")
 def get_topology(req: Request) -> Response:
     """获取拓扑图数据。
 
-    返回 GPU→容器→模型→任务四层关系，含节点、连接、统计信息。
+    返回5层拓扑关系：硬件→平台→容器→模型→任务。
     前端可用于 SVG 拓扑图可视化。
     """
     status = current_status()
-    graph = topology_builder.build(status)
+    sys_info = system_info.collect()
+    graph = topology_builder.build(status, sys_info)
 
     return Response.success({
         "nodes": [

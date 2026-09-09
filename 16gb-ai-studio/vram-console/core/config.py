@@ -19,7 +19,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # === 前端版本控制 ===
 FRONTEND_VERSION = os.environ.get("FRONTEND_VERSION", "v2").lower()
 WEB_DIR = os.path.join(BASE_DIR, "web")
-LEGACY_HTML = os.path.join(BASE_DIR, "legacy", "v1-index.html")
 
 # === 脚本路径 ===
 GPU_RELEASE_PS1 = os.environ.get("GPU_RELEASE_PS1",

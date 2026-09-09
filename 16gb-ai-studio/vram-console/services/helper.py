@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 桌面 Helper 客户端模块（services/helper.py）
@@ -17,7 +17,6 @@ GMae 桌面 Helper 客户端模块（services/helper.py）
 - desktop_kill() 在本文件是 API 代理，在 vram_helper.py 是实际执行
 
 【P1-3 改造说明】
-- HTTP 调用应逐步迁移到 clients/helper_client.py
 - subprocess 调用应逐步迁移到 clients/process_client.py
 """
 import json
