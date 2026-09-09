@@ -11,6 +11,7 @@ import re
 import time
 import urllib.request
 from core.logger import log_event, log_error
+from core.config import COMFYUI_CONTAINER, OLLAMA_CONTAINER, FOOOCUS_CONTAINER
 from core.config import REGISTRY
 from clients.docker_client import (list_running_containers, container_action,
                                     inspect_container, stop_container)
@@ -33,10 +34,10 @@ def docker_containers() -> list:
 
 
 def infer_scene(containers: list) -> str:
-    """根据运行中的容器推断当前场景。"""
-    if "fooocus" in containers:
+    """根据运行中的容器推断当前场景（容器名从配置读取，支持自定义）。"""
+    if FOOOCUS_CONTAINER in containers:
         return "fooocus"
-    if "comfyui" in containers:
+    if COMFYUI_CONTAINER in containers:
         return "comfy"
     return "dialogue"
 

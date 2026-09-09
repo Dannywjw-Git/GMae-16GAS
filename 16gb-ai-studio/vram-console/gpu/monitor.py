@@ -14,18 +14,19 @@ import threading
 from collections import deque
 from core.logger import log_event, log_error
 from core.registry import registry
+from core.config import get_threshold_value
 from clients.nvidia_smi import (query_gpu_memory, query_compute_apps,
                                  query_container_compute_pids, query_container_processes)
 from clients.docker_client import list_running_containers
 
 
 # === nvidia-smi 缓存（S1.4）===
-# 5 秒 TTL，危险状态（free_mb < 2048MB）时缩短为 2 秒
+# 5 秒 TTL，危险状态（free_mb < 动态阈值）时缩短为 2 秒
 _gpu_status_cache = {"data": None, "timestamp": 0}
 _gpu_status_lock = threading.Lock()
 _GPU_STATUS_TTL = 5.0  # 秒（正常状态）
 _GPU_STATUS_DANGER_TTL = 2.0  # 秒（危险状态，free_mb < 阈值）
-_GPU_STATUS_DANGER_FREE_MB = 2048  # free_mb 低于此值视为危险状态
+_GPU_STATUS_DANGER_FREE_MB = get_threshold_value("emergency_free_mb", 2048)  # free_mb 低于此值视为危险状态（动态阈值）
 # 上次成功查询的持久缓存（nvidia-smi 超时时回退使用，避免 auto_protect 被跳过）
 _last_good_gpu_status = None
 
@@ -33,7 +34,7 @@ _last_good_gpu_status = None
 def gpu_status(force_refresh: bool = False) -> dict:
     """查询 GPU 显存状态，带 5 秒 TTL 缓存（S1.4）。
 
-    危险状态（free_mb < 2048MB）时 TTL 缩短为 2 秒，确保危险时数据更实时。
+    危险状态（free_mb < 动态阈值）时 TTL 缩短为 2 秒，确保危险时数据更实时。
     force_refresh=True 时跳过缓存，强制执行 nvidia-smi 查询。
 
     容错：nvidia-smi 超时/失败时，回退到上次成功值并标记 stale=True，

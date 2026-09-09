@@ -58,10 +58,22 @@ REGISTRY = load_registry()
 
 # 从注册表读取配置
 OLLAMA_CONTAINER = REGISTRY.get("ollama", {}).get("container", "ollama")
+COMFYUI_CONTAINER = REGISTRY.get("comfyui", {}).get("container", "comfyui")
+FOOOCUS_CONTAINER = "fooocus"  # Fooocus 容器名（registry 中无独立配置，保持默认）
+OWUI_CONTAINER = "open-webui-open-webui-1"  # Open WebUI 容器名（docker compose 命名）
+
+# 受管容器列表（GMae 管理的 AI 服务容器）
+MANAGED_CONTAINERS = [COMFYUI_CONTAINER, OLLAMA_CONTAINER, FOOOCUS_CONTAINER]
+
+# 受保护容器列表（永不驱逐/停止）
+PROTECTED_CONTAINERS = [OWUI_CONTAINER, "immich-server", "immich-database",
+                        "immich-redis", "immich-machine-learning", "caddy", "searxng"]
+
 BIG_MODELS = [m["id"] for m in REGISTRY.get("ollama", {}).get("models", [])
               if m.get("category") == "llm"] or ["qwen3.5:9b", "qwen3:0.6b", "qwythos-9b:q4km", "darkidol-8b:q4km"]
 
-log_event("registry_loaded", models_count=len(BIG_MODELS), container=OLLAMA_CONTAINER)
+log_event("registry_loaded", models_count=len(BIG_MODELS), container=OLLAMA_CONTAINER,
+          managed_containers=MANAGED_CONTAINERS)
 
 # === 显存计算常量（消除魔法数字）===
 VRAM_BASELINE_NOISE_MB = 1200          # 系统底噪（桌面+驱动+CUDA context）

@@ -7,6 +7,7 @@ GMae 显存门卫模块
 """
 import time
 from core.logger import log_event
+from core.config import get_threshold_value
 from gpu.monitor import gpu_status, gpu_processes
 # 注意：本模块的 services 依赖采用函数内延迟导入，避免 engine 层模块级依赖 services 层。
 
@@ -34,13 +35,15 @@ def gpu_guard_check():
         g["alerts"].append("nvidia-smi 不可用，门卫盲区")
         return g
     free = gpu.get("free_mb", 0)
-    # 1. 水位判定
-    if free < 2048:
+    # 1. 水位判定（动态阈值，适配不同显存大小）
+    _emergency = get_threshold_value("emergency_free_mb", 2048)
+    _warning = get_threshold_value("warning_free_mb", 4096)
+    if free < _emergency:
         g["level"] = _guard_level(g["level"], "critical")
-        g["alerts"].append("显存空闲 %dMB < 2G，逼近打满（死机风险），建议立即驱逐" % free)
-    elif free < 4096:
+        g["alerts"].append("显存空闲 %dMB < %dG，逼近打满（死机风险），建议立即驱逐" % (free, _emergency // 1024))
+    elif free < _warning:
         g["level"] = _guard_level(g["level"], "warning")
-        g["alerts"].append("显存空闲 %dMB < 4G，注意多余占用" % free)
+        g["alerts"].append("显存空闲 %dMB < %dG，注意多余占用" % (free, _warning // 1024))
     # 2. 场景违规（已登记容器在不该出现的场景运行）
     if "fooocus" in names and "comfyui" in names:
         g["level"] = _guard_level(g["level"], "warning")
