@@ -159,7 +159,7 @@ Object.assign(Pages, {
     // ComfyUI 模型（image/video）
     comfyModels.forEach(m => {
       const id = m.id || m.name || '';
-      if (!id || m.installed === false) return;
+      if (!id) return;
       const category = m.category || 'image';
       this._modelInfoMap[id] = m;
       const label = m.full_name || m.name || id;
@@ -170,7 +170,7 @@ Object.assign(Pages, {
     // Ollama 模型（text，过滤 embedding）
     ollamaModels.forEach(m => {
       const id = m.id || m.name || '';
-      if (!id || m.installed === false) return;
+      if (!id) return;
       const category = m.category || 'text';
       if (category === 'embedding') return; // 过滤向量化模型
       this._modelInfoMap[id] = m;
