@@ -156,27 +156,18 @@ Object.assign(Pages, {
     this._modelInfoMap = {};
     const options = [];
 
-    // ComfyUI 模型（image/video）
+    // ComfyUI 模型（image/video/audio），只显示有 workflow 的模型（队列执行需要工作流）
     comfyModels.forEach(m => {
       const id = m.id || m.name || '';
-      if (!id) return;
+      if (!id || !m.workflow) return; // 队列系统只支持有工作流的 ComfyUI 模型
       const category = m.category || 'image';
       this._modelInfoMap[id] = m;
       const label = m.full_name || m.name || id;
-      const catLabel = category === 'video' ? '视频' : '图像';
+      const catLabel = category === 'video' ? '视频' : category === 'audio' ? '音频' : '图像';
       options.push(`<option value="${Utils.escapeHtml(id)}" data-category="${category}">${Utils.escapeHtml(label)} (${catLabel})</option>`);
     });
-
-    // Ollama 模型（text，过滤 embedding）
-    ollamaModels.forEach(m => {
-      const id = m.id || m.name || '';
-      if (!id) return;
-      const category = m.category || 'text';
-      if (category === 'embedding') return; // 过滤向量化模型
-      this._modelInfoMap[id] = m;
-      const label = m.full_name || m.name || id;
-      options.push(`<option value="${Utils.escapeHtml(id)}" data-category="${category}">${Utils.escapeHtml(label)} (对话)</option>`);
-    });
+    // 注意：Ollama 对话模型不在此队列页显示（队列系统当前只支持 ComfyUI 工作流模型）
+    // 对话功能请直接使用 Ollama 或 Open WebUI
 
     select.innerHTML = options.length > 0
       ? options.join('')
