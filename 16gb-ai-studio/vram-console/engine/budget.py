@@ -292,7 +292,7 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
                 vram = _profile_peak_gb(measured_peak)
             excl = bool(m.get("exclusive", False))
             loaded = mid in loaded_set
-            uncalibrated_ctx = bool(specified_ctx and str(specified_ctx) not in context_vram_map
+            uncalibrated_ctx = bool(measured_peak is None and specified_ctx and str(specified_ctx) not in context_vram_map
                                     and specified_ctx not in context_vram_map)
             invalid_estimate = not math.isfinite(vram) or vram <= 0
             if invalid_estimate:

@@ -81,3 +81,61 @@ def test_blob_digest_mismatch_is_rejected(monkeypatch):
 def test_missing_blob_identity_cannot_fall_back_to_model_name():
     with pytest.raises(ValueError,match='identify'):
         calibration.artifact_identity(dict(modelfile='FROM qwen3.5:9b',details={}))
+
+
+def complete_raw():
+    raw=example_raw()
+    raw.update(gpu_identity=dict(name='fixture',driver='fixture',uuid_sha256='1'*64),
+        artifact_identity=dict(container_id='fixture',blob_sha256='2'*64,blob_stat='fixture',
+            blob_path_sha256='3'*64,model_configuration_sha256='4'*64,model_details={}),
+        backend_version='fixture',container_backend_version='ollama version is fixture',
+        recorded_at='2026-10-08T00:00:00Z',
+        preparation=dict(condition='model_unloaded_low_torch_verified',managed_release=dict(ok=True),
+                         readings=[dict(torch_resident_bytes=0)]))
+    raw['gpu_identity_after']=raw['gpu_identity'].copy()
+    raw['model_artifact']['digest']='5'*64
+    raw['resident_after'][0]['digest']='5'*64
+    return raw
+
+
+def test_exact_ollama_profile_rejects_changed_prompt_and_environment():
+    import json
+    from core.ollama_profile import profile_from_evidence
+    from core.workload_profile import match_profile
+    raw=complete_raw();profile=profile_from_evidence(json.dumps(raw).encode(),512)
+    assert match_profile(profile,raw['request'],profile['environment'])['peak_mb']==8892
+    changed=deepcopy(raw['request']);changed['prompt']+='changed'
+    assert not match_profile(profile,changed,profile['environment'])['ok']
+    assert not match_profile(profile,raw['request'],{**profile['environment'],'driver':'changed'})['ok']
+
+
+def test_legacy_calibration_without_gpu_identity_cannot_create_profile():
+    import json
+    from core.ollama_profile import profile_from_evidence
+    with pytest.raises(KeyError): profile_from_evidence(json.dumps(example_raw()).encode(),512)
+
+
+def test_installed_ollama_raw_is_pinned_and_revalidated(tmp_path,monkeypatch):
+    import hashlib,json
+    from core.ollama_profile import profile_from_evidence
+    from engine import profile_admission
+    from core.resource_coordinator import ResourceDenied
+    raw=complete_raw();payload=json.dumps(raw).encode();profile=profile_from_evidence(payload,512)
+    key=profile['workflow_sha256']
+    (tmp_path/'raw.json').write_bytes(payload)
+    (tmp_path/(key+'.json')).write_text(json.dumps(dict(raw_file='raw.json',
+        raw_sha256=hashlib.sha256(payload).hexdigest(),margin_mb=512)))
+    monkeypatch.setenv('GMAE_PROFILE_DIR',str(tmp_path))
+    monkeypatch.setattr(profile_admission,'_live_environment',lambda raw:profile['environment'])
+    reference=profile_admission.select_profile(raw['request'])
+    assert profile_admission.measured_budget(raw['request'],reference)['peak_mb']==8892
+    (tmp_path/'raw.json').write_bytes(payload+b' ')
+    with pytest.raises(ResourceDenied): profile_admission.measured_budget(raw['request'],reference)
+
+
+def test_ollama_profile_cannot_authorize_different_coordinator_context():
+    from engine.coordinator import OperationSpec,_model_budget
+    from core.resource_coordinator import ResourceDenied
+    with pytest.raises(ResourceDenied,match='请求'):
+        _model_budget(OperationSpec('generate','ollama',calibration.MODEL,8192,
+            workflow=calibration.request_for(2048),profile_reference=dict(fake=True)))
