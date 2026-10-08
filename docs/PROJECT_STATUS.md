@@ -8,7 +8,7 @@ Work Agent 负责主要技术执行，独立 Chat Agent 负责战略、架构复
 
 ## 最新阶段
 
-分支 `feat/measured-profile-admission-20261008`，基于 PR #8 的 `52b762c`。测量 Profile 已接入正式队列与实际参数预演，入队固定 raw 摘要及余量，运行前重新核验数据和实际部署身份。完整 470 项测试通过（15.55 秒），前端检查通过。[实现、复现与原始证据](measured-profile-admission-2026-10-08.md)。本阶段提交与 Draft PR 链接随后补充；新 HEAD CI 尚待核验。
+分支 `feat/measured-profile-admission-20261008`，基于 PR #8 的 `52b762c`。测量 Profile 已接入正式队列与实际参数预演，入队固定 raw 摘要及余量，运行前重新核验数据和实际部署身份。完整 470 项测试通过（15.55 秒），前端检查通过。[实现、复现与原始证据](measured-profile-admission-2026-10-08.md)。代码提交 `26bcdf6`，见 [Draft PR #9](https://github.com/Dannywjw-Git/GMae-16GAS/pull/9)。新 HEAD CI 尚待核验。
 
 真实 GPU seed 46 完成：任务 done、后端 success、采样器未缓存、无活动预留；预算 9,649 MiB、整卡观测峰值 9,146 MiB、549 样本、0 错误，端到端 143.5 秒。前一次 seed 45 准入失败及特定手动核验证据保留。不得将失败改为通过，也不能宣称性能提升。
 
@@ -23,7 +23,7 @@ Work Agent 负责主要技术执行，独立 Chat Agent 负责战略、架构复
 | 参数化测量预算与可解释决策 | raw 重算、固定引用、fresh 身份核验、实际参数绑定 | 数据篡改/环境改变/余量替换/预演过期测试通过 | 一个 SDXL 配置通过；其他配置与模型未验证 |
 | 性能对照与稳定交付 | 原始测量脚本、数据、阶段报告 | 工具及核心测试通过 | 混合负载对照、Release、安装验收、最终演示未完成 |
 
-PR #1–#8 均为独立草稿、尚未合并；主分支保持不变。各阶段 commit、PR、验证和限制见 [HANDOFF](HANDOFF.md)。
+PR #1–#9 均为独立草稿、尚未合并；主分支保持不变。各阶段 commit、PR、验证和限制见 [HANDOFF](HANDOFF.md)。
 
 ## 当前最高优先级
 
