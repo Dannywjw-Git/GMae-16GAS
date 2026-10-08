@@ -221,7 +221,8 @@ def _profile_peak_gb(value):
         return 0
 
 
-def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool = False) -> dict:
+def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool = False,
+                  peak_overrides: dict | None = None) -> dict:
     """Step 4 显存预算引擎（蓝图 §6）：核算每个已知模型「能不能跑、要释放多少、差多少」。
     context_overrides: {model_id: context_size} — 用户在预演模式指定的 context 大小，
                        只接受已校准 context，找不到则拒绝准入。
@@ -286,6 +287,9 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
                 ctx_note = "（%dK context）" % (specified_ctx // 1024)
             else:
                 vram = default_vram
+            measured_peak = (peak_overrides or {}).get((src_key, mid))
+            if measured_peak is not None:
+                vram = _profile_peak_gb(measured_peak)
             excl = bool(m.get("exclusive", False))
             loaded = mid in loaded_set
             uncalibrated_ctx = bool(specified_ctx and str(specified_ctx) not in context_vram_map
@@ -306,6 +310,10 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
                 decision = "ok" if direct_peak_mb <= safe_ceiling_mb and not exclusive_conflict else "reject"
                 need_free, gap = 0, round(max(0, direct_peak_mb - safe_ceiling_mb) / 1024, 1)
                 note = "已加载；仍保留任务峰值预算" if decision == "ok" else "已加载但任务峰值预算不足或存在独占冲突"
+                if measured_peak is not None and decision == 'reject' and after_release_peak_mb <= safe_ceiling_mb:
+                    decision, gap = ('free_L2' if src_key == 'comfyui' else 'free_L1'), 0
+                    need_free = round(max(0, direct_peak_mb - safe_ceiling_mb) / 1024, 1)
+                    note = '保守测量包络需释放驻留占用，释放后重新核验'
             elif direct_peak_mb <= safe_ceiling_mb and not exclusive_conflict:
                 decision, need_free, gap = "ok", 0, 0
                 note = "可直接加载（含当前驻留占用）"

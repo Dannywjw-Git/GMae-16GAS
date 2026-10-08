@@ -25,7 +25,7 @@ class TaskStore:
     EDGES = {
         'queued': {'waiting_resource', 'precheck', 'canceled', 'failed'},
         'waiting_resource': {'precheck', 'canceled', 'failed'},
-        'precheck': {'submitting', 'waiting_resource', 'canceled', 'failed'},
+        'precheck': {'submitting', 'waiting_resource', 'canceled', 'failed', 'uncertain'},
         'submitting': {'running', 'uncertain', 'failed'},
         'running': {'done', 'failed', 'canceled', 'uncertain'},
         'uncertain': {'done', 'failed', 'canceled'},

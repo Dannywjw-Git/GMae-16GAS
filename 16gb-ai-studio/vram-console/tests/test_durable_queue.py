@@ -99,6 +99,25 @@ def test_changed_resource_controls_cannot_reuse_fixed_budget(runtime, monkeypatc
     assert not TaskStore(runtime).snapshot()
 
 
+def test_preflight_release_unknown_is_durable_and_not_failed(runtime, monkeypatch):
+    from core.operation_journal import OperationJournal
+    journal = OperationJournal(runtime)
+    registry.set('operation_journal', journal)
+    accepted = queue.queue_enqueue('m', {})
+    task = queue._tasks[accepted['task']['id']]
+    def incomplete_release(spec, lease):
+        lease.transition('releasing')
+        raise ResourceDenied('RELEASE_UNVERIFIED', 'physical memory still pending')
+    monkeypatch.setattr(coordinator, 'assess', incomplete_release)
+    submit = Mock()
+    monkeypatch.setattr(queue, '_queue_submit_comfy', submit)
+    queue._run_task(task)
+    assert task['status'] == 'uncertain'
+    assert TaskStore(runtime).get(task['id'])['status'] == 'uncertain'
+    assert coordinator.get_coordinator().snapshot()['active']['phase'] == 'uncertain'
+    submit.assert_not_called()
+
+
 def test_real_queue_dispatch_commits_before_rpc_and_terminal_before_release(runtime, monkeypatch):
     accepted = queue.queue_enqueue('m', {}, 'key')
     current = queue._tasks[accepted['task']['id']]

@@ -7,6 +7,7 @@ GMae 任务队列模块
 """
 import json
 import math
+from dataclasses import replace
 import os
 import threading
 import time
@@ -193,7 +194,9 @@ def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
         effective = _apply_params(template, params)
         fingerprint = workload_fingerprint(effective)
         configuration = resource_configuration_fingerprint(template)
-        if resource_configuration_fingerprint(effective) != configuration:
+        from engine.profile_admission import select_profile
+        profile_reference = select_profile(effective)
+        if resource_configuration_fingerprint(effective) != configuration and profile_reference is None:
             return {'ok': False, 'code': 'PROFILE_REQUIRED',
                     'error': '任务资源参数与登记模板不同，缺少匹配测量 Profile，拒绝复用固定显存预算'}
         queue_restore()
@@ -201,7 +204,8 @@ def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
             record, created = _store().accept(
                 {'model': model, 'workflow': wf_name, 'params': params,
                  'effective_workflow': effective, 'workflow_sha256': fingerprint,
-                 'resource_configuration_sha256': configuration}, idempotency_key)
+                 'resource_configuration_sha256': configuration,
+                 **({'profile_reference': profile_reference} if profile_reference is not None else {})}, idempotency_key)
             tid = record['id']
             task = _tasks.get(tid) or _runtime_task(record)
             _tasks[tid] = task
@@ -210,6 +214,8 @@ def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
             _start_worker()
     except TaskConflict as error:
         return {'ok': False, 'code': 'IDEMPOTENCY_CONFLICT', 'error': str(error)}
+    except ResourceDenied as error:
+        return error.result()
     except ValueError as error:
         return {'ok': False, 'code': 'INVALID_INTENT', 'error': str(error)}
     except Exception as error:
@@ -300,7 +306,7 @@ def _effective_workflow(task):
                  resource_configuration_sha256=configuration)
     if workload_fingerprint(wf) != task.get('workflow_sha256'):
         raise ValueError('已保存的工作流摘要不匹配，拒绝执行')
-    if resource_configuration_fingerprint(wf) != configuration:
+    if resource_configuration_fingerprint(wf) != configuration and not task.get('profile_reference'):
         raise ResourceDenied('PROFILE_REQUIRED', '资源参数缺少匹配测量 Profile，拒绝复用固定预算')
     return json.loads(json.dumps(wf, allow_nan=False))
 
@@ -318,7 +324,8 @@ def _execute_reserved_task(task, lease, spec):
     if decision.get("decision") != "ok":
         raise ResourceDenied("ADMISSION_CHANGED", "提交前预算发生变化，拒绝提交")
     _persist(task, budget={**decision, 'workflow_sha256': workload_fingerprint(wf),
-                          'profile_status': 'registry_estimate_unverified'}, started=int(time.time()))
+                          'profile_status': decision.get('profile_status', 'registry_estimate_unverified')},
+             started=int(time.time()))
     if '_version' in task:
         def submit_durable(workflow, submission_id):
             with _task_lock:
@@ -412,7 +419,8 @@ def _run_task(task):
             if task['status'] == 'queued':
                 _persist(task, 'precheck')
             # Validate/freeze before assessment can release any resident model.
-            _effective_workflow(task)
+            wf = _effective_workflow(task)
+            spec = replace(spec, workflow=wf, profile_reference=task.get('profile_reference'))
         while True:
             if task.get("cancel_requested"):
                 _persist(task, 'canceled', ended=int(time.time()))
@@ -429,6 +437,14 @@ def _run_task(task):
                     _persist(task, 'waiting_resource', progress=str(error), coordination=error.result())
                 time.sleep(0.25)
     except Exception as error:
+        from engine.coordinator import get_coordinator
+        active = get_coordinator().snapshot()['active']
+        if (active and active.get('owner') == 'job:' + task['id'] and active.get('phase') == 'uncertain'
+                and task['status'] not in TaskStore.TERMINAL and task['status'] != 'uncertain'):
+            try:
+                _persist(task, 'uncertain', error=str(error), coordination={'token': active['token'], 'owner': active['owner']})
+            except Exception as storage_error:
+                task.update(status='uncertain', error='未知状态无法保存: ' + str(storage_error))
         if task['status'] == 'uncertain':
             task['error'] = str(error)
         else:
