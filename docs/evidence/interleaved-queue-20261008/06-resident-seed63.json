@@ -1,0 +1,2348 @@
+{
+  "kind": "real_profiled_queue_trial",
+  "recorded_at": "2026-10-08T06:48:33.648044+00:00",
+  "samples": [
+    {
+      "monotonic_s": 47971.64,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47971.89,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47972.156,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47972.421,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47972.671,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47972.921,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47973.171,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47973.437,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47973.687,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47973.937,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47974.187,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47974.453,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47974.718,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47974.984,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47975.234,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47975.484,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47975.75,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47976.0,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47976.25,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47976.5,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47976.75,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47977.0,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47977.25,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47977.5,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47977.75,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47978.0,
+      "total_mb": 16380,
+      "used_mb": 8152,
+      "free_mb": 7956,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47978.296,
+      "total_mb": 16380,
+      "used_mb": 8152,
+      "free_mb": 7956,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47978.546,
+      "total_mb": 16380,
+      "used_mb": 8152,
+      "free_mb": 7956,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47978.812,
+      "total_mb": 16380,
+      "used_mb": 8152,
+      "free_mb": 7956,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47979.062,
+      "total_mb": 16380,
+      "used_mb": 8696,
+      "free_mb": 7412,
+      "utilization": 97
+    },
+    {
+      "monotonic_s": 47979.312,
+      "total_mb": 16380,
+      "used_mb": 8696,
+      "free_mb": 7412,
+      "utilization": 97
+    },
+    {
+      "monotonic_s": 47979.578,
+      "total_mb": 16380,
+      "used_mb": 8696,
+      "free_mb": 7412,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47979.843,
+      "total_mb": 16380,
+      "used_mb": 8696,
+      "free_mb": 7412,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47980.093,
+      "total_mb": 16380,
+      "used_mb": 8696,
+      "free_mb": 7412,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47980.359,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47980.625,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47980.875,
+      "total_mb": 16380,
+      "used_mb": 8024,
+      "free_mb": 8084,
+      "utilization": 0
+    }
+  ],
+  "sampling_errors": [],
+  "comparative_result": false,
+  "residency_before": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791442113663791310,
+    "monotonic_ns": 47920849377946,
+    "load_epoch": 5,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "9175d935-32ca-43af-b0a8-c0bd7bf7a894",
+    "ok": true
+  },
+  "baseline": {
+    "monotonic_s": 47971.593,
+    "total_mb": 16380,
+    "used_mb": 8024,
+    "free_mb": 8084,
+    "utilization": 0
+  },
+  "managed_unload_calls": 0,
+  "task_id": "a7be7360f63b40fc9784a9b84526c0a5",
+  "effective_workflow": {
+    "1": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      }
+    },
+    "2": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "A small red ceramic teapot on a plain wooden table, studio lighting"
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "worst quality, low quality, blurry, distorted, ugly, watermark, text"
+      }
+    },
+    "4": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "batch_size": 1,
+        "height": 512,
+        "width": 512
+      }
+    },
+    "5": {
+      "class_type": "KSampler",
+      "inputs": {
+        "cfg": 6.0,
+        "denoise": 1.0,
+        "latent_image": [
+          "4",
+          0
+        ],
+        "model": [
+          "1",
+          0
+        ],
+        "negative": [
+          "3",
+          0
+        ],
+        "positive": [
+          "2",
+          0
+        ],
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "seed": 63,
+        "steps": 8
+      }
+    },
+    "6": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "5",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      }
+    },
+    "7": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "sdxl_t2i",
+        "images": [
+          "6",
+          0
+        ]
+      }
+    }
+  },
+  "profile_reference": {
+    "margin_mb": 512,
+    "profile_key": "332bc75a458b14306ee391a680fe3abbb769dc4cd14cb0bab0f84aca03b438c5",
+    "raw_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+    "resident_raw_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+    "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076"
+  },
+  "task_status": "done",
+  "duration_s": 9.31300000000192,
+  "budget": {
+    "avg_seconds": 46.0,
+    "context_vram": {},
+    "decision": "ok",
+    "default_ctx": 0,
+    "est_time_text": "基于 19 次历史生成，平均约 46秒",
+    "exclusive": false,
+    "gap_gb": 0,
+    "gen_count": 19,
+    "id": "SDXL",
+    "loaded": true,
+    "measured_profile": {
+      "basis": "verified_resident_growth_plus_margin",
+      "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+      "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+      "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+      "increment_mb": 1184,
+      "limitation": "observed peaks plus margin are not an OOM guarantee",
+      "limitations": [
+        "single trial",
+        "sampling may miss peaks",
+        "includes background memory"
+      ],
+      "margin_mb": 512,
+      "match_policy": "seed_and_output_name_invariant",
+      "memory_scope": "measured_resident_increment",
+      "ok": true,
+      "peak_mb": 1184,
+      "profile_status": "raw_evidence_and_live_identity_verified",
+      "residency_epoch": 5,
+      "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+      "resident_model_mb": 6618,
+      "sample_count": 1,
+      "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076"
+    },
+    "name": "SDXL",
+    "need_free_gb": 0,
+    "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+    "profile_status": "raw_evidence_and_live_identity_verified",
+    "resident_model_mb": 6618,
+    "source": "comfyui",
+    "specified_ctx": null,
+    "vram_gb": 1.15625,
+    "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076"
+  },
+  "prompt_id": "11fefb65-452e-456c-8bd5-8000b467fdc5",
+  "error": "",
+  "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076",
+  "backend_terminal": "success",
+  "sampler_cache_hit": false,
+  "coordination": {
+    "gpu_id": 0,
+    "policy": "serial",
+    "active": null,
+    "reserved_mb": 0,
+    "sequence": 103,
+    "events": [
+      {
+        "sequence": 1,
+        "monotonic_s": 47688.359,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "phase": "assessing",
+        "started_monotonic_s": 47688.359
+      },
+      {
+        "sequence": 2,
+        "monotonic_s": 47756.531,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 3,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 4,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8321,
+            "free_mb": 8059
+          }
+        }
+      },
+      {
+        "sequence": 5,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 6,
+        "monotonic_s": 47758.421,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 7,
+        "monotonic_s": 47760.296,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 8,
+        "monotonic_s": 47760.312,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 9,
+        "monotonic_s": 47763.328,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "completed",
+        "details": {
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 10,
+        "monotonic_s": 47763.343,
+        "event": "released",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 11,
+        "monotonic_s": 47763.671,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "phase": "assessing",
+        "started_monotonic_s": 47763.671
+      },
+      {
+        "sequence": 12,
+        "monotonic_s": 47765.609,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 9217,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "free_L2",
+            "need_free_gb": 3.6,
+            "gap_gb": 0,
+            "note": "需释放受管负载并重新核验实时显存",
+            "avg_seconds": 51.2,
+            "gen_count": 14,
+            "est_time_text": "基于 14 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "3cb232724baf6966fcaf355d45d44a1f735a7a8505339974450b75569e910502",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          }
+        }
+      },
+      {
+        "sequence": 13,
+        "monotonic_s": 47765.812,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {
+          "reason": "需释放受管负载并重新核验实时显存",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 14,
+        "monotonic_s": 47766.187,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          }
+        }
+      },
+      {
+        "sequence": 15,
+        "monotonic_s": 47766.203,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 16,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          }
+        }
+      },
+      {
+        "sequence": 17,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 18,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 19,
+        "monotonic_s": 47766.968,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8306,
+            "free_mb": 8074
+          }
+        }
+      },
+      {
+        "sequence": 20,
+        "monotonic_s": 47766.968,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 21,
+        "monotonic_s": 47768.515,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 22,
+        "monotonic_s": 47768.75,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 23,
+        "monotonic_s": 47768.75,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 24,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "可直接加载（含当前驻留占用）",
+            "avg_seconds": 51.2,
+            "gen_count": 14,
+            "est_time_text": "基于 14 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "3cb232724baf6966fcaf355d45d44a1f735a7a8505339974450b75569e910502",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          },
+          "available_mb": 12186,
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 25,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          },
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 26,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 27,
+        "monotonic_s": 47774.015,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 28,
+        "monotonic_s": 47775.671,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "running",
+        "details": {
+          "prompt_id": "5450e6f5-ef2d-4c63-8bbc-c2ca05a3389b",
+          "job_id": "dde8f7a61cc24b50acf9779c1f1c7747",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 29,
+        "monotonic_s": 47775.687,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "running",
+        "details": {
+          "prompt_id": "5450e6f5-ef2d-4c63-8bbc-c2ca05a3389b",
+          "job_id": "dde8f7a61cc24b50acf9779c1f1c7747",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 30,
+        "monotonic_s": 47829.812,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 31,
+        "monotonic_s": 47829.812,
+        "event": "released",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 32,
+        "monotonic_s": 47830.234,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "phase": "assessing",
+        "started_monotonic_s": 47830.234
+      },
+      {
+        "sequence": 33,
+        "monotonic_s": 47832.64,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 51.4,
+            "gen_count": 15,
+            "est_time_text": "基于 15 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "6bbe378e5a85463194cb763ad574935dd68a24252ea0c076213af3678e7de91b",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 34,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 51.4,
+            "gen_count": 15,
+            "est_time_text": "基于 15 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "6bbe378e5a85463194cb763ad574935dd68a24252ea0c076213af3678e7de91b",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 35,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 36,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 37,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 38,
+        "monotonic_s": 47836.562,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0ff03604-0d48-4c74-8622-4bfe5ee8c235",
+          "job_id": "dd4e235aae2f4a6ebff21f558de479bc",
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 39,
+        "monotonic_s": 47836.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0ff03604-0d48-4c74-8622-4bfe5ee8c235",
+          "job_id": "dd4e235aae2f4a6ebff21f558de479bc",
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 40,
+        "monotonic_s": 47839.625,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "completed",
+        "details": {
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 41,
+        "monotonic_s": 47839.64,
+        "event": "released",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 42,
+        "monotonic_s": 47840.187,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "phase": "assessing",
+        "started_monotonic_s": 47840.187
+      },
+      {
+        "sequence": 43,
+        "monotonic_s": 47842.375,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 48.4,
+            "gen_count": 16,
+            "est_time_text": "基于 16 次历史生成，平均约 48秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "da5b8258edab3ed2de65f19ef1f270353c5e99a6d022254ac660fac6331304ce",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 44,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 48.4,
+            "gen_count": 16,
+            "est_time_text": "基于 16 次历史生成，平均约 48秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "da5b8258edab3ed2de65f19ef1f270353c5e99a6d022254ac660fac6331304ce",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 45,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 46,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 47,
+        "monotonic_s": 47844.265,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 48,
+        "monotonic_s": 47846.109,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "running",
+        "details": {
+          "prompt_id": "82dd6a75-2924-4fd9-823a-6f4c5891e507",
+          "job_id": "96194995a0bf4119856da627fcad8845",
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 49,
+        "monotonic_s": 47846.14,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "running",
+        "details": {
+          "prompt_id": "82dd6a75-2924-4fd9-823a-6f4c5891e507",
+          "job_id": "96194995a0bf4119856da627fcad8845",
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 50,
+        "monotonic_s": 47849.171,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "completed",
+        "details": {
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 51,
+        "monotonic_s": 47849.171,
+        "event": "released",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 52,
+        "monotonic_s": 47849.531,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "phase": "assessing",
+        "started_monotonic_s": 47849.531
+      },
+      {
+        "sequence": 53,
+        "monotonic_s": 47851.453,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 9217,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "free_L2",
+            "need_free_gb": 3.6,
+            "gap_gb": 0,
+            "note": "需释放受管负载并重新核验实时显存",
+            "avg_seconds": 45.7,
+            "gen_count": 17,
+            "est_time_text": "基于 17 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          }
+        }
+      },
+      {
+        "sequence": 54,
+        "monotonic_s": 47851.64,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {
+          "reason": "需释放受管负载并重新核验实时显存",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 55,
+        "monotonic_s": 47852.031,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 56,
+        "monotonic_s": 47852.031,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 57,
+        "monotonic_s": 47852.375,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 58,
+        "monotonic_s": 47852.375,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 59,
+        "monotonic_s": 47852.39,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 60,
+        "monotonic_s": 47852.796,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 61,
+        "monotonic_s": 47852.796,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 62,
+        "monotonic_s": 47854.343,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 63,
+        "monotonic_s": 47854.593,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 64,
+        "monotonic_s": 47854.593,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 65,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "可直接加载（含当前驻留占用）",
+            "avg_seconds": 45.7,
+            "gen_count": 17,
+            "est_time_text": "基于 17 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          },
+          "available_mb": 12186,
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 66,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          },
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 67,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 68,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 69,
+        "monotonic_s": 47861.812,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "running",
+        "details": {
+          "prompt_id": "91f8b5b1-d55d-4f85-a180-b791840fa2b6",
+          "job_id": "f3f4dc89a0ae489195a7b7427ef945a1",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 70,
+        "monotonic_s": 47861.843,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "running",
+        "details": {
+          "prompt_id": "91f8b5b1-d55d-4f85-a180-b791840fa2b6",
+          "job_id": "f3f4dc89a0ae489195a7b7427ef945a1",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 71,
+        "monotonic_s": 47907.015,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 72,
+        "monotonic_s": 47907.031,
+        "event": "released",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 73,
+        "monotonic_s": 47907.546,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "phase": "assessing",
+        "started_monotonic_s": 47907.546
+      },
+      {
+        "sequence": 74,
+        "monotonic_s": 47909.718,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 9217,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "free_L2",
+            "need_free_gb": 3.6,
+            "gap_gb": 0,
+            "note": "需释放受管负载并重新核验实时显存",
+            "avg_seconds": 45.7,
+            "gen_count": 18,
+            "est_time_text": "基于 18 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "73005642cfd4a552fcc8d4873185ee5c8063d03f6b0639805b8d6c96851c675d",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          }
+        }
+      },
+      {
+        "sequence": 75,
+        "monotonic_s": 47909.921,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "releasing",
+        "details": {
+          "reason": "需释放受管负载并重新核验实时显存",
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 76,
+        "monotonic_s": 47910.281,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8295,
+            "free_mb": 8085
+          }
+        }
+      },
+      {
+        "sequence": 77,
+        "monotonic_s": 47910.281,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 78,
+        "monotonic_s": 47910.64,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8295,
+            "free_mb": 8085
+          }
+        }
+      },
+      {
+        "sequence": 79,
+        "monotonic_s": 47910.64,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 80,
+        "monotonic_s": 47910.64,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 81,
+        "monotonic_s": 47911.062,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8295,
+            "free_mb": 8085
+          }
+        }
+      },
+      {
+        "sequence": 82,
+        "monotonic_s": 47911.062,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 83,
+        "monotonic_s": 47912.625,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 84,
+        "monotonic_s": 47912.875,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 85,
+        "monotonic_s": 47912.875,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 86,
+        "monotonic_s": 47918.343,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "可直接加载（含当前驻留占用）",
+            "avg_seconds": 45.7,
+            "gen_count": 18,
+            "est_time_text": "基于 18 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "73005642cfd4a552fcc8d4873185ee5c8063d03f6b0639805b8d6c96851c675d",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          },
+          "available_mb": 12186,
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 87,
+        "monotonic_s": 47918.343,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8295,
+            "free_mb": 8085
+          },
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 88,
+        "monotonic_s": 47918.343,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 89,
+        "monotonic_s": 47918.343,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 90,
+        "monotonic_s": 47920.015,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "running",
+        "details": {
+          "prompt_id": "03e2cd05-6df6-4d34-9f7d-92590027f594",
+          "job_id": "1631b2c0bf2b4b4a97436ae4700e9883",
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 91,
+        "monotonic_s": 47920.046,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "running",
+        "details": {
+          "prompt_id": "03e2cd05-6df6-4d34-9f7d-92590027f594",
+          "job_id": "1631b2c0bf2b4b4a97436ae4700e9883",
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 92,
+        "monotonic_s": 47971.203,
+        "event": "transition",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "phase": "completed",
+        "details": {
+          "journal_id": "ae4efc01a89c43959a5859babb9a1a45"
+        }
+      },
+      {
+        "sequence": 93,
+        "monotonic_s": 47971.218,
+        "event": "released",
+        "token_sha256": "bfcf34ac6f15b0944cb7476ff9b36d199ca588500ea0bb10de062bb506f87ef3",
+        "owner": "job:1631b2c0bf2b4b4a97436ae4700e9883",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 94,
+        "monotonic_s": 47971.609,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "phase": "assessing",
+        "started_monotonic_s": 47971.609
+      },
+      {
+        "sequence": 95,
+        "monotonic_s": 47974.0,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 46.0,
+            "gen_count": 19,
+            "est_time_text": "基于 19 次历史生成，平均约 46秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 5,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 96,
+        "monotonic_s": 47975.937,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 46.0,
+            "gen_count": 19,
+            "est_time_text": "基于 19 次历史生成，平均约 46秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "84e3f543b6dca39fdb3b5758e80c7ee1d2aeea8b03c12e6f59934caa1374c076",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 5,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 97,
+        "monotonic_s": 47975.937,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8296,
+            "free_mb": 8084
+          }
+        }
+      },
+      {
+        "sequence": 98,
+        "monotonic_s": 47975.937,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 99,
+        "monotonic_s": 47975.953,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 100,
+        "monotonic_s": 47977.843,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "running",
+        "details": {
+          "prompt_id": "11fefb65-452e-456c-8bd5-8000b467fdc5",
+          "job_id": "a7be7360f63b40fc9784a9b84526c0a5",
+          "journal_id": "02687f5a94114cf0b281f24a1ac8442a"
+        }
+      },
+      {
+        "sequence": 101,
+        "monotonic_s": 47977.859,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "running",
+        "details": {
+          "prompt_id": "11fefb65-452e-456c-8bd5-8000b467fdc5",
+          "job_id": "a7be7360f63b40fc9784a9b84526c0a5",
+          "journal_id": "02687f5a94114cf0b281f24a1ac8442a"
+        }
+      },
+      {
+        "sequence": 102,
+        "monotonic_s": 47980.89,
+        "event": "transition",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "phase": "completed",
+        "details": {
+          "journal_id": "02687f5a94114cf0b281f24a1ac8442a"
+        }
+      },
+      {
+        "sequence": 103,
+        "monotonic_s": 47980.89,
+        "event": "released",
+        "token_sha256": "9e9d6ddace8451ab217d0f79f8c7decb53e066224bfeef0f3e3d69bcf8276c2d",
+        "owner": "job:a7be7360f63b40fc9784a9b84526c0a5",
+        "outcome": "completed"
+      }
+    ],
+    "recovery_pending": []
+  },
+  "residency_after": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791442123052258715,
+    "monotonic_ns": 47930238989408,
+    "load_epoch": 5,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "c5c49c08-1c68-47fc-b362-0145035addf8",
+    "ok": true
+  },
+  "observed_device_peak_mb": 8696
+}

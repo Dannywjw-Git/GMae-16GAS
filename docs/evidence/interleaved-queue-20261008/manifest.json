@@ -1,0 +1,96 @@
+{
+  "kind": "interleaved_formal_queue_benchmark",
+  "recorded_at": "2026-10-08T06:43:50.175667+00:00",
+  "plan": [
+    "conservative",
+    "resident",
+    "resident",
+    "conservative",
+    "conservative",
+    "resident",
+    "resident",
+    "conservative"
+  ],
+  "warmup_excluded": true,
+  "randomized": false,
+  "rows": [
+    {
+      "index": 0,
+      "mode": "resident",
+      "seed": 57,
+      "warmup": true,
+      "raw_file": "00-resident-seed57.json",
+      "raw_sha256": "2d2ec29e9061765f5c85bda002f10a544f01fe90890ec2d88cf84caf37e5dd8d"
+    },
+    {
+      "index": 1,
+      "mode": "conservative",
+      "seed": 58,
+      "warmup": false,
+      "raw_file": "01-conservative-seed58.json",
+      "raw_sha256": "38892a013e9d4e1c5c95a75c906926ef358c1986e3e1577e5aca801e4de9cdb6"
+    },
+    {
+      "index": 2,
+      "mode": "resident",
+      "seed": 59,
+      "warmup": false,
+      "raw_file": "02-resident-seed59.json",
+      "raw_sha256": "23a10592aa474b312c70131025dbc0983352c88e5d4bc7139ef3fa5c4e983525"
+    },
+    {
+      "index": 3,
+      "mode": "resident",
+      "seed": 60,
+      "warmup": false,
+      "raw_file": "03-resident-seed60.json",
+      "raw_sha256": "482785ffba139c542fb8e8501f06cfc824de05d2b090f427f9a33c7355796166"
+    },
+    {
+      "index": 4,
+      "mode": "conservative",
+      "seed": 61,
+      "warmup": false,
+      "raw_file": "04-conservative-seed61.json",
+      "raw_sha256": "afb9fbf7d31eb8cd58cf5cdd0dd28aeb659c0a7db6590393a562ce3d9dcb6b4e"
+    },
+    {
+      "index": 5,
+      "mode": "conservative",
+      "seed": 62,
+      "warmup": false,
+      "raw_file": "05-conservative-seed62.json",
+      "raw_sha256": "23398bc6a81d59b43326513d922815f94363167b992ada25c9622924f210d013"
+    },
+    {
+      "index": 6,
+      "mode": "resident",
+      "seed": 63,
+      "warmup": false,
+      "raw_file": "06-resident-seed63.json",
+      "raw_sha256": "65cda3d6f1110817d1917ce0042d4d36319ddbe5ccee1fdc1abc44bca7788636"
+    },
+    {
+      "index": 7,
+      "mode": "resident",
+      "seed": 64,
+      "warmup": false,
+      "raw_file": "07-resident-seed64.json",
+      "raw_sha256": "46884cb166a277bc67e39ac5f6f49d4e7bd70875fd401542eb7532c8d9cb9335"
+    },
+    {
+      "index": 8,
+      "mode": "conservative",
+      "seed": 65,
+      "warmup": false,
+      "raw_file": "08-conservative-seed65.json",
+      "raw_sha256": "7b7ab97c9a6cae1ef72e90e33d62bb6d6424a3c5688fd0c7a95facdf7f7d9e1a"
+    }
+  ],
+  "status": "success",
+  "limitations": [
+    "single GPU and one configuration",
+    "background and CPU/disk caches uncontrolled",
+    "same process identity cache; initial verification retained in warmup"
+  ]
+}

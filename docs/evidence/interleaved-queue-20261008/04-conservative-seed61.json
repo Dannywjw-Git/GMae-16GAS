@@ -1,0 +1,3139 @@
+{
+  "kind": "real_profiled_queue_trial",
+  "recorded_at": "2026-10-08T06:46:31.575605+00:00",
+  "samples": [
+    {
+      "monotonic_s": 47849.562,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47849.812,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47850.062,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47850.296,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47850.546,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47850.812,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47851.062,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47851.312,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47851.562,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47851.812,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47852.062,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47852.312,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47852.562,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47852.828,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47853.078,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47853.328,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47853.578,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 87
+    },
+    {
+      "monotonic_s": 47853.828,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 87
+    },
+    {
+      "monotonic_s": 47854.093,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 30
+    },
+    {
+      "monotonic_s": 47854.359,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 30
+    },
+    {
+      "monotonic_s": 47854.609,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 31
+    },
+    {
+      "monotonic_s": 47854.875,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 31
+    },
+    {
+      "monotonic_s": 47855.14,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 21
+    },
+    {
+      "monotonic_s": 47855.39,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 21
+    },
+    {
+      "monotonic_s": 47855.64,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47855.89,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47856.14,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47856.39,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47856.656,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47856.906,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47857.156,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47857.39,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47857.64,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47857.89,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47858.14,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47858.406,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47858.671,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47858.937,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47859.187,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47859.453,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47859.703,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47859.968,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47860.218,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47860.453,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47860.703,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47860.968,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47861.234,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47861.484,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47861.734,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47862.0,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47862.25,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47862.484,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47862.75,
+      "total_mb": 16380,
+      "used_mb": 1389,
+      "free_mb": 14719,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47863.062,
+      "total_mb": 16380,
+      "used_mb": 3149,
+      "free_mb": 12959,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47863.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 84
+    },
+    {
+      "monotonic_s": 47863.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47863.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47864.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47864.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47864.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47864.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47865.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47865.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47865.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47865.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47866.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47866.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47866.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47866.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47867.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47867.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47867.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47867.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47868.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47868.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47868.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47868.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47869.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47869.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47869.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47869.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47870.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47870.343,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47870.593,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47870.843,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47871.093,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47871.343,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47871.593,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47871.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47872.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47872.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47872.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47872.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47873.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47873.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47873.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47873.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47874.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 47874.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 47874.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47874.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47875.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47875.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47875.578,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 47875.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 47876.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47876.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47876.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47876.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47877.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47877.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47877.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47877.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47878.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 47878.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 47878.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47878.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47879.062,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47879.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47879.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47879.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47880.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47880.343,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47880.609,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47880.875,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47881.14,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47881.39,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47881.656,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47881.921,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47882.187,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47882.453,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47882.718,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47882.984,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47883.25,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47883.515,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47883.781,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47884.046,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47884.312,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 47884.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47884.828,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47885.093,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47885.343,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47885.609,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47885.875,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47886.14,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47886.406,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47886.671,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47886.937,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47887.203,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47887.468,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47887.734,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47888.0,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47888.265,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47888.531,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 47888.796,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47889.046,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47889.296,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47889.562,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47889.812,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47890.078,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47890.328,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47890.593,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47890.859,
+      "total_mb": 16380,
+      "used_mb": 6285,
+      "free_mb": 9823,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47891.14,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 85
+    },
+    {
+      "monotonic_s": 47891.39,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 85
+    },
+    {
+      "monotonic_s": 47891.656,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47891.921,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47892.203,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47892.437,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47892.718,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47892.984,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 47893.25,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47893.515,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47893.781,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47894.046,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47894.312,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47894.578,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47894.843,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47895.093,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47895.359,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47895.625,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47895.89,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47896.156,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47896.421,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47896.687,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47896.953,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 47897.218,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47897.468,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 47897.734,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 47898.0,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 47898.265,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47898.531,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47898.796,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 47899.062,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47899.328,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 47899.593,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47899.859,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47900.125,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47900.375,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47900.625,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 47900.89,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 47901.156,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47901.421,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47901.671,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47901.937,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 4
+    },
+    {
+      "monotonic_s": 47902.203,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 47902.468,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 47902.734,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47903.0,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 47903.25,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 47903.515,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 47903.765,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47904.015,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 47904.281,
+      "total_mb": 16380,
+      "used_mb": 7853,
+      "free_mb": 8255,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47904.546,
+      "total_mb": 16380,
+      "used_mb": 7885,
+      "free_mb": 8223,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47904.796,
+      "total_mb": 16380,
+      "used_mb": 7981,
+      "free_mb": 8127,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47905.093,
+      "total_mb": 16380,
+      "used_mb": 7981,
+      "free_mb": 8127,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47905.359,
+      "total_mb": 16380,
+      "used_mb": 7981,
+      "free_mb": 8127,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47905.609,
+      "total_mb": 16380,
+      "used_mb": 7981,
+      "free_mb": 8127,
+      "utilization": 96
+    },
+    {
+      "monotonic_s": 47905.875,
+      "total_mb": 16380,
+      "used_mb": 8621,
+      "free_mb": 7487,
+      "utilization": 96
+    },
+    {
+      "monotonic_s": 47906.109,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47906.359,
+      "total_mb": 16380,
+      "used_mb": 8013,
+      "free_mb": 8095,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47906.609,
+      "total_mb": 16380,
+      "used_mb": 8023,
+      "free_mb": 8085,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47906.859,
+      "total_mb": 16380,
+      "used_mb": 8023,
+      "free_mb": 8085,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47907.109,
+      "total_mb": 16380,
+      "used_mb": 8023,
+      "free_mb": 8085,
+      "utilization": 0
+    }
+  ],
+  "sampling_errors": [],
+  "comparative_result": false,
+  "residency_before": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791441991588243645,
+    "monotonic_ns": 47798768480566,
+    "load_epoch": 3,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "5bb64f18-fec7-4a34-ae05-32c3a0116a5a",
+    "ok": true
+  },
+  "baseline": {
+    "monotonic_s": 47849.515,
+    "total_mb": 16380,
+    "used_mb": 8013,
+    "free_mb": 8095,
+    "utilization": 0
+  },
+  "managed_unload_calls": 1,
+  "task_id": "f3f4dc89a0ae489195a7b7427ef945a1",
+  "effective_workflow": {
+    "1": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      }
+    },
+    "2": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "A small red ceramic teapot on a plain wooden table, studio lighting"
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "worst quality, low quality, blurry, distorted, ugly, watermark, text"
+      }
+    },
+    "4": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "batch_size": 1,
+        "height": 512,
+        "width": 512
+      }
+    },
+    "5": {
+      "class_type": "KSampler",
+      "inputs": {
+        "cfg": 6.0,
+        "denoise": 1.0,
+        "latent_image": [
+          "4",
+          0
+        ],
+        "model": [
+          "1",
+          0
+        ],
+        "negative": [
+          "3",
+          0
+        ],
+        "positive": [
+          "2",
+          0
+        ],
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "seed": 61,
+        "steps": 8
+      }
+    },
+    "6": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "5",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      }
+    },
+    "7": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "sdxl_t2i",
+        "images": [
+          "6",
+          0
+        ]
+      }
+    }
+  },
+  "profile_reference": {
+    "margin_mb": 512,
+    "profile_key": "332bc75a458b14306ee391a680fe3abbb769dc4cd14cb0bab0f84aca03b438c5",
+    "raw_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+    "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46"
+  },
+  "task_status": "done",
+  "duration_s": 57.71899999999732,
+  "budget": {
+    "avg_seconds": 45.7,
+    "context_vram": {},
+    "decision": "ok",
+    "default_ctx": 0,
+    "est_time_text": "基于 17 次历史生成，平均约 45秒",
+    "exclusive": false,
+    "gap_gb": 0,
+    "gen_count": 17,
+    "id": "SDXL",
+    "loaded": false,
+    "measured_profile": {
+      "basis": "exact_workflow_measured_envelope",
+      "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+      "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+      "limitation": "observed peaks plus margin are not an OOM guarantee",
+      "limitations": [
+        "single trial",
+        "sampling may miss peaks",
+        "includes background memory"
+      ],
+      "margin_mb": 512,
+      "match_policy": "seed_and_output_name_invariant",
+      "memory_scope": "sampled_whole_device_upper_envelope",
+      "ok": true,
+      "peak_mb": 9217,
+      "profile_status": "raw_evidence_and_live_identity_verified",
+      "sample_count": 1,
+      "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46"
+    },
+    "name": "SDXL",
+    "need_free_gb": 0,
+    "note": "可直接加载（含当前驻留占用）",
+    "profile_status": "raw_evidence_and_live_identity_verified",
+    "source": "comfyui",
+    "specified_ctx": null,
+    "vram_gb": 9.0009765625,
+    "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46"
+  },
+  "prompt_id": "91f8b5b1-d55d-4f85-a180-b791840fa2b6",
+  "error": "",
+  "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46",
+  "backend_terminal": "success",
+  "sampler_cache_hit": false,
+  "coordination": {
+    "gpu_id": 0,
+    "policy": "serial",
+    "active": null,
+    "reserved_mb": 0,
+    "sequence": 72,
+    "events": [
+      {
+        "sequence": 1,
+        "monotonic_s": 47688.359,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "phase": "assessing",
+        "started_monotonic_s": 47688.359
+      },
+      {
+        "sequence": 2,
+        "monotonic_s": 47756.531,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 3,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 4,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8321,
+            "free_mb": 8059
+          }
+        }
+      },
+      {
+        "sequence": 5,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 6,
+        "monotonic_s": 47758.421,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 7,
+        "monotonic_s": 47760.296,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 8,
+        "monotonic_s": 47760.312,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 9,
+        "monotonic_s": 47763.328,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "completed",
+        "details": {
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 10,
+        "monotonic_s": 47763.343,
+        "event": "released",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 11,
+        "monotonic_s": 47763.671,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "phase": "assessing",
+        "started_monotonic_s": 47763.671
+      },
+      {
+        "sequence": 12,
+        "monotonic_s": 47765.609,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 9217,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "free_L2",
+            "need_free_gb": 3.6,
+            "gap_gb": 0,
+            "note": "需释放受管负载并重新核验实时显存",
+            "avg_seconds": 51.2,
+            "gen_count": 14,
+            "est_time_text": "基于 14 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "3cb232724baf6966fcaf355d45d44a1f735a7a8505339974450b75569e910502",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          }
+        }
+      },
+      {
+        "sequence": 13,
+        "monotonic_s": 47765.812,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {
+          "reason": "需释放受管负载并重新核验实时显存",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 14,
+        "monotonic_s": 47766.187,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          }
+        }
+      },
+      {
+        "sequence": 15,
+        "monotonic_s": 47766.203,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 16,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          }
+        }
+      },
+      {
+        "sequence": 17,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 18,
+        "monotonic_s": 47766.546,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 19,
+        "monotonic_s": 47766.968,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8306,
+            "free_mb": 8074
+          }
+        }
+      },
+      {
+        "sequence": 20,
+        "monotonic_s": 47766.968,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 21,
+        "monotonic_s": 47768.515,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 22,
+        "monotonic_s": 47768.75,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 23,
+        "monotonic_s": 47768.75,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 24,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "可直接加载（含当前驻留占用）",
+            "avg_seconds": 51.2,
+            "gen_count": 14,
+            "est_time_text": "基于 14 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "3cb232724baf6966fcaf355d45d44a1f735a7a8505339974450b75569e910502",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          },
+          "available_mb": 12186,
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 25,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8310,
+            "free_mb": 8070
+          },
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 26,
+        "monotonic_s": 47774.0,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 27,
+        "monotonic_s": 47774.015,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 28,
+        "monotonic_s": 47775.671,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "running",
+        "details": {
+          "prompt_id": "5450e6f5-ef2d-4c63-8bbc-c2ca05a3389b",
+          "job_id": "dde8f7a61cc24b50acf9779c1f1c7747",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 29,
+        "monotonic_s": 47775.687,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "running",
+        "details": {
+          "prompt_id": "5450e6f5-ef2d-4c63-8bbc-c2ca05a3389b",
+          "job_id": "dde8f7a61cc24b50acf9779c1f1c7747",
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 30,
+        "monotonic_s": 47829.812,
+        "event": "transition",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "phase": "completed",
+        "details": {
+          "journal_id": "82d55235658d48ffb5c3aafbad41ca0a"
+        }
+      },
+      {
+        "sequence": 31,
+        "monotonic_s": 47829.812,
+        "event": "released",
+        "token_sha256": "e3ae7768ff9430e96feb94e7cbca002c056070d832a9150e63fac89d161c2af2",
+        "owner": "job:dde8f7a61cc24b50acf9779c1f1c7747",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 32,
+        "monotonic_s": 47830.234,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "phase": "assessing",
+        "started_monotonic_s": 47830.234
+      },
+      {
+        "sequence": 33,
+        "monotonic_s": 47832.64,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 51.4,
+            "gen_count": 15,
+            "est_time_text": "基于 15 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "6bbe378e5a85463194cb763ad574935dd68a24252ea0c076213af3678e7de91b",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 34,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 51.4,
+            "gen_count": 15,
+            "est_time_text": "基于 15 次历史生成，平均约 51秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "6bbe378e5a85463194cb763ad574935dd68a24252ea0c076213af3678e7de91b",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 35,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 36,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 37,
+        "monotonic_s": 47834.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 38,
+        "monotonic_s": 47836.562,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0ff03604-0d48-4c74-8622-4bfe5ee8c235",
+          "job_id": "dd4e235aae2f4a6ebff21f558de479bc",
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 39,
+        "monotonic_s": 47836.578,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0ff03604-0d48-4c74-8622-4bfe5ee8c235",
+          "job_id": "dd4e235aae2f4a6ebff21f558de479bc",
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 40,
+        "monotonic_s": 47839.625,
+        "event": "transition",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "phase": "completed",
+        "details": {
+          "journal_id": "744d03a253754958ac1c39246b7af899"
+        }
+      },
+      {
+        "sequence": 41,
+        "monotonic_s": 47839.64,
+        "event": "released",
+        "token_sha256": "44e85fd91b58d42cc6b0b9cf4ff521223d05d0b05b6a93829bdf50b855f563dc",
+        "owner": "job:dd4e235aae2f4a6ebff21f558de479bc",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 42,
+        "monotonic_s": 47840.187,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "phase": "assessing",
+        "started_monotonic_s": 47840.187
+      },
+      {
+        "sequence": 43,
+        "monotonic_s": 47842.375,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 48.4,
+            "gen_count": 16,
+            "est_time_text": "基于 16 次历史生成，平均约 48秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "da5b8258edab3ed2de65f19ef1f270353c5e99a6d022254ac660fac6331304ce",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 44,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 48.4,
+            "gen_count": 16,
+            "est_time_text": "基于 16 次历史生成，平均约 48秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "da5b8258edab3ed2de65f19ef1f270353c5e99a6d022254ac660fac6331304ce",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 3,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 45,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 46,
+        "monotonic_s": 47844.25,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 47,
+        "monotonic_s": 47844.265,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 48,
+        "monotonic_s": 47846.109,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "running",
+        "details": {
+          "prompt_id": "82dd6a75-2924-4fd9-823a-6f4c5891e507",
+          "job_id": "96194995a0bf4119856da627fcad8845",
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 49,
+        "monotonic_s": 47846.14,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "running",
+        "details": {
+          "prompt_id": "82dd6a75-2924-4fd9-823a-6f4c5891e507",
+          "job_id": "96194995a0bf4119856da627fcad8845",
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 50,
+        "monotonic_s": 47849.171,
+        "event": "transition",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "phase": "completed",
+        "details": {
+          "journal_id": "93bcc0e3821142a58c92b9a2c176b4bd"
+        }
+      },
+      {
+        "sequence": 51,
+        "monotonic_s": 47849.171,
+        "event": "released",
+        "token_sha256": "d2cbc9dd798b8666b8b28a642c1e19e20e1f21d27d67b133c39e0aa33fae8c83",
+        "owner": "job:96194995a0bf4119856da627fcad8845",
+        "outcome": "completed"
+      },
+      {
+        "sequence": 52,
+        "monotonic_s": 47849.531,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "phase": "assessing",
+        "started_monotonic_s": 47849.531
+      },
+      {
+        "sequence": 53,
+        "monotonic_s": 47851.453,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 9217,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "free_L2",
+            "need_free_gb": 3.6,
+            "gap_gb": 0,
+            "note": "需释放受管负载并重新核验实时显存",
+            "avg_seconds": 45.7,
+            "gen_count": 17,
+            "est_time_text": "基于 17 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          }
+        }
+      },
+      {
+        "sequence": 54,
+        "monotonic_s": 47851.64,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {
+          "reason": "需释放受管负载并重新核验实时显存",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 55,
+        "monotonic_s": 47852.031,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 56,
+        "monotonic_s": 47852.031,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 57,
+        "monotonic_s": 47852.375,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 58,
+        "monotonic_s": 47852.375,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 59,
+        "monotonic_s": 47852.39,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 60,
+        "monotonic_s": 47852.796,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          }
+        }
+      },
+      {
+        "sequence": 61,
+        "monotonic_s": 47852.796,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "releasing",
+        "details": {}
+      },
+      {
+        "sequence": 62,
+        "monotonic_s": 47854.343,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 63,
+        "monotonic_s": 47854.593,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {}
+      },
+      {
+        "sequence": 64,
+        "monotonic_s": 47854.593,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 65,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 9.0009765625,
+            "exclusive": false,
+            "loaded": false,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "可直接加载（含当前驻留占用）",
+            "avg_seconds": 45.7,
+            "gen_count": 17,
+            "est_time_text": "基于 17 次历史生成，平均约 45秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 9217,
+              "basis": "exact_workflow_measured_envelope",
+              "sample_count": 1,
+              "workflow_sha256": "7ebed8e0ce8522fea0f0d6ceb179448a5634484d4df358419fec16af723f4b46",
+              "calibration_workflow_sha256": "d6cb473dbb31b8ac3bbfd04e6d0a7d01b4d3d015f025ceff97915c92013378e3",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "memory_scope": "sampled_whole_device_upper_envelope",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified"
+          },
+          "available_mb": 12186,
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 66,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8285,
+            "free_mb": 8095
+          },
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 67,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 68,
+        "monotonic_s": 47860.093,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "verifying",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 69,
+        "monotonic_s": 47861.812,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "running",
+        "details": {
+          "prompt_id": "91f8b5b1-d55d-4f85-a180-b791840fa2b6",
+          "job_id": "f3f4dc89a0ae489195a7b7427ef945a1",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 70,
+        "monotonic_s": 47861.843,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "running",
+        "details": {
+          "prompt_id": "91f8b5b1-d55d-4f85-a180-b791840fa2b6",
+          "job_id": "f3f4dc89a0ae489195a7b7427ef945a1",
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 71,
+        "monotonic_s": 47907.015,
+        "event": "transition",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "phase": "completed",
+        "details": {
+          "journal_id": "20963cf27d7943d9948130f6f024a0aa"
+        }
+      },
+      {
+        "sequence": 72,
+        "monotonic_s": 47907.031,
+        "event": "released",
+        "token_sha256": "e7a060d85f14e854083e9db4184b8f8292993e2419851b178939f656599b3d25",
+        "owner": "job:f3f4dc89a0ae489195a7b7427ef945a1",
+        "outcome": "completed"
+      }
+    ],
+    "recovery_pending": []
+  },
+  "residency_after": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791442049375172970,
+    "monotonic_ns": 47856558088879,
+    "load_epoch": 4,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "f517cbd8-699a-4c9d-8ab1-21df468fcebc",
+    "ok": true
+  },
+  "observed_device_peak_mb": 8621
+}
