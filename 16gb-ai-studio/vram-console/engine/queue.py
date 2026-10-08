@@ -89,14 +89,28 @@ def queue_restore():
             return
         records = _store().snapshot()
         journal = registry.get('operation_journal')
-        journal_ids = {row['intent']['owner']: row['id'] for row in journal.pending()} if journal else {}
+        journal_records = {row['intent']['owner']: row for row in journal.pending()} if journal else {}
+        journal_ids = {owner:row['id'] for owner,row in journal_records.items()}
         for record in records:
             task = _runtime_task(record)
             _tasks[task['id']] = task
+            if task['status']=='running' and _confirmed_ollama_completion(task):
+                operation=journal_records.get('job:'+task['id'])
+                if operation and (operation['intent'].get('service')!='ollama'
+                                  or operation['intent'].get('model')!=task['model']):
+                    raise ConfigError('Ollama 完成回执与资源日志意图冲突')
+                _persist(task,'canceled' if task.get('cancel_requested') else 'done',
+                         ended=int(time.time()),progress='重启后核验已持久化完整回执，不重放')
+                if operation:
+                    journal.finish(operation['id'],True,{'terminal':True,'job_id':task['id'],
+                        'basis':'persisted_exact_ollama_completion'})
+                continue
             if task['status'] in ('submitting', 'running', 'uncertain'):
                 lease = get_coordinator().restore_uncertain(
-                    ResourceRequest('generate', 'job:' + task['id'], 'comfyui', task['model']),
-                    {'job_id': task['id'], 'prompt_id': task.get('prompt_id') or task.get('submission_id'),
+                    ResourceRequest('generate', 'job:' + task['id'], task.get('source','comfyui'), task['model']),
+                    {'job_id': task['id'],
+                     **({'prompt_id': task.get('prompt_id') or task.get('submission_id')}
+                        if task.get('source','comfyui')=='comfyui' else {}),
                      **({'journal_id': journal_ids['job:' + task['id']]} if 'job:' + task['id'] in journal_ids else {}),
                      'reason': '进程重启后执行未知，必须核验对应后端任务'})
                 _persist(task, 'uncertain', coordination={'token': lease.token, 'owner': 'job:' + task['id']})
@@ -243,6 +257,52 @@ def _queue_submit_comfy(wf, submission_id=None):
         return None, {"message": str(e), "uncertain": True}
 
 
+def queue_enqueue_ollama(request, idempotency_key=None):
+    """Accept an exact measured request; backend supplies no durable request ID."""
+    try:
+        request=_validate_ollama_request(request)
+        from engine.profile_admission import select_profile
+        reference=select_profile(request)
+        if reference is None:
+            return {'ok':False,'code':'PROFILE_REQUIRED','error':'Ollama 请求缺少精确测量 Profile'}
+        queue_restore()
+        with _task_lock:
+            record,created=_store().accept(dict(source='ollama',model=request['model'],
+                effective_workflow=request,workflow_sha256=workload_fingerprint(request),
+                profile_reference=reference),idempotency_key)
+            task=_tasks.get(record['id']) or _runtime_task(record)
+            _tasks[record['id']]=task
+            if created: _task_queue.append(record['id'])
+            _start_worker()
+        return {'ok':True,'created':created,'task':dict(task)}
+    except TaskConflict as error:
+        return {'ok':False,'code':'IDEMPOTENCY_CONFLICT','error':str(error)}
+    except ResourceDenied as error:
+        return error.result()
+    except (ValueError,TypeError,KeyError) as error:
+        return {'ok':False,'code':'INVALID_INTENT','error':str(error)}
+    except Exception as error:
+        return {'ok':False,'code':'TASK_STORAGE_UNAVAILABLE','error':str(error)}
+
+
+def _validate_ollama_request(request):
+    if not isinstance(request,dict) or set(request)!={'model','prompt','think','stream','keep_alive','options'}:
+        raise ValueError('需提供完整有限 Ollama 请求，不允许额外参数')
+    options=request['options']
+    if (request['think'] is not False or request['stream'] is not False
+            or not isinstance(request['prompt'],str) or not request['prompt']
+            or not isinstance(request['keep_alive'],str) or request['keep_alive']!='30m'
+            or not isinstance(options,dict) or set(options)!={'num_ctx','num_predict','temperature','seed'}):
+        raise ValueError('不支持的 Ollama 请求选项')
+    if (type(options['num_ctx']) is not int or not 1<=options['num_ctx']<=8192
+            or type(options['num_predict']) is not int or not 1<=options['num_predict']<=32
+            or type(options['seed']) is not int or options['temperature']!=0):
+        raise ValueError('上下文或有限输出参数无效')
+    if not any(m['id']==request['model'] for m in REGISTRY.get('ollama',{}).get('models',[])):
+        raise ValueError('Ollama 模型未登记')
+    return json.loads(json.dumps(request,allow_nan=False))
+
+
 def _queue_wait(prompt_id, task, timeout=3600):
     """轮询 /history/{prompt_id} 直到 success/error，回填进度。"""
     url = "http://127.0.0.1:8188/history/%s" % prompt_id
@@ -291,6 +351,11 @@ def _queue_wait(prompt_id, task, timeout=3600):
 def _effective_workflow(task):
     """New tasks use their committed payload; legacy tasks bind once before execution."""
     wf = task.get('effective_workflow')
+    if task.get('source')=='ollama':
+        wf=_validate_ollama_request(wf)
+        if (workload_fingerprint(wf)!=task.get('workflow_sha256') or not task.get('profile_reference')):
+            raise ResourceDenied('PROFILE_UNVERIFIED','保存的 Ollama 请求或证据引用不完整')
+        return wf
     configuration = task.get('resource_configuration_sha256')
     if configuration is None:
         template = _load_workflow(task['workflow'])
@@ -311,6 +376,65 @@ def _effective_workflow(task):
     return json.loads(json.dumps(wf, allow_nan=False))
 
 
+def _ollama_generate(request):
+    """Synchronous owned RPC; response loss is ambiguous, never retried."""
+    from engine.coordinator import get_coordinator
+    if not get_coordinator().current_token():
+        raise ResourceDenied('INVALID_LEASE','Ollama 提交必须持有预留')
+    rpc=urllib.request.Request('http://127.0.0.1:11434/api/generate',
+        data=json.dumps(request).encode(),headers={'Content-Type':'application/json'})
+    with urllib.request.urlopen(rpc,timeout=300) as response:
+        return json.load(response)
+
+
+def _confirmed_ollama_completion(task):
+    """Only the durable response for this exact intent proves historical success."""
+    import hashlib
+    try:
+        request=task['effective_workflow'];completion=task['backend_completion'];result=task['result']
+        metrics=completion['metrics']
+        return (task.get('source')=='ollama' and completion['model']==task['model']==request['model']
+            and workload_fingerprint(request)==task['workflow_sha256']
+            and metrics.get('done') is True and type(metrics.get('eval_count')) is int
+            and 0<metrics['eval_count']<=request['options']['num_predict']
+            and result['metrics']==metrics and isinstance(result['response'],str)
+            and hashlib.sha256(result['response'].encode()).hexdigest()==result['response_sha256'])
+    except (KeyError,TypeError,ValueError):
+        return False
+
+
+def _execute_ollama_task(task,lease,request):
+    """Write-ahead synchronous dispatch; local ID is not a backend history ID."""
+    import hashlib
+    _persist(task,'submitting',submission_id=str(uuid.uuid4()),backend_correlation_supported=False)
+    try:
+        lease.transition('running',job_id=task['id'])
+        response=_ollama_generate(request)
+        if (not isinstance(response,dict) or response.get('done') is not True
+                or response.get('model')!=request['model']
+                or type(response.get('eval_count')) is not int
+                or not 0<response['eval_count']<=request['options']['num_predict']
+                or not isinstance(response.get('response'),str)):
+            raise ValueError('Ollama 完整生成回执无法核验')
+        metrics={key:response.get(key) for key in ('done','done_reason','eval_count',
+            'prompt_eval_count','total_duration','load_duration','eval_duration','prompt_eval_duration')}
+        # Persist the response before terminal state. A crash in this window must
+        # retain unknown ownership until the durable response is inspected.
+        _persist(task,'running',backend_completion=dict(model=response['model'],metrics=metrics),
+            result=dict(response=response['response'],
+                response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics))
+        _persist(task,'canceled' if task.get('cancel_requested') else 'done',ended=int(time.time()),
+            progress='后端完整生成回执已持久化；取消为请求结束后确认，未即时中断')
+        lease.transition('completed')
+    except BaseException as error:
+        lease.uncertain('Ollama 请求或完成保存未知，不重放',job_id=task['id'])
+        try:
+            _persist(task,'uncertain',error=str(error))
+        except Exception as storage_error:
+            task.update(status='uncertain',error='未知状态保存失败: '+str(storage_error))
+        raise
+
+
 def _execute_reserved_task(task, lease, spec):
     """Keep one reservation through submission and execution confirmation."""
     _persist(task, 'precheck', coordination={"token": lease.token, "owner": spec.owner})
@@ -326,6 +450,9 @@ def _execute_reserved_task(task, lease, spec):
     _persist(task, budget={**decision, 'workflow_sha256': workload_fingerprint(wf),
                           'profile_status': decision.get('profile_status', 'registry_estimate_unverified')},
              started=int(time.time()))
+    if task.get('source')=='ollama':
+        _execute_ollama_task(task,lease,wf)
+        return
     if '_version' in task:
         def submit_durable(workflow, submission_id):
             with _task_lock:
@@ -408,7 +535,7 @@ def _wait_reserved_task(task, lease, pid):
 
 def _run_task(task):
     """Wait for ownership and execute under one lifetime reservation."""
-    spec = OperationSpec("generate", "comfyui", task["model"], owner="job:" + task["id"])
+    spec = OperationSpec("generate", task.get('source','comfyui'), task["model"], owner="job:" + task["id"])
     try:
         with _task_lock:
             if task['status'] in TaskStore.TERMINAL:
@@ -420,7 +547,8 @@ def _run_task(task):
                 _persist(task, 'precheck')
             # Validate/freeze before assessment can release any resident model.
             wf = _effective_workflow(task)
-            spec = replace(spec, workflow=wf, profile_reference=task.get('profile_reference'))
+            spec = replace(spec, workflow=wf, profile_reference=task.get('profile_reference'),
+                           ctx=wf['options']['num_ctx'] if spec.service=='ollama' else None)
         while True:
             if task.get("cancel_requested"):
                 _persist(task, 'canceled', ended=int(time.time()))
@@ -558,6 +686,11 @@ def queue_cancel(tid: str) -> dict:
 def _cancel_backend(task):
     """Special capability for canceling the owned job, not a new GPU operation."""
     from engine.coordinator import get_coordinator
+    if task.get('source')=='ollama':
+        # Closing HTTP is not proof that the runner stopped; never issue a global
+        # stop or invent an interrupt acknowledgment from /api/ps.
+        return {'ok':False,'code':'CANCEL_UNSUPPORTED',
+                'error':'取消意图已保存；Ollama 请求结束确认前保留预留，不宣称即时中断'}
     from clients.comfyui_client import cancel_job
     with _task_lock:
         active = get_coordinator().snapshot()['active']

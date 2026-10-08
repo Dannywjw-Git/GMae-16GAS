@@ -1,0 +1,44 @@
+{
+  "condition": "model_unloaded_low_torch_verified",
+  "duration_s": 2.735000000000582,
+  "managed_release": {
+    "ok": true,
+    "http": 200,
+    "free_mb_before": 8074,
+    "free_mb_after": 8074,
+    "freed_mb": 0
+  },
+  "readings": [
+    {
+      "gpu": {
+        "monotonic_s": 51810.687,
+        "total_mb": 16380,
+        "used_mb": 8034,
+        "free_mb": 8074,
+        "utilization": 48
+      },
+      "torch_resident_bytes": 1355128648
+    },
+    {
+      "gpu": {
+        "monotonic_s": 51810.984,
+        "total_mb": 16380,
+        "used_mb": 3810,
+        "free_mb": 12298,
+        "utilization": 47
+      },
+      "torch_resident_bytes": 8519680
+    },
+    {
+      "gpu": {
+        "monotonic_s": 51811.5,
+        "total_mb": 16380,
+        "used_mb": 1410,
+        "free_mb": 14698,
+        "utilization": 0
+      },
+      "torch_resident_bytes": 8519680
+    }
+  ],
+  "limitation": "low torch occupancy does not prove CPU/disk caches cold"
+}

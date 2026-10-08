@@ -1,0 +1,17 @@
+{
+  "source_commits": {
+    "5f9f4e4": "5f9f4e40ef8283bb0fac07a21ae512d0592b7bd8",
+    "b498ec6": "b498ec63c879703cc7408d380592e16adc856425"
+  },
+  "files": {
+    "analyzer.py": "25b13cf8dc375742ae02bc7ebfa0caf81b42dc384a4dbe814c7b53de2d91411a",
+    "collector-pilot.py": "d1c25217adfa9f1239f1e652b1fb05192d18e461e070a5aaff6089b815be66eb",
+    "collector-verified.py": "51edd0d34694dd94590b09f23bb600b562326fd0ac0022ab77aac2c8bac42a05",
+    "final-unload.json": "459af1c25be677052e88f14579e602c0989a83f57c50b7740d81651123dac902",
+    "finish-mixed.py": "0a5ed9ce82802959379b646f1cff318b3880d6649043825741587f97c575bd8f",
+    "pilot.json": "80458f034736ddf001679679964e4b682d80d1e2ea4cc47707343d6d7683ee57",
+    "summary.json": "a92f1c1e4dc2927eaf8a5cd99ab2340d3683173a080487daa0e34ebc22978bc6",
+    "verified.json": "1f9010ce18fd4a9d65414187ef24c668413cb646cb34cd58ff171b63a10d4223"
+  },
+  "comparative_result": false
+}

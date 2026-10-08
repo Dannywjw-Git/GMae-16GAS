@@ -52,6 +52,14 @@ def restore_resource_operations():
             intent = record['intent']
             if intent['operation'] == 'generate' and intent['owner'].startswith('job:'):
                 task = journal.store.get(intent['owner'][4:])
+                if (task and task['status'] in ('done','canceled') and intent['service']=='ollama'
+                        and task['intent'].get('source')=='ollama'
+                        and task['intent'].get('model')==intent.get('model')):
+                    from engine.queue import _runtime_task,_confirmed_ollama_completion
+                    if _confirmed_ollama_completion(_runtime_task(task)):
+                        journal.finish(record['id'],True,{'terminal':True,'job_id':task['id'],
+                            'basis':'persisted_exact_ollama_completion'})
+                        continue
                 if task and task['status'] in ('submitting', 'running', 'uncertain'):
                     # The task's durable correlation ID is the stronger recovery
                     # record. queue_restore installs its hold; avoid duplication.
@@ -191,7 +199,7 @@ def _assess_model(spec: OperationSpec, lease: ResourceLease) -> None:
         released = gpu_guard_evict()
         if not released.get("ok"):
             raise ResourceDenied("RELEASE_FAILED", "显存释放失败，未提交目标负载", {"release": released})
-        lease.transition("verifying")
+        lease.transition("verifying", release_evidence=released)
         deadline = time.monotonic() + 30
         while True:
             result, item = _model_budget(spec, allow_rejected=True)
@@ -204,7 +212,8 @@ def _assess_model(spec: OperationSpec, lease: ResourceLease) -> None:
     result, item = _model_budget(spec)
     if item.get("decision") != "ok":
         raise ResourceDenied("ADMISSION_CHANGED", "执行前预算发生变化，等待重新准入", {"budget": item})
-    lease.transition("reserved", budget=item, available_mb=round(result.get("avail_gb", 0) * 1024))
+    lease.transition("reserved", budget=item, peak_mb=math.ceil(float(item['vram_gb'])*1024),
+                     available_mb=round(result.get("avail_gb", 0) * 1024))
 
 
 def _assess_start(spec: OperationSpec, lease: ResourceLease, gpu: dict) -> None:
@@ -253,6 +262,7 @@ def assess(spec: OperationSpec, lease: ResourceLease) -> None:
         _assess_model(spec, lease)
     elif spec.operation in ("start", "restart", "unpause"):
         _assess_start(spec, lease, gpu)
+    gpu=fresh_gpu()
     lease.transition("reserved", telemetry={k: gpu[k] for k in ("total_mb", "used_mb", "free_mb")})
 
 
