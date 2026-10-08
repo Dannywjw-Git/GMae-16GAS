@@ -19,12 +19,14 @@
 | 资源命令执行边界 | 持久尝试身份、成功回执及超时保留已接入；独立回执执行者待开发 | 完整 388 项通过，新增 8 项测试；新提交 CI 待核验 | 未完成 |
 | 独立命令执行与有限恢复 | 已实现父进程退出后保存回执、原子领取和限定容器命令核验 | 完整 407 项通过，新增 19 项测试；新分支 CI 待核验 | 未完成；进程测试使用受控 Python 命令 |
 | 持久提交边界 | 已接入正式队列 | 提交边界 10 项与运行时测试通过；新提交 CI 待核验 | 未完成 |
-| 参数化 Profile、可解释调度 | 待完成 | 未完成 | 未完成 |
+| 参数化 Profile、可解释调度 | 精确工作流/环境匹配、实际参数绑定与持久 payload 已实现；测量准入待接入 | 当前分支完整 438 项通过；新增 31 项 Profile/参数与持久执行测试 | 未完成；无真实测量 Profile |
 | 基线对照实验、稳定发布、演示材料 | 待完成 | 未完成相应验收 | 未运行对照实验 |
 
 PR：[审计整改 #1](https://github.com/Dannywjw-Git/GMae-16GAS/pull/1)、[统一协调 #2](https://github.com/Dannywjw-Git/GMae-16GAS/pull/2)、[持久账本基础 #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。均为草稿，主分支尚未合并。
 
 当前阶段：[独立命令执行与有限容器恢复 Draft PR #4](https://github.com/Dannywjw-Git/GMae-16GAS/pull/4)，代码提交 `843853f`，基于 PR #3 的 `19ee61b`。
+
+最新开发阶段：[实际工作流绑定与 Profile 基础 Draft PR #5](https://github.com/Dannywjw-Git/GMae-16GAS/pull/5)，提交 `bb84ccd`，基于 PR #4 的 `a1a2313`。基础提交两项 CI 成功；新阶段 CI 运行中。正式测量准入接入与真实 GPU 实验仍未完成。
 
 PR #3 当前代码的 CI：[PR 检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719023821)、[分支检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719020765)。证据仅对应上述提交；后续改动须重新核验适用检查。
 
