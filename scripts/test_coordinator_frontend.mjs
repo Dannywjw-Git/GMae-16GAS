@@ -9,6 +9,11 @@ const elements = new Map([
   ['#task-budget', {innerHTML: ''}],
   ['#btn-submit-task', {disabled: true}],
   ['#task-model', {value: 'registered-model'}],
+  ['#task-prompt', {value: 'test prompt'}],
+  ['#task-width', {value: '512'}],
+  ['#task-height', {value: '768'}],
+  ['#task-steps', {value: '8'}],
+  ['#task-cfg', {value: '0'}],
   ['#task-list', {innerHTML: ''}],
   ['#q-waiting', {}],
 ]);
@@ -49,7 +54,8 @@ await Pages._checkTaskBudget();
 assert.equal(elements.get('#btn-submit-task').disabled, false);
 assert.match(elements.get('#task-budget').innerHTML, /可排队/);
 assert.match(elements.get('#task-budget').innerHTML, /&lt;busy&gt;/);
-assert.equal(JSON.stringify(calls.pop()), JSON.stringify({source: 'comfyui', model: 'registered-model'}));
+assert.equal(JSON.stringify(calls.pop()), JSON.stringify({source: 'comfyui', model: 'registered-model',
+  params: {prompt: 'test prompt', width: 512, height: 768, steps: 8, cfg: 0}}));
 response = {ok: false, allowed: false, reason: 'uncalibrated'};
 await Pages._checkTaskBudget();
 assert.equal(elements.get('#btn-submit-task').disabled, true);
@@ -57,6 +63,22 @@ rejectPreview = true;
 await Pages._checkTaskBudget();
 assert.equal(elements.get('#btn-submit-task').disabled, true);
 assert.match(elements.get('#task-budget').innerHTML, /不可用/);
+
+// An older allowed result must not override a newer rejected parameter preview.
+let resolveOld;
+let previewCount = 0;
+context.API.previewResources = body => {
+  calls.push(body);
+  return ++previewCount === 1 ? new Promise(resolve => { resolveOld = resolve; })
+    : Promise.resolve({allowed: false, reason: 'new parameters require evidence'});
+};
+const oldPreview = Pages._checkTaskBudget();
+elements.get('#task-width').value = '2048';
+await Pages._checkTaskBudget();
+resolveOld({allowed: true, execution_ready: true, budget: {vram_gb: 8}});
+await oldPreview;
+assert.equal(elements.get('#btn-submit-task').disabled, true);
+assert.match(elements.get('#task-budget').innerHTML, /new parameters require evidence/);
 
 Pages._hiddenTaskIds = new Set();
 await Pages._loadQueue();

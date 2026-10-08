@@ -1,5 +1,18 @@
 # GMae 阶段交接
 
+## 2026-10-08：测量准入接入与真实队列执行
+
+- 分支 `feat/measured-profile-admission-20261008`，基于 PR #8 HEAD `52b762c`；代码 commit `26bcdf6`，[Draft PR #9](https://github.com/Dannywjw-Git/GMae-16GAS/pull/9)，新 HEAD CI 待核验。
+- 基础 PR #8 全部 CI 成功：`37728419303`、`37728415547`，精确提交 `52b762c1b44adc53495f2b540960a766bfa78e64`。
+- 本阶段代码 `26bcdf6e723b5e45292224ab8bc611ad9983ad90` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37730458497) 和 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37730427063) 均 success；后续文档 HEAD 必须独立核验。
+- 实现：原始证据重算、接受意图固定、fresh 实际环境/模型身份；只复用 seed/输出名变化。前端预演使用实际参数，忽略过时响应。实际试验暴露释放后物理回收延迟，修复等待中的提前拒绝；未知资源操作不能因任务失败被恢复路径误确认。
+- 自动化：完整 470 项通过（15.55 秒）；前端模块及行为检查通过；名称检查 0 阻断/65 既有警告；编译与 diff 检查通过。
+- 真实 GPU：seed 46 正式队列 done / 后端 success / 无活动预留，549 样本、0 错误、峰值 9,146 MiB、小于预算 9,649 MiB，端到端 143.5 秒。seed 45 失败及后续特定人工核验均保留；不是通用自动恢复，也不是通过试验。[报告及原始数据](measured-profile-admission-2026-10-08.md)。
+- 已知瓶颈：第一次模型摘要核验、身份推断不一致和保守整卡包络造成重复卸载；当前无性能收益证据。支持范围一个 SDXL 配置，非完整 HTTP 服务部署验收；混合对照、真实运行中取消/崩溃、参数网格与 Release 尚未完成。
+- 请 Chat Agent 独立评审 raw/margin 固定、seed 复用范围、模型缓存假设、未知预留恢复、物理回收等待、前端参数一致性和下一阶段对照方案。
+- 下一步：可信驻留及阶段预算，减少同模型卸载，立即开展控制加载/身份条件的真实比较。无需等待下一轮评审。
+
+
 ## 2026-10-08：可复现身份、重复试验与证据导入
 
 - 分支 `feat/reproducible-profile-trials-20261008`，代码提交 `6d7a299`，基于 PR #7 的 `aac6334`。[Draft PR #8](https://github.com/Dannywjw-Git/GMae-16GAS/pull/8)，新阶段 CI 待核验。

@@ -1,0 +1,25 @@
+{
+  "terminal": true,
+  "kind": "owned_trial_manual_evidence_reconciliation",
+  "operation_id": "37fb10dc4bea4f41bb5ea3098fa6531f",
+  "task_id": "d0125d7caddf4777b8f0dbd0f7f4431e",
+  "never_submitted": true,
+  "confirmed_command_ids": [
+    "3916a59c0364487cb1a0f7c596d2318b",
+    "3f93fa9e879e420794bbcf083d1232be",
+    "589cec06fcea49449fa034d2136198e7",
+    "b828ab9ec1854c478cf139d7b8a3e0be"
+  ],
+  "fresh_backend_queue_empty": true,
+  "fresh_ollama_models_empty": true,
+  "torch_reserved_bytes": 33554432,
+  "fresh_gpu": {
+    "monotonic_s": 40903.031,
+    "total_mb": 16380,
+    "used_mb": 1853,
+    "free_mb": 14255,
+    "utilization": 0
+  },
+  "reason": "failed before RPC; release effects now observed and all owned commands terminal",
+  "gpu_idle_proven": false
+}

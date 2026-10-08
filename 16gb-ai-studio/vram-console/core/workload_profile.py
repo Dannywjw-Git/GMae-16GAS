@@ -31,6 +31,15 @@ def resource_configuration_fingerprint(workflow):
     return workload_fingerprint(normalized)
 
 
+def execution_configuration_fingerprint(workflow):
+    """Measured reuse varies only RNG seed and output names, retaining prompt."""
+    normalized = json.loads(json.dumps(workflow, allow_nan=False))
+    for node in normalized.values():
+        for key in ('seed', 'noise_seed', 'filename_prefix'):
+            node.get('inputs', {}).pop(key, None)
+    return workload_fingerprint(normalized)
+
+
 def match_profile(profile, workflow, environment):
     """Return a conservative measured envelope only for an exact evidence match.
 
@@ -49,7 +58,12 @@ def match_profile(profile, workflow, environment):
         return {**rejected, 'reason': 'incomplete execution environment'}
     if profile.get('environment') != environment:
         return {**rejected, 'reason': 'execution environment mismatch'}
-    if profile.get('workflow_sha256') != workload_fingerprint(workflow):
+    policy = profile.get('match_policy', 'exact')
+    if policy not in ('exact', 'seed_and_output_name_invariant'):
+        return {**rejected, 'reason': 'unsupported matching policy'}
+    matches = (profile.get('workflow_sha256') == workload_fingerprint(workflow) if policy == 'exact'
+               else profile.get('execution_configuration_sha256') == execution_configuration_fingerprint(workflow))
+    if not matches:
         return {**rejected, 'reason': 'effective workflow mismatch'}
     evidence = profile.get('evidence')
     if not isinstance(evidence, dict) or evidence.get('kind') != 'real_gpu':
@@ -72,7 +86,8 @@ def match_profile(profile, workflow, environment):
         return {**rejected, 'reason': 'invalid memory range'}
     return {'ok': True, 'peak_mb': math.ceil(max(samples) + margin),
             'basis': 'exact_workflow_measured_envelope', 'sample_count': len(samples),
-            'workflow_sha256': profile['workflow_sha256'],
+            'workflow_sha256': workload_fingerprint(workflow),
+            'calibration_workflow_sha256': profile['workflow_sha256'], 'match_policy': policy,
             'evidence_sha256': digest, 'margin_mb': margin,
             'limitation': 'observed peaks plus margin are not an OOM guarantee'}
 
@@ -127,6 +142,8 @@ def profile_from_evidence(raw_bytes, margin_mb):
                        driver=gpu['driver'], model_digest=model_digest,
                        backend=workload_fingerprint({'backend': backend}))
     profile = dict(schema_version=1, environment=environment,
+        match_policy='seed_and_output_name_invariant',
+        execution_configuration_sha256=execution_configuration_fingerprint(workflow),
         workflow_sha256=raw['workflow_sha256'], peak_mb_samples=[peak], margin_mb=margin_mb,
         evidence=dict(kind='real_gpu', raw_data_sha256=hashlib.sha256(raw_bytes).hexdigest(),
                       recorded_at=raw['recorded_at']),

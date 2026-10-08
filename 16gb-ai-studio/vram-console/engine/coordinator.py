@@ -26,6 +26,8 @@ class OperationSpec:
     ctx: int | None = None
     owner: str | None = None
     command_only: bool = False
+    workflow: dict | None = None
+    profile_reference: dict | None = None
 
 
 def get_coordinator() -> ResourceCoordinator:
@@ -53,9 +55,8 @@ def restore_resource_operations():
                     # The task's durable correlation ID is the stronger recovery
                     # record. queue_restore installs its hold; avoid duplication.
                     continue
-                if task and task['status'] in journal.store.TERMINAL:
-                    journal.finish(record['id'], True, {'terminal_task': task['id']})
-                    continue
+                # A task can fail before submission while release effects remain
+                # unknown. Terminal task status alone cannot confirm the operation.
             get_coordinator().restore_uncertain(
                 ResourceRequest(intent['operation'], intent['owner'], intent['service'], intent.get('model')),
                 {'journal_id': record['id'],
@@ -126,11 +127,22 @@ def check_idle(service: str) -> None:
 def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[dict, dict]:
     from engine.budget import budget_engine
     context = {spec.model: spec.ctx} if spec.ctx is not None else None
-    result = budget_engine(context, force_refresh=True)
+    measured = None
+    if spec.profile_reference is not None:
+        from engine.profile_admission import measured_budget
+        measured = measured_budget(spec.workflow, spec.profile_reference)
+        result = budget_engine(context, force_refresh=True,
+                               peak_overrides={(spec.service, spec.model): measured['peak_mb'] / 1024})
+    else:
+        result = budget_engine(context, force_refresh=True)
     item = next((m for m in result.get("models", [])
                  if m.get("id") == spec.model and m.get("source") == spec.service), None)
     if not result.get("ok") or item is None:
         raise ResourceDenied("BUDGET_UNAVAILABLE", result.get("error") or "模型未登记或预算缺失")
+    if measured is not None:
+        item = {**item, 'measured_profile': measured, 'profile_status': measured['profile_status']}
+    else:
+        item = {**item, 'profile_status': 'registry_estimate_unverified'}
     context_size = spec.ctx if spec.ctx is not None else item.get("default_ctx", 0)
     if spec.service == "ollama" and context_size > 8192:
         raise ResourceDenied("CONTEXT_LIMIT", "现行显存指南禁止 num_ctx 超过 8192")
@@ -162,9 +174,9 @@ def _assess_model(spec: OperationSpec, lease: ResourceLease) -> None:
         if not released.get("ok"):
             raise ResourceDenied("RELEASE_FAILED", "显存释放失败，未提交目标负载", {"release": released})
         lease.transition("verifying")
-        deadline = time.monotonic() + 5
+        deadline = time.monotonic() + 30
         while True:
-            result, item = _model_budget(spec)
+            result, item = _model_budget(spec, allow_rejected=True)
             if item.get("decision") == "ok":
                 break
             if time.monotonic() >= deadline:

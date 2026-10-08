@@ -87,29 +87,10 @@ Object.assign(Pages, {
     Utils.$('#btn-clear-done').onclick = () => this._clearDoneTasks();
     Utils.$('#btn-submit-task').onclick = async () => {
       const model = Utils.$('#task-model').value;
-      const modelInfo = this._modelInfoMap[model] || {};
-      const category = modelInfo.category || this._detectModelType(model);
       const prompt = Utils.$('#task-prompt').value;
       if (!prompt || !prompt.trim()) { Toast.warning('请输入提示词'); return; }
 
-      // 统一参数格式：{model, params: {...}}
-      const params = { prompt };
-      if (category === 'image' || category === 'video') {
-        params.width = parseInt(Utils.$('#task-width')?.value) || 1024;
-        params.height = parseInt(Utils.$('#task-height')?.value) || 1024;
-        params.steps = parseInt(Utils.$('#task-steps')?.value) || 30;
-        params.cfg = parseFloat(Utils.$('#task-cfg')?.value) || 7.0;
-      }
-      if (category === 'video') {
-        params.frames = parseInt(Utils.$('#task-frames')?.value) || 17;
-      }
-      if (category === 'text') {
-        params.temperature = parseFloat(Utils.$('#task-temperature')?.value) || 0.7;
-        params.max_tokens = parseInt(Utils.$('#task-max-tokens')?.value) || 2048;
-      }
-      if (category === 'audio') {
-        params.duration = parseInt(Utils.$('#task-duration')?.value) || 30;
-      }
+      const params = this._taskParameters(model);
 
       const btn = Utils.$('#btn-submit-task');
       btn.disabled = true;
@@ -247,8 +228,28 @@ Object.assign(Pages, {
     });
   },
 
-  /** 预算预检（后端格式：{action, args: {model, params: {...}}}） */
+  _taskParameters(model) {
+    const category = this._modelInfoMap[model]?.category || this._detectModelType(model);
+    const params = {prompt: Utils.$('#task-prompt')?.value ?? ''};
+    const number = (id, fallback) => Number(Utils.$(id)?.value ?? fallback);
+    if (category === 'image' || category === 'video') {
+      params.width = number('#task-width', 1024);
+      params.height = number('#task-height', 1024);
+      params.steps = number('#task-steps', 30);
+      params.cfg = number('#task-cfg', 7);
+    }
+    if (category === 'video') params.frames = number('#task-frames', 17);
+    if (category === 'audio') params.duration = number('#task-duration', 30);
+    if (category === 'text') {
+      params.temperature = number('#task-temperature', 0.7);
+      params.max_tokens = number('#task-max-tokens', 2048);
+    }
+    return params;
+  },
+
+  /** Preview and submit use the same effective form controls. */
   async _checkTaskBudget() {
+    const sequence = this._budgetPreviewSeq = (this._budgetPreviewSeq || 0) + 1;
     const badge = Utils.$('#task-budget');
     const submitBtn = Utils.$('#btn-submit-task');
     if (!badge || !submitBtn) return;
@@ -256,22 +257,24 @@ Object.assign(Pages, {
     if (!model) { badge.innerHTML = '<span class="badge badge--neutral">请选择模型</span>'; submitBtn.disabled = true; return; }
     badge.innerHTML = '<span class="badge badge--neutral">⏳ 检测中...</span>';
     try {
-      // Advisory preview uses the registered model profile.
-      const res = await API.previewResources({ source: 'comfyui', model });
+      const res = await API.previewResources({ source: 'comfyui', model, params: this._taskParameters(model) });
+      if (sequence !== this._budgetPreviewSeq) return;
       const allowed = res.allowed ?? false;
       const reason = res.reason || res.error?.message || '';
       if (allowed) {
         const peak = res.budget?.vram_gb;
-        const label = res.execution_ready ? '登记预算允许执行' : '可排队，执行前重新准入';
+        const measured = res.budget?.profile_status === 'raw_evidence_and_live_identity_verified';
+        const label = res.execution_ready ? (measured ? '测量预算允许执行' : '预算允许执行（尚未实测）') : '可排队，执行前重新准入';
         badge.innerHTML = `<span class="badge badge--${res.execution_ready ? 'success' : 'warning'}">${Utils.escapeHtml(label)}</span>
-          <div>${Utils.escapeHtml(reason)}${peak ? ` · 登记峰值 ${Utils.escapeHtml(String(peak))} GiB` : ''}</div>
-          <div class="text-muted">此估计仅适用于登记配置；修改尺寸、帧数等参数需重新校准。</div>`;
+          <div>${Utils.escapeHtml(reason)}${peak ? ` · ${measured ? '测量包络' : '未验证估计'} ${Utils.escapeHtml(String(peak))} GiB` : ''}</div>
+          <div class="text-muted">${measured ? '该配置匹配测量证据；执行前重新核验环境与显存。' : '该配置仍使用未验证估计；资源参数变化需要测量证据。'}</div>`;
         submitBtn.disabled = false;
       } else {
         badge.innerHTML = `<span class="badge badge--danger">❌ ${Utils.escapeHtml(reason || '显存不足')}</span>`;
         submitBtn.disabled = true;
       }
     } catch (e) {
+      if (sequence !== this._budgetPreviewSeq) return;
       badge.innerHTML = '<span class="badge badge--neutral">⚠️ 预算检测不可用</span>';
       submitBtn.disabled = true;
     }

@@ -44,6 +44,19 @@ def test_completed_owned_control_receipt_resolves_without_replaying(recovery):
     assert len(recovery.commands(operation_id)) == 1
 
 
+def test_terminal_task_does_not_confirm_unknown_preflight_operation(recovery, monkeypatch):
+    task, _ = recovery.store.accept({'model': 'm', 'workflow': 'test.json', 'params': {}})
+    task = recovery.store.checkpoint(task['id'], task['version'], 'precheck')
+    recovery.store.checkpoint(task['id'], task['version'], 'failed')
+    request = ResourceRequest('generate', 'job:' + task['id'], 'comfyui', 'm')
+    operation_id = recovery.begin({**asdict(request), 'command_only': False})
+    registry.delete('operation_journal')
+    monkeypatch.setenv('GMAE_TASK_DB', str(recovery.store.path))
+    coordinator.restore_resource_operations()
+    assert coordinator.get_coordinator().snapshot()['active']['phase'] == 'uncertain'
+    assert recovery.get(operation_id)['state'] != 'confirmed'
+
+
 @pytest.mark.parametrize('state', [
     {'ok': False},
     {'ok': True, 'running': True, 'paused': False, 'dead': False, 'restarting': False},

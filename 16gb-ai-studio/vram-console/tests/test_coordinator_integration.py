@@ -342,7 +342,7 @@ def test_acknowledged_release_without_reclaimed_memory_cannot_submit(gpu_environ
     state, config = gpu_environment
     state.update(used_mb=8192, free_mb=8192, loaded=[{"name": "other", "size_gb": 6}])
     monkeypatch.setattr("engine.eviction_guard.gpu_guard_evict", lambda: {"ok": True})
-    monkeypatch.setattr(coordinator.time, "monotonic", Mock(side_effect=[0, 6]))
+    monkeypatch.setattr(coordinator.time, "monotonic", Mock(side_effect=[0, 31]))
     submit = Mock()
     monkeypatch.setattr(queue, "_queue_submit_comfy", submit)
     current = task()
