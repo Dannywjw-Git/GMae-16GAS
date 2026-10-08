@@ -20,6 +20,9 @@ def journal(tmp_path, monkeypatch):
     previous = registry.get('operation_journal')
     registry.delete('operation_journal')
     coordinator.restore_resource_operations()
+    # These boundary tests inject subprocess.run locally. The supervisor path
+    # is separately covered with real independent processes.
+    registry.get('operation_journal').supervised = False
     monkeypatch.setattr(coordinator, 'assess', lambda *args: None)
     yield registry.get('operation_journal')
     if previous is None:

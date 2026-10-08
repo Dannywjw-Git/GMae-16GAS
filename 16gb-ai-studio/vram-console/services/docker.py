@@ -51,7 +51,7 @@ def infer_scene(containers: list) -> str:
     return "dialogue"
 
 
-@coordinated(lambda a: OperationSpec(a["action"] if a["action"] in ("start", "restart", "unpause") else "release", a["name"]), shape="tuple")
+@coordinated(lambda a: OperationSpec(a["action"] if a["action"] in ("start", "restart", "unpause") else "release", a["name"], command_only=True), shape="tuple")
 def docker_action(name: str, action: str) -> tuple:
     """启停受管 GPU Docker 容器，白名单校验。"""
     if name not in ("comfyui", "fooocus", "ollama"):
@@ -79,7 +79,7 @@ def _container_has_gpu(name):
         return False
 
 
-@coordinated(lambda a: OperationSpec("release", a["name"]), shape="dict")
+@coordinated(lambda a: OperationSpec("release", a["name"], command_only=True), shape="dict")
 def container_stop(name: str) -> dict:
     """停止指定 Docker 容器。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
@@ -100,7 +100,7 @@ def get_paused_containers() -> dict:
     return dict(_paused_containers)
 
 
-@coordinated(lambda a: OperationSpec("release", a["name"]), shape="dict")
+@coordinated(lambda a: OperationSpec("release", a["name"], command_only=True), shape="dict")
 def container_pause(name: str) -> dict:
     """暂停容器（L2 分级释放，保留状态可秒级恢复）。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
@@ -115,7 +115,7 @@ def container_pause(name: str) -> dict:
     return {"ok": ok, "name": name, "message": msg[-200:]}
 
 
-@coordinated(lambda a: OperationSpec("unpause", a["name"]), shape="dict")
+@coordinated(lambda a: OperationSpec("unpause", a["name"], command_only=True), shape="dict")
 def container_unpause(name: str) -> dict:
     """恢复暂停的容器。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
