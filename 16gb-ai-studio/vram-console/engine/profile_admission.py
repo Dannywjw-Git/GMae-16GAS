@@ -25,7 +25,8 @@ def _root():
 def select_profile(workflow):
     """Pin installed evidence at acceptance; HTTP callers cannot provide peaks."""
     digest = workload_fingerprint(workflow)
-    profile_key = execution_configuration_fingerprint(workflow)
+    profile_key = (digest if isinstance(workflow.get('model'), str)
+                   else execution_configuration_fingerprint(workflow))
     manifest_path = _root() / (profile_key + '.json')
     if not manifest_path.exists():
         return None
@@ -80,6 +81,9 @@ def _live_environment(raw):
     Cache assumes ordinary immutable model deployment, not adversarial metadata
     spoofing. Fresh container ID and file inode/ctime/mtime/size fence replacement.
     """
+    if raw.get('kind') == 'real_ollama_calibration':
+        from clients.ollama_client import live_profile_environment
+        return live_profile_environment(raw['request']['model'])
     rc, output = run_args(['nvidia-smi', '--id=0',
         '--query-gpu=name,uuid,driver_version,memory.total', '--format=csv,noheader,nounits'], 10)
     if rc:

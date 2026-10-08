@@ -101,6 +101,9 @@ def profile_from_evidence(raw_bytes, margin_mb):
     if not isinstance(raw_bytes, bytes):
         raise ValueError('raw evidence must be bytes')
     raw = json.loads(raw_bytes)
+    if raw.get('kind') == 'real_ollama_calibration':
+        from core.ollama_profile import profile_from_evidence as ollama_profile
+        return ollama_profile(raw_bytes, margin_mb)
     if (raw.get('kind') != 'real_gpu_baseline' or raw.get('terminal_status') != 'success'
             or raw.get('sampler_cache_hit') is not False or raw.get('sampling_errors') != []):
         raise ValueError('successful uncached trial without sampling errors required')

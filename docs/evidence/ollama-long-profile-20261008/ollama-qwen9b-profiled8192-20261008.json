@@ -1,0 +1,2555 @@
+{
+  "kind": "real_ollama_profiled_trial",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "Read the following notes and summarize their common point in one sentence.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\n\nIn one short sentence, explain why GPU memory scheduling matters.",
+    "think": false,
+    "stream": false,
+    "keep_alive": "30m",
+    "options": {
+      "num_ctx": 8192,
+      "num_predict": 32,
+      "temperature": 0,
+      "seed": 20261008
+    }
+  },
+  "profile_reference": {
+    "workflow_sha256": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+    "profile_key": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+    "raw_sha256": "169728e2b4b790d23a6a800add4d70bfffbab4e6ead8fedea3a2707b59eb6a51",
+    "margin_mb": 512
+  },
+  "samples": [
+    {
+      "monotonic_s": 50141.187,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50141.437,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50141.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50141.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50142.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50142.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50142.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50142.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50143.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50143.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50143.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50143.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50144.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50144.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50144.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50144.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50145.218,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50145.468,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50145.718,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50145.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50146.234,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50146.484,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50146.75,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50147.015,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50147.265,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50147.531,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50147.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50148.046,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50148.296,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50148.562,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50148.812,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50149.078,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50149.343,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50149.609,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50149.859,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50150.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50150.39,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50150.64,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50150.906,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50151.171,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50151.437,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50151.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50151.968,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50152.234,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50152.484,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50152.75,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50153.015,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50153.281,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50153.546,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50153.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50154.046,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50154.296,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50154.562,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50154.812,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50155.078,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50155.343,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50155.609,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50155.875,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50156.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50156.39,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50156.64,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50156.875,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50157.14,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50157.406,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50157.671,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50157.937,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50158.187,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50158.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50158.718,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50158.984,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50159.25,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50159.515,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50159.781,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50160.046,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50160.312,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50160.578,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50160.828,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50161.093,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50161.328,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50161.593,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50161.843,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50162.093,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50162.359,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50162.625,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50162.875,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50163.14,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50163.39,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50163.656,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50163.921,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50164.187,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50164.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50164.718,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50164.984,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50165.25,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50165.515,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50165.765,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50166.031,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50166.281,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50166.546,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50166.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50167.046,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50167.312,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50167.562,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50167.828,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50168.093,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50168.343,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50168.609,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50168.859,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50169.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50169.39,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50169.656,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50169.921,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50170.171,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50170.421,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50170.687,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50170.937,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50171.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50171.437,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50171.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50171.984,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50172.234,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50172.5,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50172.765,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50173.015,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50173.281,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50173.546,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50173.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50174.062,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50174.328,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50174.593,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50174.843,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50175.093,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50175.359,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50175.625,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50175.875,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50176.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50176.375,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50176.64,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50176.89,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50177.14,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50177.406,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50177.656,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50177.921,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50178.187,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50178.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50178.703,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50178.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50179.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50179.468,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50179.734,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50179.984,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50180.25,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50180.515,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50180.781,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50181.031,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50181.281,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50181.531,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50181.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50182.062,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50182.343,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50182.609,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50182.859,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50183.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50183.375,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50183.625,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50183.89,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50184.156,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50184.421,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50184.687,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50184.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50185.203,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50185.468,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50185.734,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50186.0,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50186.25,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50186.5,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50186.765,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50187.015,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50187.281,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50187.531,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50187.796,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50188.062,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50188.312,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50188.562,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50188.812,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50189.078,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50189.343,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50189.609,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50189.859,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50190.125,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50190.375,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50190.625,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50190.89,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50191.156,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50191.406,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50191.671,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50191.921,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50192.171,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50192.421,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50192.671,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50192.906,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50193.171,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50193.421,
+      "total_mb": 16380,
+      "used_mb": 1418,
+      "free_mb": 14690,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50193.687,
+      "total_mb": 16380,
+      "used_mb": 1418,
+      "free_mb": 14690,
+      "utilization": 22
+    },
+    {
+      "monotonic_s": 50193.953,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 22
+    },
+    {
+      "monotonic_s": 50194.234,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50194.484,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50194.734,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 25
+    },
+    {
+      "monotonic_s": 50195.0,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 25
+    },
+    {
+      "monotonic_s": 50195.25,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50195.5,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50195.75,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50196.0,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50196.25,
+      "total_mb": 16380,
+      "used_mb": 1528,
+      "free_mb": 14580,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50196.515,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50196.765,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50197.015,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50197.265,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50197.515,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50197.765,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50198.015,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50198.281,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50198.531,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50198.781,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50199.046,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50199.296,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50199.546,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50199.796,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50200.062,
+      "total_mb": 16380,
+      "used_mb": 6246,
+      "free_mb": 9862,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50200.312,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50200.578,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50200.828,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50201.093,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50201.359,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50201.609,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50201.875,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50202.14,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50202.406,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 50202.671,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50202.937,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50203.203,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50203.468,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50203.718,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 50203.984,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 50204.25,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50204.515,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50204.781,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50205.046,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50205.296,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50205.562,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50205.828,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 50206.093,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50206.359,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50206.625,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 18
+    },
+    {
+      "monotonic_s": 50206.89,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 18
+    },
+    {
+      "monotonic_s": 50207.156,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 50207.421,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 50207.687,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50207.953,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50208.218,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50208.468,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50208.718,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 50208.968,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 50209.218,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50209.484,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50209.734,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50210.0,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50210.265,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50210.531,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50210.796,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50211.062,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50211.328,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 50211.578,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50211.828,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50212.078,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50212.343,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50212.609,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50212.875,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 50213.14,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50213.406,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50213.671,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50213.937,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 50214.187,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50214.453,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 50214.718,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 50214.984,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 50215.234,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 50215.5,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 50215.765,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 50216.015,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 50216.265,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50216.515,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50216.781,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50217.046,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50217.296,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50217.562,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 50217.828,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 50218.093,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50218.343,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 50218.593,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50218.828,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50219.093,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50219.359,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50219.625,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50219.89,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50220.156,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50220.421,
+      "total_mb": 16380,
+      "used_mb": 6245,
+      "free_mb": 9863,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 50220.687,
+      "total_mb": 16380,
+      "used_mb": 6763,
+      "free_mb": 9345,
+      "utilization": 69
+    },
+    {
+      "monotonic_s": 50220.953,
+      "total_mb": 16380,
+      "used_mb": 6763,
+      "free_mb": 9345,
+      "utilization": 69
+    },
+    {
+      "monotonic_s": 50221.203,
+      "total_mb": 16380,
+      "used_mb": 6763,
+      "free_mb": 9345,
+      "utilization": 49
+    },
+    {
+      "monotonic_s": 50221.468,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 49
+    },
+    {
+      "monotonic_s": 50221.718,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 50221.984,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 50222.234,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50222.5,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50222.75,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50223.015,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50223.281,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50223.531,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50223.781,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50224.046,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50224.296,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50224.562,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 50224.828,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50225.078,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50225.343,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50225.593,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50225.859,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 50226.125,
+      "total_mb": 16380,
+      "used_mb": 7777,
+      "free_mb": 8331,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50226.39,
+      "total_mb": 16380,
+      "used_mb": 8035,
+      "free_mb": 8073,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 50226.64,
+      "total_mb": 16380,
+      "used_mb": 8035,
+      "free_mb": 8073,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50226.89,
+      "total_mb": 16380,
+      "used_mb": 8035,
+      "free_mb": 8073,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50227.14,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 63
+    },
+    {
+      "monotonic_s": 50227.39,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 63
+    },
+    {
+      "monotonic_s": 50227.687,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50227.937,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50228.187,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50228.453,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50228.703,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50228.968,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50229.218,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50229.484,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 50229.75,
+      "total_mb": 16380,
+      "used_mb": 8047,
+      "free_mb": 8061,
+      "utilization": 91
+    }
+  ],
+  "sampling_errors": [],
+  "preparation": {
+    "condition": "model_unloaded_low_torch_verified",
+    "duration_s": 1.8910000000032596,
+    "managed_release": {
+      "ok": true,
+      "http": 200,
+      "free_mb_before": 14698,
+      "free_mb_after": 14698,
+      "freed_mb": 0
+    },
+    "readings": [
+      {
+        "gpu": {
+          "monotonic_s": 50140.875,
+          "total_mb": 16380,
+          "used_mb": 1410,
+          "free_mb": 14698,
+          "utilization": 1
+        },
+        "torch_resident_bytes": 8519680
+      }
+    ],
+    "limitation": "low torch occupancy does not prove CPU/disk caches cold"
+  },
+  "baseline": {
+    "monotonic_s": 50141.125,
+    "total_mb": 16380,
+    "used_mb": 1410,
+    "free_mb": 14698,
+    "utilization": 0
+  },
+  "admission": {
+    "operation": "generate",
+    "owner": "experiment:profiled-ollama",
+    "service": "ollama",
+    "model": "qwen3.5:9b",
+    "peak_mb": 8833,
+    "token_sha256": "b1c1ebaa4714b90216cf8c8d1a3bd71aad19a998a1468ce415fccb58f8c7c870",
+    "phase": "reserved",
+    "started_monotonic_s": 50141.125,
+    "target_model": "qwen3.5:9b",
+    "budget": {
+      "source": "ollama",
+      "id": "qwen3.5:9b",
+      "name": "Qwen3.5 9B",
+      "vram_gb": 8.6259765625,
+      "exclusive": false,
+      "loaded": false,
+      "decision": "ok",
+      "need_free_gb": 0,
+      "gap_gb": 0,
+      "note": "\u53ef\u76f4\u63a5\u52a0\u8f7d\uff08\u542b\u5f53\u524d\u9a7b\u7559\u5360\u7528\uff09",
+      "avg_seconds": null,
+      "gen_count": 0,
+      "est_time_text": "\u9996\u6b21\u8fd0\u884c\uff0c\u4f30\u7b97\u7ea6 4\u520618\u79d2",
+      "context_vram": {
+        "16384": 6.2,
+        "65536": 7.7,
+        "131072": 9.9,
+        "200704": 11.0
+      },
+      "default_ctx": 16384,
+      "specified_ctx": 8192,
+      "measured_profile": {
+        "ok": true,
+        "peak_mb": 8833,
+        "basis": "exact_workflow_measured_envelope",
+        "sample_count": 1,
+        "workflow_sha256": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+        "calibration_workflow_sha256": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+        "match_policy": "exact",
+        "evidence_sha256": "169728e2b4b790d23a6a800add4d70bfffbab4e6ead8fedea3a2707b59eb6a51",
+        "margin_mb": 512,
+        "limitation": "observed peaks plus margin are not an OOM guarantee",
+        "profile_status": "raw_evidence_and_live_identity_verified",
+        "memory_scope": "sampled_whole_device_upper_envelope",
+        "limitations": [
+          "single trial",
+          "exact prompt and all request parameters only",
+          "sampling may miss peaks",
+          "includes background memory",
+          "long synthetic prompt; not full-context or worst-case peak"
+        ]
+      },
+      "profile_status": "raw_evidence_and_live_identity_verified"
+    },
+    "available_mb": 12186,
+    "telemetry": {
+      "total_mb": 16380,
+      "used_mb": 1682,
+      "free_mb": 14698
+    }
+  },
+  "response_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "prompt_eval_count": 6182,
+    "eval_count": 24,
+    "total_duration": 36755332438,
+    "load_duration": 33892407015,
+    "prompt_eval_duration": 2279245000,
+    "eval_duration": 546060000
+  },
+  "resident_after": [
+    {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "size": 5729167604,
+      "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-10-08T07:56:11.936815634Z",
+      "size_vram": 5729167604,
+      "context_length": 8192
+    }
+  ],
+  "output_sha256": "bb3b922ec067a4b3b58d5ea9826f2109df9b52c95a88211e3f0b66ae7b588317",
+  "status": "success",
+  "duration_s": 88.73399999999674,
+  "sampler_stopped": true,
+  "observed_whole_device_peak_mb": 8319
+}

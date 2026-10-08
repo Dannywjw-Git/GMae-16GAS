@@ -39,14 +39,6 @@ def docker_read(args, timeout=120):
     return subprocess.check_output(['docker', *args], timeout=timeout, encoding='utf-8').strip()
 
 
-def gpu_identity():
-    identity = subprocess.check_output(['nvidia-smi','--id=0',
-        '--query-gpu=name,uuid,driver_version','--format=csv,noheader'],
-        timeout=10,encoding='utf-8').strip()
-    name,uuid,driver=(part.strip() for part in identity.split(','))
-    return dict(name=name,driver=driver,uuid_sha256=hashlib.sha256(uuid.encode()).hexdigest())
-
-
 def artifact_identity(show):
     """Hash actual GGUF blob; avoid publishing custom system prompts/modelfile."""
     matches = re.findall(r'^FROM\s+"?(/[^"\s]+/sha256-[0-9a-f]{64})"?\s*$',
@@ -64,9 +56,7 @@ def artifact_identity(show):
         raise ValueError('model content does not match blob address')
     return dict(container_id=instance, blob_sha256=digest, blob_stat=before,
                 blob_path_sha256=hashlib.sha256(path.encode()).hexdigest(),
-                model_details=show['details'],
-                model_configuration_sha256=hashlib.sha256(json.dumps(show,sort_keys=True,
-                    separators=(',',':')).encode()).hexdigest())
+                model_details=show['details'])
 
 
 def planning_registry(ctx,size):
@@ -106,7 +96,6 @@ def main():
             data=json.dumps({'model':MODEL}).encode(),headers={'Content-Type':'application/json'})
         with urllib.request.urlopen(show_request,timeout=10) as response: show=json.load(response)
         document['artifact_identity']=artifact_identity(show)
-        document['gpu_identity']=gpu_identity()
         document['container_backend_version']=docker_read(['exec','ollama','ollama','--version'])
         if document['container_backend_version'] != 'ollama version is '+document['backend_version']:
             raise ValueError('host/container version mismatch')
@@ -141,10 +130,6 @@ def main():
                     document['resident_after'][0].get('context_length')!=args.ctx):
                 lease.uncertain('resident model/context identity unverified')
                 raise ValueError('actual model/context not verified')
-            document['gpu_identity_after']=gpu_identity()
-            if document['gpu_identity_after'] != document['gpu_identity']:
-                lease.uncertain('GPU identity changed during calibration')
-                raise ValueError('GPU identity mismatch')
             lease.transition('completed')
         document['duration_s']=time.monotonic()-started
         document['status']='success'

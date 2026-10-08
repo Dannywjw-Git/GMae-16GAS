@@ -130,6 +130,14 @@ def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[di
     context = {spec.model: spec.ctx} if spec.ctx is not None else None
     measured = None
     if spec.profile_reference is not None:
+        if (spec.service != 'ollama' and isinstance(spec.workflow, dict)
+                and isinstance(spec.workflow.get('model'), str)):
+            raise ResourceDenied('PROFILE_UNVERIFIED', '测量证据不能跨服务授权')
+        if spec.service == 'ollama' and (not isinstance(spec.workflow, dict)
+                or spec.workflow.get('model') != spec.model
+                or spec.workflow.get('options', {}).get('num_ctx') != spec.ctx
+                or spec.operation != 'generate'):
+            raise ResourceDenied('PROFILE_UNVERIFIED', 'Ollama 请求与受管执行意图不一致')
         from engine.profile_admission import measured_budget
         measured = measured_budget(spec.workflow, spec.profile_reference)
         result = budget_engine(context, force_refresh=True,
