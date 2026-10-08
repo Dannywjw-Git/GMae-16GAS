@@ -93,9 +93,10 @@ if __name__ == "__main__":
         server = ThreadingHTTPServer((HOST, PORT), Handler)
         # Fail closed on unavailable storage and restore unknown GPU ownership
         # before any reaper/QoS mutations or HTTP requests can run.
-        from engine.coordinator import restore_resource_operations
+        from engine.coordinator import restore_resource_operations, reconcile_recovered_operations
         restore_resource_operations()
         queue_restore()
+        reconcile_recovered_operations()
 
         # 启动后台线程
         start_idle_reaper()      # 后台空闲回收线程

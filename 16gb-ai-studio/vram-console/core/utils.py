@@ -42,6 +42,7 @@ def _safe_model_name(name: str) -> tuple:
 def run_args(args: list, timeout: int = 30) -> tuple:
     """安全执行命令（shell=False + 参数数组）。"""
     journal, command_id, coordinator, token = None, None, None, None
+    tracked = False
     try:
         from core.registry import registry
         coordinator = registry.get('resource_coordinator')
@@ -56,6 +57,12 @@ def run_args(args: list, timeout: int = 30) -> tuple:
             args[1] in ('ps', 'inspect', 'stats', 'version', 'info', 'events'))
         tracked = active and active.get('journal_id') and active['phase'] in ('running', 'releasing', 'stopping') and not read_only
         if journal is not None and tracked:
+            if journal.supervised:
+                from core.command_worker import run_supervised
+                command_id, (return_code, output) = run_supervised(journal, active['journal_id'], args, timeout)
+                if return_code != 0:
+                    coordinator.transition(token, 'uncertain', {'reason': '命令执行未确认成功', 'command_id': command_id})
+                return return_code, output
             command_id = journal.command_begin(active['journal_id'], args)
         p = subprocess.run(args, shell=False, capture_output=True, text=True, timeout=timeout)
         out = (p.stdout or "") + (p.stderr or "")
@@ -74,7 +81,7 @@ def run_args(args: list, timeout: int = 30) -> tuple:
                 pass  # The durable inflight receipt still blocks recovery.
         return -1, "TIMEOUT"
     except Exception as e:
-        if command_id:
+        if command_id or (journal is not None and token and tracked and journal.supervised):
             coordinator.transition(token, 'uncertain', {'reason': '命令执行或结束记录不可用', 'command_id': command_id})
         return -2, str(e)
 

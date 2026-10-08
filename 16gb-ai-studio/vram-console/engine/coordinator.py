@@ -25,6 +25,7 @@ class OperationSpec:
     model: str | None = None
     ctx: int | None = None
     owner: str | None = None
+    command_only: bool = False
 
 
 def get_coordinator() -> ResourceCoordinator:
@@ -65,16 +66,17 @@ def restore_resource_operations():
 
 class _TrackedLease(ResourceLease):
     """Persist immediately before the first adapter mutation phase."""
-    def __init__(self, lease, journal, request):
+    def __init__(self, lease, journal, request, command_only=False):
         super().__init__(lease.coordinator, lease.token, lease.borrowed)
         self.journal = journal
         self.request = request
         self.operation_id = None
+        self.command_only = command_only
 
     def transition(self, phase, **details):
         if (self.journal is not None and not self.borrowed and self.operation_id is None and
                 phase in ('running', 'releasing', 'stopping')):
-            self.operation_id = self.journal.begin(asdict(self.request))
+            self.operation_id = self.journal.begin({**asdict(self.request), 'command_only': self.command_only})
         if self.operation_id:
             details['journal_id'] = self.operation_id
         super().transition(phase, **details)
@@ -217,7 +219,7 @@ def coordinated_operation(spec: OperationSpec) -> Iterator[ResourceLease]:
 
     def assessed(lease):
         nonlocal tracked
-        tracked = _TrackedLease(lease, journal, request)
+        tracked = _TrackedLease(lease, journal, request, spec.command_only)
         try:
             assess(spec, tracked)
         except BaseException:
@@ -306,6 +308,8 @@ def reconcile_uncertain() -> dict:
         return {"ok": True, "resolved": False, "message": "没有待核验的执行"}
     prompt_id = active.get("prompt_id")
     if active.get("service") != "comfyui" or not prompt_id:
+        if active.get('journal_id'):
+            return _reconcile_command_operation(coordinator, active)
         return {"ok": False, "code": "UNCONFIRMED_EXECUTION",
                 "error": "该后端未提供可核验的任务结束记录，资源预留继续保留"}
     from clients.comfyui_client import _get
@@ -340,6 +344,58 @@ def reconcile_uncertain() -> dict:
                                              "status": status})
         log_event("resource_reconciled", owner=active["owner"], prompt_id=prompt_id)
         return {"ok": True, "resolved": True, "prompt_id": prompt_id}
+    except ResourceDenied as error:
+        return error.result()
+    except Exception as error:
+        return {'ok': False, 'code': 'TASK_STORAGE_UNAVAILABLE', 'error': str(error)}
+
+
+def reconcile_recovered_operations(limit=32):
+    """Bounded startup reconciliation; no watchdog and no blind replay."""
+    results = []
+    for _ in range(limit):
+        active = get_coordinator().snapshot()['active']
+        if not active or active['phase'] != 'uncertain':
+            break
+        result = reconcile_uncertain()
+        results.append(result)
+        if not result.get('resolved'):
+            break
+    return results
+
+
+def _reconcile_command_operation(coordinator, active):
+    """Confirm interrupted single-container control only from owned receipts.
+
+    This proves completion of the original control command, not GPU idleness.
+    A new operation still passes ordinary fresh admission. Mixed operations,
+    scripts, container exec and unconfirmed/nonzero receipts remain blocked.
+    """
+    try:
+        journal = registry.get('operation_journal')
+        record = journal.get(active['journal_id']) if journal else None
+        if not record or record['intent'].get('command_only') is not True:
+            raise ResourceDenied('UNCONFIRMED_EXECUTION', '该操作不具备完整独立命令回执，继续保留预留')
+        intent = record['intent']
+        if any(intent.get(key) != active.get(key) for key in ('owner', 'operation', 'service', 'model')):
+            raise ResourceDenied('UNCONFIRMED_EXECUTION', '操作日志身份不匹配')
+        commands = journal.commands(record['id'])
+        if len(commands) != 1 or commands[0]['state'] != 'confirmed' or commands[0]['return_code'] != 0:
+            raise ResourceDenied('UNCONFIRMED_EXECUTION', '命令仍未确认成功，不能解除预留')
+        args = commands[0]['intent']
+        permitted = {'start': {'start'}, 'restart': {'restart'}, 'unpause': {'unpause'}, 'release': {'stop', 'pause'}}
+        if (len(args) != 3 or os.path.basename(args[0]).lower() not in ('docker', 'docker.exe') or
+                args[1] not in permitted.get(intent['operation'], set()) or
+                args[2] != intent['service'] or args[2] not in ('comfyui', 'ollama', 'fooocus')):
+            raise ResourceDenied('UNCONFIRMED_EXECUTION', '回执不属于支持核验的单条容器控制命令')
+        fresh_gpu()
+        evidence = {'terminal': True, 'operation_id': record['id'], 'command_id': commands[0]['id'],
+                    'status': 'interrupted_operation_command_completed'}
+        if record['state'] != 'confirmed':
+            journal.finish(record['id'], True, evidence)
+        coordinator.resolve(active['token'], evidence)
+        return {'ok': True, 'resolved': True, 'operation_id': record['id'],
+                'note': '原容器控制命令已结束；中断流程未重放，后续操作仍须重新准入'}
     except ResourceDenied as error:
         return error.result()
     except Exception as error:
