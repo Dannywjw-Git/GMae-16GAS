@@ -27,4 +27,5 @@ def post_preview(req: Request) -> Response:
 @router.post("/api/coordinator/reconcile")
 def post_reconcile(req: Request) -> Response:
     """Client cannot supply terminal evidence or arbitrarily clear a reservation."""
+    req.body  # Consume the request stream; never use it as terminal evidence.
     return Response.from_result(reconcile_uncertain())

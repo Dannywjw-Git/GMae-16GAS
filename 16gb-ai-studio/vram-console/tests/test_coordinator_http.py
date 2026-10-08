@@ -23,7 +23,7 @@ def http_endpoint(monkeypatch):
         if authenticated:
             headers['X-API-Key'] = 'test-only-token'
         try:
-            connection.request(method, path, json.dumps(body or {}), headers)
+            connection.request(method, path, json.dumps(body) if body is not None else None, headers)
             response = connection.getresponse()
             return response.status, json.loads(response.read())
         finally:
