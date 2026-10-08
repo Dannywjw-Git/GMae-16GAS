@@ -52,7 +52,10 @@ def phase_profile_from_evidence(payload, margin_mb):
 
 def match_resident_phase(profile, snapshot, artifact_identity):
     """The host separately hashes the file; observation alone cannot prove content."""
-    if residency_key(snapshot) != profile['residency_key']:
+    current, calibrated = residency_key(snapshot), profile['residency_key']
+    if current['epoch'] < calibrated['epoch']:
+        raise ValueError('observer epoch regressed')
+    if {k:v for k,v in current.items() if k != 'epoch'} != {k:v for k,v in calibrated.items() if k != 'epoch'}:
         raise ValueError('fresh residency does not match calibrated state')
     if artifact_identity['model_digest'] != profile['environment']['model_digest']:
         raise ValueError('artifact digest mismatch')

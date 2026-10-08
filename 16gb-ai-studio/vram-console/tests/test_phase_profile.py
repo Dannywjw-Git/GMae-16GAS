@@ -27,12 +27,12 @@ def test_increment_is_distinct_from_large_model_size(trace):
     assert result['increment_mb'] < result['resident_model_mb']
 
 
-@pytest.mark.parametrize('change', ['restart', 'reload', 'unknown', 'partial', 'busy', 'file', 'observer'])
+@pytest.mark.parametrize('change', ['restart', 'epoch_regressed', 'unknown', 'partial', 'busy', 'file', 'observer'])
 def test_changed_or_unverified_state_cannot_reuse(trace, change):
     profile = build(trace)
     snapshot = deepcopy(trace['residency_after'])
     if change == 'restart': snapshot['backend_instance_id'] = '00000000-0000-0000-0000-000000000000'
-    elif change == 'reload': snapshot['load_epoch'] += 1
+    elif change == 'epoch_regressed': snapshot['load_epoch'] = 0
     elif change == 'unknown': snapshot['components'][0]['known'] = False
     elif change == 'partial': snapshot['components'][0]['resident_bytes'] -= 1
     elif change == 'busy': snapshot['activity']['running'] = 1
@@ -56,3 +56,18 @@ def test_content_digest_is_required_separately(trace):
     source = trace['residency_before']['components'][0]
     with pytest.raises(ValueError, match='artifact digest'):
         match_resident_phase(profile, trace['residency_after'],dict(model_digest='0'*64,file_identity=source['file_identity'],path_sha256=source['path_sha256']))
+
+
+def test_known_complete_reloaded_state_can_match_same_physical_condition(trace):
+    profile = build(trace)
+    snapshot = deepcopy(trace['residency_after'])
+    snapshot['load_epoch'] += 1
+    source = snapshot['components'][0]
+    result = match_resident_phase(profile,snapshot,dict(model_digest=trace['model_artifact']['sha256'],file_identity=source['file_identity'],path_sha256=source['path_sha256']))
+    assert result['increment_mb']==1184
+
+
+def test_loading_across_calibration_window_cannot_define_resident_growth(trace):
+    trace['residency_after']['load_epoch']+=1
+    with pytest.raises(ValueError,match='changed during calibration'):
+        build(trace)
