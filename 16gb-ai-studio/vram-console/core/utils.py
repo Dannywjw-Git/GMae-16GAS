@@ -64,7 +64,8 @@ def run_args(args: list, timeout: int = 30) -> tuple:
                     coordinator.transition(token, 'uncertain', {'reason': '命令执行未确认成功', 'command_id': command_id})
                 return return_code, output
             command_id = journal.command_begin(active['journal_id'], args)
-        p = subprocess.run(args, shell=False, capture_output=True, text=True, timeout=timeout)
+        text_options = {"encoding": "utf-8", "errors": "replace"} if executable in ("docker", "docker.exe") else {}
+        p = subprocess.run(args, shell=False, capture_output=True, text=True, timeout=timeout, **text_options)
         out = (p.stdout or "") + (p.stderr or "")
         if command_id:
             journal.command_finish(command_id, p.returncode)

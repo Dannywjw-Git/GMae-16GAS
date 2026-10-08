@@ -1,0 +1,447 @@
+{
+  "kind": "comfy_startup_calibration",
+  "recorded_at": "2026-10-08T06:04:58.020372+00:00",
+  "production_profile_installed": false,
+  "warm_admission_enabled": false,
+  "experimental_capacity_bound_mb": 10240,
+  "reserve_mb": 2560,
+  "samples": [],
+  "sampling_errors": [],
+  "preparation": {
+    "condition": "model_unloaded_low_torch_verified",
+    "duration_s": 15.218999999997322,
+    "managed_release": {
+      "ok": true,
+      "http": 200,
+      "free_mb_before": 8079,
+      "free_mb_after": 8079,
+      "freed_mb": 0
+    },
+    "readings": [
+      {
+        "gpu": {
+          "monotonic_s": 45358.015,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 22
+        },
+        "torch_resident_bytes": 6353652812
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45358.343,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 23
+        },
+        "torch_resident_bytes": 6130653772
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45358.64,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 55
+        },
+        "torch_resident_bytes": 5845323852
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45358.953,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 55
+        },
+        "torch_resident_bytes": 5304193612
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45359.25,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 61
+        },
+        "torch_resident_bytes": 4745354568
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45359.562,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 58
+        },
+        "torch_resident_bytes": 4214172488
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45359.859,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 58
+        },
+        "torch_resident_bytes": 4029261128
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45360.171,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 29
+        },
+        "torch_resident_bytes": 3751214408
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45360.468,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 29
+        },
+        "torch_resident_bytes": 3681702728
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45360.765,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 10
+        },
+        "torch_resident_bytes": 3572846408
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45361.093,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 13
+        },
+        "torch_resident_bytes": 3482992968
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45361.421,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 13
+        },
+        "torch_resident_bytes": 3404326728
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45361.75,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 20
+        },
+        "torch_resident_bytes": 3308580168
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45362.078,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 23
+        },
+        "torch_resident_bytes": 3217439048
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45362.39,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 23
+        },
+        "torch_resident_bytes": 3139389768
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45362.687,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 19
+        },
+        "torch_resident_bytes": 3069878088
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45362.984,
+          "total_mb": 16380,
+          "used_mb": 8029,
+          "free_mb": 8079,
+          "utilization": 19
+        },
+        "torch_resident_bytes": 2997089608
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45363.296,
+          "total_mb": 16380,
+          "used_mb": 8028,
+          "free_mb": 8080,
+          "utilization": 20
+        },
+        "torch_resident_bytes": 2719035208
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45363.609,
+          "total_mb": 16380,
+          "used_mb": 8028,
+          "free_mb": 8080,
+          "utilization": 30
+        },
+        "torch_resident_bytes": 2594483528
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45363.937,
+          "total_mb": 16380,
+          "used_mb": 8028,
+          "free_mb": 8080,
+          "utilization": 30
+        },
+        "torch_resident_bytes": 2479083848
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45364.234,
+          "total_mb": 16380,
+          "used_mb": 8028,
+          "free_mb": 8080,
+          "utilization": 12
+        },
+        "torch_resident_bytes": 2446292808
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45364.562,
+          "total_mb": 16380,
+          "used_mb": 8028,
+          "free_mb": 8080,
+          "utilization": 19
+        },
+        "torch_resident_bytes": 2403016008
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45364.875,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 19
+        },
+        "torch_resident_bytes": 2333504328
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45365.218,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 24
+        },
+        "torch_resident_bytes": 2207590728
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45365.531,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 35
+        },
+        "torch_resident_bytes": 2098734408
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45365.843,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 35
+        },
+        "torch_resident_bytes": 1959711048
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45366.156,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 24
+        },
+        "torch_resident_bytes": 1890199368
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45366.468,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 24
+        },
+        "torch_resident_bytes": 1794473288
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45366.796,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 24
+        },
+        "torch_resident_bytes": 1629896008
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45367.109,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 21
+        },
+        "torch_resident_bytes": 1560384328
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45367.421,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 21
+        },
+        "torch_resident_bytes": 1477092168
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45367.718,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 21
+        },
+        "torch_resident_bytes": 1394470728
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45368.046,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 20
+        },
+        "torch_resident_bytes": 1324959048
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45368.343,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 20
+        },
+        "torch_resident_bytes": 1255447368
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45368.64,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 35
+        },
+        "torch_resident_bytes": 1138071368
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45368.953,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 35
+        },
+        "torch_resident_bytes": 1056735048
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45369.25,
+          "total_mb": 16380,
+          "used_mb": 8017,
+          "free_mb": 8091,
+          "utilization": 41
+        },
+        "torch_resident_bytes": 862658888
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45369.578,
+          "total_mb": 16380,
+          "used_mb": 8021,
+          "free_mb": 8087,
+          "utilization": 27
+        },
+        "torch_resident_bytes": 793147208
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45369.89,
+          "total_mb": 16380,
+          "used_mb": 8021,
+          "free_mb": 8087,
+          "utilization": 27
+        },
+        "torch_resident_bytes": 402312008
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45370.187,
+          "total_mb": 16380,
+          "used_mb": 3829,
+          "free_mb": 12279,
+          "utilization": 73
+        },
+        "torch_resident_bytes": 8519680
+      },
+      {
+        "gpu": {
+          "monotonic_s": 45371.359,
+          "total_mb": 16380,
+          "used_mb": 1397,
+          "free_mb": 14711,
+          "utilization": 1
+        },
+        "torch_resident_bytes": 8519680
+      }
+    ],
+    "limitation": "low torch occupancy does not prove CPU/disk caches cold"
+  },
+  "before_environment": {
+    "comfyui_version": "0.34.0",
+    "python_version": "3.10.12 (main, Sep 11 2024, 15:47:36) [GCC 11.4.0]",
+    "pytorch_version": "2.5.1+cu121"
+  },
+  "before_container": {
+    "ok": false,
+    "error": "invalid container inspect evidence"
+  },
+  "status": "failed",
+  "error_type": "ValueError",
+  "error": "existing container identity not verified",
+  "sampler_stopped": true
+}

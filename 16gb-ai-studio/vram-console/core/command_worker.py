@@ -23,7 +23,9 @@ def execute(path, command_id, timeout):
     if args is None:
         return False
     try:
-        process = subprocess.run(args, shell=False, capture_output=True, text=True, timeout=timeout)
+        executable = os.path.basename(str(args[0])).lower()
+        text_options = {"encoding": "utf-8", "errors": "replace"} if executable in ("docker", "docker.exe") else {}
+        process = subprocess.run(args, shell=False, capture_output=True, text=True, timeout=timeout, **text_options)
         return_code = process.returncode
         output = ((process.stdout or '') + (process.stderr or '')).strip()
     except subprocess.TimeoutExpired:
