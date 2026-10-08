@@ -388,9 +388,22 @@ def _reconcile_command_operation(coordinator, active):
                 args[1] not in permitted.get(intent['operation'], set()) or
                 args[2] != intent['service'] or args[2] not in ('comfyui', 'ollama', 'fooocus')):
             raise ResourceDenied('UNCONFIRMED_EXECUTION', '回执不属于支持核验的单条容器控制命令')
+        from clients.docker_client import container_target_state
+        state = container_target_state(args[2])
+        target_ok = (state.get('ok') is True and state.get('dead') is False and
+                     state.get('restarting') is False)
+        if args[1] == 'stop':
+            target_ok = target_ok and state.get('running') is False and state.get('paused') is False
+        elif args[1] == 'pause':
+            target_ok = target_ok and state.get('running') is True and state.get('paused') is True
+        else:
+            target_ok = target_ok and state.get('running') is True and state.get('paused') is False
+        if not target_ok:
+            raise ResourceDenied('CONTAINER_STATE_UNVERIFIED', '命令成功但容器目标状态尚未确认，保留预留')
         fresh_gpu()
         evidence = {'terminal': True, 'operation_id': record['id'], 'command_id': commands[0]['id'],
-                    'status': 'interrupted_operation_command_completed'}
+                    'status': 'interrupted_operation_command_completed', 'container_state': state,
+                    'gpu_idle_proven': False}
         if record['state'] != 'confirmed':
             journal.finish(record['id'], True, evidence)
         coordinator.resolve(active['token'], evidence)
