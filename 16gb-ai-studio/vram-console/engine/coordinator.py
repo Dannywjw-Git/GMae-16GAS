@@ -52,6 +52,14 @@ def restore_resource_operations():
             intent = record['intent']
             if intent['operation'] == 'generate' and intent['owner'].startswith('job:'):
                 task = journal.store.get(intent['owner'][4:])
+                if (task and task['status'] in ('done','canceled') and intent['service']=='ollama'
+                        and task['intent'].get('source')=='ollama'
+                        and task['intent'].get('model')==intent.get('model')):
+                    from engine.queue import _runtime_task,_confirmed_ollama_completion
+                    if _confirmed_ollama_completion(_runtime_task(task)):
+                        journal.finish(record['id'],True,{'terminal':True,'job_id':task['id'],
+                            'basis':'persisted_exact_ollama_completion'})
+                        continue
                 if task and task['status'] in ('submitting', 'running', 'uncertain'):
                     # The task's durable correlation ID is the stronger recovery
                     # record. queue_restore installs its hold; avoid duplication.

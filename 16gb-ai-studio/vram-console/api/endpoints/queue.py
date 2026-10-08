@@ -9,7 +9,7 @@
 from api.router import router
 from api.request import Request
 from api.response import Response
-from engine.queue import queue_snapshot, queue_enqueue, queue_cancel
+from engine.queue import queue_snapshot, queue_enqueue, queue_cancel, queue_enqueue_ollama
 from core.status_cache import status_cache
 from core.event_bus import event_bus
 from core.logger import log_error
@@ -29,6 +29,13 @@ def post_queue(req: Request) -> Response:
         model: 模型标识（sdxl / flux / music3 / wan2.2 等）
         params: 模型参数（prompt / steps / size 等）
     """
+    source=req.body_get('source','comfyui')
+    if source=='ollama':
+        result=queue_enqueue_ollama(req.body_get('request',None),req.body_get('idempotency_key',None))
+        status_cache.invalidate()
+        return Response.from_result(result)
+    if source!='comfyui':
+        return Response.from_result({'ok':False,'code':'INVALID_INTENT','error':'未知任务后端'})
     task_model = req.body_get("model", "")
     task_params = req.body_get("params", {})
     # 预算预检：检查当前显存是否够运行该模型

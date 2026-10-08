@@ -14,6 +14,110 @@ _real_wait = queue._queue_wait
 
 
 @pytest.fixture
+def ollama_runtime(runtime,tmp_path,monkeypatch):
+    import hashlib,json
+    from pathlib import Path
+    from core.ollama_profile import profile_from_evidence
+    payload=(Path(__file__).resolve().parents[3]/'docs/evidence/ollama-long-profile-20261008/ollama-qwen9b-long8192-20261008.json').read_bytes()
+    raw=json.loads(payload);profile=profile_from_evidence(payload,512)
+    directory=tmp_path/'profiles';directory.mkdir()
+    (directory/'raw.json').write_bytes(payload)
+    (directory/(profile['workflow_sha256']+'.json')).write_text(json.dumps(dict(
+        raw_file='raw.json',raw_sha256=hashlib.sha256(payload).hexdigest(),margin_mb=512)))
+    monkeypatch.setenv('GMAE_PROFILE_DIR',str(directory))
+    monkeypatch.setattr(queue,'REGISTRY',{'ollama':{'models':[{'id':raw['request']['model']}]},
+        'comfyui':{'models':[{'id':'m','workflow':'test.json'}]}})
+    return runtime,raw['request']
+
+
+def ollama_response(request):
+    return dict(model=request['model'],done=True,done_reason='stop',eval_count=2,
+                prompt_eval_count=10,response='test output')
+
+
+def test_ollama_intent_idempotent_and_conflicts_across_backends(ollama_runtime):
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request,'shared-key')
+    retry=queue.queue_enqueue_ollama(request,'shared-key')
+    assert first['created'] and not retry['created']
+    assert first['task']['id']==retry['task']['id'] and len(queue._task_queue)==1
+    assert queue.queue_enqueue('m',{},'shared-key')['code']=='IDEMPOTENCY_CONFLICT'
+    assert TaskStore(path).get(first['task']['id'])['intent']['effective_workflow']==request
+
+
+def test_ollama_submit_checkpoint_precedes_rpc_and_completion_is_saved(ollama_runtime,monkeypatch):
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request)
+    task=queue._tasks[first['task']['id']]
+    def rpc(body):
+        assert TaskStore(path).get(task['id'])['status']=='submitting'
+        assert coordinator.get_coordinator().snapshot()['active']['service']=='ollama'
+        return ollama_response(body)
+    monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    queue._run_task(task)
+    saved=TaskStore(path).get(task['id'])
+    assert saved['status']=='done' and saved['checkpoint']['backend_correlation_supported'] is False
+    assert queue._confirmed_ollama_completion(task)
+    assert coordinator.get_coordinator().snapshot()['active'] is None
+
+
+def test_ollama_lost_response_retained_and_never_replayed(ollama_runtime,monkeypatch):
+    _,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request)
+    rpc=Mock(side_effect=TimeoutError('response lost'))
+    monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    queue._run_task(queue._tasks[first['task']['id']])
+    assert queue._tasks[first['task']['id']]['status']=='uncertain'
+    restart()
+    active=coordinator.get_coordinator().snapshot()['active']
+    assert active['service']=='ollama' and active.get('prompt_id') is None
+    assert not queue._task_queue and rpc.call_count==1
+    assert coordinator.reconcile_uncertain()['code']=='UNCONFIRMED_EXECUTION'
+
+
+def test_ollama_cancel_during_rpc_waits_for_complete_response(ollama_runtime,monkeypatch):
+    _,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);task=queue._tasks[first['task']['id']]
+    def rpc(body):
+        result=queue.queue_cancel(task['id'])
+        assert result['backend_cancel']['code']=='CANCEL_UNSUPPORTED'
+        assert coordinator.get_coordinator().snapshot()['active'] is not None
+        return ollama_response(body)
+    monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    queue._run_task(task)
+    assert task['status']=='canceled' and queue._confirmed_ollama_completion(task)
+    assert coordinator.get_coordinator().snapshot()['active'] is None
+
+
+def test_ollama_queued_cancel_never_submits_after_restart(ollama_runtime,monkeypatch):
+    _,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request)
+    assert queue.queue_cancel(first['task']['id'])['ok']
+    rpc=Mock();monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    restart()
+    assert not queue._task_queue
+    queue._run_task(queue._tasks[first['task']['id']]);rpc.assert_not_called()
+
+
+def test_saved_ollama_response_recovers_without_backend_replay(ollama_runtime,monkeypatch):
+    import hashlib
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);store=TaskStore(path)
+    record=store.get(first['task']['id'])
+    for status in ('precheck','submitting'):
+        record=store.checkpoint(record['id'],record['version'],status,{'submission_id':'local-only'})
+    response=ollama_response(request);metrics={k:v for k,v in response.items() if k not in ('model','response')}
+    record=store.checkpoint(record['id'],record['version'],'running',dict(
+        backend_completion=dict(model=request['model'],metrics=metrics),
+        result=dict(response=response['response'],response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics)))
+    rpc=Mock();monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    restart()
+    assert store.get(record['id'])['status']=='done'
+    assert not queue._task_queue and coordinator.get_coordinator().snapshot()['active'] is None
+    rpc.assert_not_called()
+
+
+@pytest.fixture
 def runtime(tmp_path, monkeypatch):
     path = tmp_path / 'tasks.sqlite3'
     registry.delete('task_store')
