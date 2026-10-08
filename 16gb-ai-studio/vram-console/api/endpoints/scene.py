@@ -7,6 +7,7 @@
 """
 from core.logger import log_error
 from api.router import router
+from api.resource_commands import resource_command
 from api.request import Request
 from api.response import Response
 from services.scene import scene_switch, combo_switch
@@ -15,6 +16,7 @@ from core.event_bus import event_bus
 
 
 @router.post("/api/scene")
+@resource_command
 def post_scene(req: Request) -> Response:
     """切换场景。
 
@@ -34,10 +36,11 @@ def post_scene(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="scene.py:34")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/combo")
+@resource_command
 def post_combo(req: Request) -> Response:
     """切换组合（多模型组合）。
 
@@ -57,4 +60,4 @@ def post_combo(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="scene.py:57")
-    return Response.success(result)
+    return Response.from_result(result)

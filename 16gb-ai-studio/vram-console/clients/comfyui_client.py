@@ -122,13 +122,17 @@ def queue_status() -> dict:
                         cls = v["class_type"]
                         break
             pid = it[1] if len(it) > 1 and isinstance(it[1], str) else (it[0] if it else "")
-            out.append({"prompt_id": str(pid)[:8], "node": cls})
+            out.append({"prompt_id": str(pid), "node": cls})
         return out
 
+    running = brief(d.get("queue_running"))
+    pending = brief(d.get("queue_pending"))
     return {
         "ok": True,
-        "running": brief(d.get("queue_running")),
-        "pending": brief(d.get("queue_pending")),
+        "running": running,
+        "pending": pending,
+        "running_count": len(running),
+        "pending_count": len(pending),
     }
 
 

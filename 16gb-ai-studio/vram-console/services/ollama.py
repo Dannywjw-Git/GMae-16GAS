@@ -5,8 +5,9 @@ GMae Ollama 服务模块
 - 模型列表/已加载模型查询
 - 批量停止模型
 """
+from engine.coordinator import OperationSpec, coordinated
 from core.logger import log_event, log_error
-from core.config import BIG_MODELS, OLLAMA_CONTAINER
+from core.config import OLLAMA_CONTAINER
 from core.utils import _safe_model_name
 from clients.ollama_client import list_loaded_models, list_installed_models
 from clients.docker_client import exec_command
@@ -22,6 +23,7 @@ def ollama_tags() -> set:
     return list_installed_models()
 
 
+@coordinated(lambda a: OperationSpec("release", "ollama"), shape="tuple")
 def ollama_stop_all() -> tuple:
     """停止所有已加载的 ollama 模型。"""
     loaded = set()
@@ -29,7 +31,9 @@ def ollama_stop_all() -> tuple:
     if result.get("ok"):
         for m in result.get("models", []):
             loaded.add(m.get("name", ""))
-    targets = loaded | set(BIG_MODELS)
+    if not result.get("ok"):
+        return -1, "Ollama 驻留状态不可用，拒绝猜测卸载目标"
+    targets = loaded
     bad = []
     outs = []
     for m in targets:
@@ -42,6 +46,7 @@ def ollama_stop_all() -> tuple:
     return (0 if not bad else 1), " | ".join(outs) + ("" if not bad else "  FAILED: " + ",".join(bad))
 
 
+@coordinated(lambda a: OperationSpec("release", "ollama"), shape="tuple")
 def ollama_stop(names: list) -> tuple:
     """逐个停止指定的 Ollama 模型（带模型名安全校验）。"""
     bad = []

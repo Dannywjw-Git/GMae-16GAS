@@ -6,6 +6,7 @@
 """
 from core.logger import log_error
 from api.router import router
+from api.resource_commands import resource_command
 from api.request import Request
 from api.response import Response
 from gpu.process_guard import gpu_guard_kick
@@ -15,6 +16,7 @@ from core.event_bus import event_bus
 
 
 @router.post("/api/guard")
+@resource_command
 def post_guard(req: Request) -> Response:
     """显存门卫操作。
 
@@ -55,4 +57,4 @@ def post_guard(req: Request) -> Response:
             log_error("exception_suppressed", error=e, context="guard.py:53")
     else:
         result = gpu_guard_check()
-    return Response.success(result)
+    return Response.from_result(result)

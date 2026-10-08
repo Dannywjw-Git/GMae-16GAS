@@ -8,6 +8,7 @@
 """
 from core.logger import log_error
 from api.router import router
+from api.resource_commands import resource_command
 from api.request import Request
 from api.response import Response
 from services.scene import service_action, model_action
@@ -17,6 +18,7 @@ from core.event_bus import event_bus
 
 
 @router.post("/api/service")
+@resource_command
 def post_service(req: Request) -> Response:
     """服务操作。
 
@@ -38,10 +40,11 @@ def post_service(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:38")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/model")
+@resource_command
 def post_model(req: Request) -> Response:
     """模型操作。
 
@@ -71,10 +74,11 @@ def post_model(req: Request) -> Response:
             )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:71")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/container/stop")
+@resource_command
 def post_container_stop(req: Request) -> Response:
     """停止 Docker 容器。
 
@@ -94,10 +98,11 @@ def post_container_stop(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:94")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/container/pause")
+@resource_command
 def post_container_pause(req: Request) -> Response:
     """暂停 Docker 容器（L2 分级释放，保留状态可秒级恢复）。
 
@@ -117,10 +122,11 @@ def post_container_pause(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:pause")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/container/unpause")
+@resource_command
 def post_container_unpause(req: Request) -> Response:
     """恢复暂停的 Docker 容器。
 
@@ -140,4 +146,4 @@ def post_container_unpause(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="service.py:unpause")
-    return Response.success(result)
+    return Response.from_result(result)

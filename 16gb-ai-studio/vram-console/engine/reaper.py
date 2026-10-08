@@ -5,13 +5,12 @@ GMae Idle Reaper 引擎
 - 服务活跃度追踪
 - 空闲自动回收显存
 """
+from engine.coordinator import OperationSpec, coordinated
 import os
 import time
 import threading
 from core.logger import log_event, log_error
-from core.config import OLLAMA_CONTAINER
 from core.registry import registry
-from core.utils import run_args
 # 注意：本模块的 services 依赖（ollama_ps / comfy_free / comfy_queue）采用函数内延迟导入，
 # 避免 engine 层模块级依赖 services 层，保证模块可独立导入和测试。
 
@@ -31,7 +30,11 @@ def service_activity():
     from services.comfy import comfy_queue
     now = int(time.time())
     om = ollama_ps().get("models", [])
-    if om:
+    from engine.coordinator import get_coordinator
+    active = get_coordinator().snapshot().get("active") or {}
+    busy_ollama = (active.get("service") == "ollama" and active.get("operation") == "load"
+                   and active.get("phase") in ("running", "uncertain"))
+    if busy_ollama:
         _mark_busy("ollama")
     cq = comfy_queue()
     busy_comfy = cq.get("ok") and (cq.get("running_count", 0) + cq.get("pending_count", 0)) > 0
@@ -39,10 +42,13 @@ def service_activity():
         _mark_busy("comfyui")
     out = {}
     busy_map = registry.get("last_busy", {})
-    for svc, running in (("ollama", bool(om)), ("comfyui", busy_comfy), ("fooocus", False)):
+    for svc, running in (("ollama", busy_ollama), ("comfyui", busy_comfy), ("fooocus", False)):
         lb = busy_map.get(svc)
         out[svc] = {"busy": running, "last_busy": lb,
                     "idle_s": (now - lb) if (lb is not None and not running) else 0}
+        if svc == "ollama":
+            out[svc].update(resident=bool(om), activity_scope="coordinator_requests",
+                            external_activity_known=False)
     return {"ok": True, "services": out, "ts": now}
 
 
@@ -58,30 +64,24 @@ REAPER_CFG = {
 }
 
 
+@coordinated(lambda a: OperationSpec("release", a["svc"], owner="reaper:" + str(a["svc"])), shape="dict")
 def _reap_service(svc, idle_s):
-    """执行空闲回收：ollama 卸载空闲模型；comfyui 释放显存。"""
-    from services.ollama import ollama_ps
+    """Return actual release outcome and preserve idle bookkeeping on failure."""
+    from services.ollama import ollama_stop_all
     from services.comfy import comfy_free
     log_event("idle_reaper_reap", service=svc, idle_s=idle_s)
     if svc == "ollama":
-        for m in ollama_ps().get("models", []):
-            name = m.get("model") or m.get("name")
-            if not name:
-                continue
-            try:
-                rc, _ = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "stop", name], 60)
-                log_event("idle_reaper_ollama_stop", model=name, rc=rc)
-            except Exception as e:
-                log_error("idle_reaper_ollama_stop_failed", error=e, model=name)
+        rc, output = ollama_stop_all()
+        result = {"ok": rc == 0, "error": output if rc else None}
     elif svc == "comfyui":
-        try:
-            r = comfy_free()
-            log_event("idle_reaper_comfy_free", ok=r.get("ok"), error=r.get("error"))
-        except Exception as e:
-            log_error("idle_reaper_comfy_free_failed", error=e)
-    busy = registry.get("last_busy", {})
-    busy.pop(svc, None)
-    registry.set("last_busy", busy)
+        result = comfy_free()
+    else:
+        return {"ok": False, "error": "unsupported idle service: " + svc}
+    if result.get("ok"):
+        busy = registry.get("last_busy", {})
+        busy.pop(svc, None)
+        registry.set("last_busy", busy)
+    return result
 
 
 def _idle_reaper_loop():

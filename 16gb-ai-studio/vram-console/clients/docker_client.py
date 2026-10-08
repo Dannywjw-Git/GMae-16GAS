@@ -36,6 +36,14 @@ def _get_docker_cmd() -> str:
     return _docker_cmd_cache
 
 
+def running_containers_status() -> dict:
+    """Read fresh Docker state without confusing query failure with no containers."""
+    rc, out = run_args([_get_docker_cmd(), "ps", "--format", "{{.Names}}"], 10)
+    if rc != 0:
+        return {"ok": False, "containers": [], "error": out[:200]}
+    return {"ok": True, "containers": sorted({line.strip() for line in out.splitlines() if line.strip()})}
+
+
 def list_running_containers() -> set:
     """列出所有运行中的容器名称。
 

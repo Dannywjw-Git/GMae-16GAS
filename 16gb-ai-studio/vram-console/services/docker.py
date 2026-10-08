@@ -6,6 +6,7 @@ GMae Docker 容器管理模块
 - 容器启停/GPU挂载检测
 - 一键释放（free_all）
 """
+from engine.coordinator import OperationSpec, coordinated
 import json
 import re
 import time
@@ -17,12 +18,20 @@ from clients.docker_client import (list_running_containers, container_action,
                                     inspect_container, stop_container)
 
 
-def docker_containers() -> list:
+def docker_containers(strict: bool = False) -> list:
     """获取运行中的 Docker 容器名称列表。
 
     优先从 Docker Events 内存表获取（S1.2，零延迟），
     不可用或未初始化时回退到 docker ps 命令。
     """
+    if strict:
+        from clients.docker_client import running_containers_status
+        from core.resource_coordinator import ResourceDenied
+        result = running_containers_status()
+        if not result.get("ok"):
+            raise ResourceDenied("ACTIVITY_UNKNOWN", "Docker 运行状态不可用，暂停资源操作",
+                                 {"docker_error": result.get("error")})
+        return result["containers"]
     # 延迟导入，避免模块加载时的循环依赖
     from core.docker_events import docker_events
     if docker_events.is_available():
@@ -42,6 +51,7 @@ def infer_scene(containers: list) -> str:
     return "dialogue"
 
 
+@coordinated(lambda a: OperationSpec(a["action"] if a["action"] in ("start", "restart", "unpause") else "release", a["name"]), shape="tuple")
 def docker_action(name: str, action: str) -> tuple:
     """启停受管 GPU Docker 容器，白名单校验。"""
     if name not in ("comfyui", "fooocus", "ollama"):
@@ -69,6 +79,7 @@ def _container_has_gpu(name):
         return False
 
 
+@coordinated(lambda a: OperationSpec("release", a["name"]), shape="dict")
 def container_stop(name: str) -> dict:
     """停止指定 Docker 容器。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
@@ -89,6 +100,7 @@ def get_paused_containers() -> dict:
     return dict(_paused_containers)
 
 
+@coordinated(lambda a: OperationSpec("release", a["name"]), shape="dict")
 def container_pause(name: str) -> dict:
     """暂停容器（L2 分级释放，保留状态可秒级恢复）。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
@@ -103,6 +115,7 @@ def container_pause(name: str) -> dict:
     return {"ok": ok, "name": name, "message": msg[-200:]}
 
 
+@coordinated(lambda a: OperationSpec("unpause", a["name"]), shape="dict")
 def container_unpause(name: str) -> dict:
     """恢复暂停的容器。"""
     if not name or not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_.-]*$', name):
@@ -168,6 +181,7 @@ def _get_memory_percent() -> float:
     return 0.0
 
 
+@coordinated(lambda a: OperationSpec("release"), shape="dict")
 def free_all() -> dict:
     """一键释放：遍历 registry gpu_guard.managed 列表，按 evict 方式释放。
     返回格式兼容前端 showFreeResult：{freed_mb, free_mb_before, free_mb_after,
@@ -195,6 +209,10 @@ def free_all() -> dict:
             # 逐个停止已加载的模型，并循环验证确保真正停止（防止 ollama keepalive 重新加载）
             ps_result = ollama_ps()
             loaded_models = []
+            if not ps_result.get("ok"):
+                actions.append({"name": name, "action": "stop models", "ok": False,
+                                "output": "Ollama 模型状态不可用，不能确认释放"})
+                continue
             if ps_result.get("ok"):
                 loaded_models = [m.get("name", "") for m in ps_result.get("models", []) if m.get("name")]
             if loaded_models:
@@ -202,24 +220,32 @@ def free_all() -> dict:
                     # 第一次停止
                     rc, out = ollama_stop([model_name])
                     ok = rc == 0
+                    verified = False
                     # 循环验证：最多重试3次，确保模型真正停止
                     for attempt in range(3):
                         time.sleep(2)  # 等待2秒让模型卸载
                         verify_ps = ollama_ps()
+                        if not verify_ps.get("ok"):
+                            ok = False
+                            out = "Ollama 释放后状态不可用"
+                            break
                         verify_models = [m.get("name", "") for m in verify_ps.get("models", []) if m.get("name")]
                         if model_name not in verify_models:
+                            verified = True
                             break  # 模型已停止，跳出循环
                         # 模型还在，再次停止
                         rc2, out2 = ollama_stop([model_name])
+                        if rc2 != 0:
+                            ok = False
                         if rc2 == 0:
                             out = out2  # 更新输出
                     actions.append({
                         "name": "ollama: " + model_name,
                         "action": "stop model",
-                        "ok": ok,
+                        "ok": ok and verified,
                         "output": out[-200:],
                     })
-                    if ok:
+                    if ok and verified:
                         stopped.append({"name": "ollama: " + model_name, "method": "stop_model"})
             else:
                 # 没有已加载模型，记录一个空操作
@@ -237,17 +263,7 @@ def free_all() -> dict:
             actions.append({"name": name, "action": "docker stop", "ok": ok})
             if ok:
                 stopped.append({"name": name, "method": "docker_stop"})
-    # 通用扫描：未登记但挂载 GPU 的容器
-    if guard.get("system", {}).get("gpu_container_scan", False):
-        for cont in docker_containers():
-            if any(m.get("name") == cont for m in managed):
-                continue
-            if _container_has_gpu(cont):
-                r = container_stop(cont)
-                ok = r.get("ok", False)
-                actions.append({"name": cont, "action": "docker stop (auto-scan)", "ok": ok})
-                if ok:
-                    stopped.append({"name": cont, "method": "docker_stop"})
+    # Unregistered GPU containers are reported below, never stopped by this operation.
     # 最后等待5秒确保所有模型完全卸载，然后清除状态缓存
     time.sleep(5)
     try:
@@ -307,7 +323,8 @@ def free_all() -> dict:
     total_count = len(actions)
     success_count = sum(1 for a in actions if a.get("ok", False))
     return {
-        "ok": True,
+        "ok": bool(after.get("ok")) and not after.get("stale", False)
+              and all(a.get("ok", False) for a in actions + escalated),
         "free_mb_before": before.get("free_mb", 0),
         "free_mb_after": after.get("free_mb", 0),
         "freed_mb": freed_mb,

@@ -8,6 +8,8 @@ import os
 import re
 import subprocess
 from api.router import router
+from api.resource_commands import resource_command
+from engine.coordinator import OperationSpec, coordinated_operation
 from api.request import Request
 from api.response import Response
 from core.status_cache import status_cache
@@ -38,7 +40,14 @@ def _is_system_process(name: str) -> bool:
 
 
 @router.post("/api/process/kill")
+@resource_command
 def post_process_kill(req: Request) -> Response:
+    """Coordinate manual process termination with every other resource mutation."""
+    with coordinated_operation(OperationSpec("release", owner="process-kill")):
+        return _process_kill(req)
+
+
+def _process_kill(req: Request) -> Response:
     """结束指定 Windows 进程（安全范围：非系统关键进程）。
 
     Body 参数：
