@@ -17,3 +17,6 @@ def isolate_auth_files(tmp_path, monkeypatch):
     monkeypatch.setattr(auth, "SESSIONS_FILE", str(tmp_path / "sessions.json"))
     monkeypatch.setattr(auth, "SESSIONS", {})
     monkeypatch.setattr(auth, "RESET_CODES", {})
+    from core.registry import registry
+    from core.resource_coordinator import ResourceCoordinator
+    registry.set("resource_coordinator", ResourceCoordinator())

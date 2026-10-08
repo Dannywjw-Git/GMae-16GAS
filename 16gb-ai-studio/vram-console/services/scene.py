@@ -7,16 +7,16 @@ GMae 场景切换与模型同步模块（配置驱动版 v2.0）
 - 通用步骤执行器：pre_release_vram / ollama_stop_all / docker_start / docker_stop / vram_release / game_on / wait_ready
 - 并发锁保护 + 显存预算预检 + 场景状态持久化
 """
+from engine.coordinator import OperationSpec, coordinated
 import json
 import os
 import time
 import threading
 import urllib.request
 from core.logger import log_event, log_error
-from core.config import (REGISTRY, OLLAMA_CONTAINER, GPU_RELEASE_PS1, GAME_ON_PS1,
-                         get_threshold_value)
+from core.config import REGISTRY, OLLAMA_CONTAINER
 from core.registry import registry
-from core.utils import run_ps1, run_args, _safe_model_name
+from core.utils import run_args, _safe_model_name
 from gpu.monitor import gpu_status
 from services.docker import docker_action, wait_ready
 from services.ollama import ollama_stop_all, ollama_tags
@@ -70,10 +70,11 @@ if _last:
 def _step_pre_release_vram(step: dict, context: dict) -> tuple:
     """预释放显存：当 free_mb < threshold 时执行 gpu_release.ps1"""
     threshold = step.get("threshold_mb", 4096)
-    gpu = gpu_status()
+    from engine.coordinator import fresh_gpu
+    gpu = fresh_gpu()
     if gpu.get("ok") and gpu.get("free_mb", 99999) < threshold:
         log_event("vram_pre_release", reason="free<%dMB" % threshold, free_mb=gpu.get("free_mb"))
-        return run_ps1(GPU_RELEASE_PS1)
+        return _step_vram_release(step, context)
     return 0, "skipped: free_mb=%d >= %d" % (gpu.get("free_mb", 0), threshold)
 
 
@@ -98,12 +99,16 @@ def _step_docker_stop(step: dict, context: dict) -> tuple:
 
 def _step_vram_release(step: dict, context: dict) -> tuple:
     """释放显存（gpu_release.ps1）"""
-    return run_ps1(GPU_RELEASE_PS1)
+    from engine.eviction_guard import gpu_guard_evict
+    result = gpu_guard_evict()
+    return (0 if result.get("ok") else -1), json.dumps(result, ensure_ascii=False)
 
 
 def _step_game_on(step: dict, context: dict) -> tuple:
     """游戏模式优化（game-on.ps1）"""
-    return run_ps1(GAME_ON_PS1)
+    # Legacy script can stop unmanaged applications outside the coordinator.
+    # Game intent here only releases registered GPU services.
+    return _step_vram_release(step, context)
 
 
 def _step_wait_ready(step: dict, context: dict) -> tuple:
@@ -159,7 +164,9 @@ def _execute_step(step: dict, context: dict) -> dict:
     """执行单个步骤，返回 {step, rc, output, critical, label}"""
     action = step.get("action", "")
     label = step.get("label", action)
-    critical = step.get("critical", False)
+    # Every failed resource mutation aborts the transition, including legacy
+    # release steps labelled optional. It cannot precede a successful load.
+    critical = step.get("critical", False) or action in _STEP_HANDLERS
     handler = _STEP_HANDLERS.get(action)
     if not handler:
         return {"step": label, "action": action, "rc": -99, "output": "unknown action: %s" % action,
@@ -180,40 +187,19 @@ def _execute_step(step: dict, context: dict) -> dict:
 # ============================================================
 
 def _check_vram_budget(scene_config: dict) -> dict:
-    """检查目标场景的显存预算是否可达。
-    返回 {ok, required_mb, current_free_mb, releasable_mb, message}"""
-    budget_gb = scene_config.get("vram_budget_gb", 0)
-    if not budget_gb:
-        return {"ok": True, "message": "无预算限制"}
-    required_mb = budget_gb * 1024
-    gpu = gpu_status()
-    current_free = gpu.get("free_mb", 0)
-    # 估算可释放显存：已加载模型 + 可停止容器
-    releasable = 0
-    try:
-        from services.status import comfy_loaded_models
-        loaded = comfy_loaded_models()
-        for m in loaded.get("models", []):
-            releasable += m.get("vram_mb", 0)
-    except Exception as e:
-        log_error("exception_suppressed", error=e, context="scene.py:176")
-    total_available = current_free + releasable
-    ok = total_available >= required_mb * 0.9  # 允许10%余量
-    return {
-        "ok": ok,
-        "required_mb": required_mb,
-        "current_free_mb": current_free,
-        "releasable_mb": releasable,
-        "total_available_mb": total_available,
-        "message": "需要 %.1fGB，可用 %.1fGB（当前 %.1fG + 可释放 %.1fG）" % (
-            required_mb / 1024, total_available / 1024, current_free / 1024, releasable / 1024)
-    }
+    """Scene lease protects the transition; each start/load gets trusted admission."""
+    from engine.coordinator import fresh_gpu
+    gpu = fresh_gpu()
+    return {"ok": True, "current_free_mb": gpu["free_mb"],
+            "policy": "coordinator_per_operation",
+            "message": "场景切换持有资源租约；每个启动/加载步骤单独验证峰值预算"}
 
 
 # ============================================================
 # 场景切换（配置驱动）
 # ============================================================
 
+@coordinated(lambda a: OperationSpec("scene", owner="scene:" + str(a["scene"])), shape="dict")
 def scene_switch(scene: str) -> dict:
     """场景切换：配置驱动，步骤定义在 registry.json 的 scenes[scene].steps 中。
 
@@ -259,10 +245,11 @@ def scene_switch(scene: str) -> dict:
         for step in steps:
             result = _execute_step(step, context)
             results.append(result)
-            # 关键步骤失败时，继续执行后续步骤（如停止容器），但标记整体失败
+            # Failed resource steps abort before any subsequent load or start.
             if result["critical"] and result["rc"] != 0 and not result["skipped"]:
                 log_error("scene_switch_critical_failed", scene=scene,
                           step=result["step"], rc=result["rc"])
+                break  # Never start a target after a required release failed.
 
         # 5. 关键步骤失败判定
         failed_critical = [r["step"] for r in results
@@ -275,8 +262,9 @@ def scene_switch(scene: str) -> dict:
         # 6.5 场景感知：自动恢复新场景需要的被暂停容器
         try:
             from services.docker import get_paused_containers, container_unpause
-            paused = get_paused_containers()
-            scene_containers = [c.get("name") for c in scene_config.get("containers", [])]
+            paused = get_paused_containers() if overall_ok else {}
+            scene_containers = [c.get("name") if isinstance(c, dict) else c
+                                for c in scene_config.get("containers", [])]
             for pname in list(paused.keys()):
                 if pname in scene_containers:
                     r = container_unpause(pname)
@@ -317,19 +305,42 @@ def scene_switch(scene: str) -> dict:
 # 模型加载/停止（保留原有功能）
 # ============================================================
 
+@coordinated(lambda a: OperationSpec("load", "ollama", a["name"], a["ctx"]), shape="tuple")
 def load_model_api(name, ctx, keep="30m"):
     """通过 API 加载模型(keep_alive 默认 30m, 不阻塞太久)"""
+    meta = next((m for m in REGISTRY.get("ollama", {}).get("models", []) if m.get("id") == name), {})
+    options = {"num_ctx": ctx, "num_predict": 1}
+    if meta.get("device") == "cpu":
+        options["num_gpu"] = 0
     body = json.dumps({"model": name, "prompt": "hi", "stream": False, "keep_alive": keep,
-                       "options": {"num_ctx": ctx, "num_predict": 1}}).encode()
+                       "options": options}).encode()
     try:
         req = urllib.request.Request("http://127.0.0.1:11434/api/generate", data=body,
                                      headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=300) as r:
+        with urllib.request.urlopen(req, timeout=300):
             return 0, "loaded (ctx=%d)" % ctx
+    except urllib.error.HTTPError as e:
+        if 400 <= e.code < 500:
+            return -1, "Ollama rejected load: " + str(e)
+        _retain_ollama_load(str(e))
+        return -1, str(e)
     except Exception as e:
+        _retain_ollama_load(str(e))
         return -1, str(e)
 
 
+def _retain_ollama_load(error):
+    """Keep ownership when a submitted load has no definitive response."""
+    from engine.coordinator import get_coordinator
+    from core.resource_coordinator import ResourceLease
+    coordinator = get_coordinator()
+    token = coordinator.current_token()
+    if token:
+        ResourceLease(coordinator, token, True).uncertain("Ollama 加载响应失败，执行状态未知: " + error,
+                                                         target_service="ollama")
+
+
+@coordinated(lambda a: OperationSpec("release", "ollama"), shape="tuple")
 def ollama_stop(names):
     """逐个 stop（容器化后用 docker exec 调用 ollama CLI）"""
     bad = []
@@ -351,6 +362,7 @@ def ollama_stop(names):
 # 组合切换（修复返回值）
 # ============================================================
 
+@coordinated(lambda a: OperationSpec("combo", "ollama", owner="combo:" + str(a["combo"])), shape="dict")
 def combo_switch(combo: str) -> dict:
     """对话态模型组合（从 registry.json 配置驱动）。
     互斥规则: 27B 独占, 换入前必须先 stop 其他大模型。
@@ -385,12 +397,13 @@ def combo_switch(combo: str) -> dict:
         results.append(("stop conflicting models", rc, out))
         if rc != 0:
             all_ok = False
-    for model_id in to_load:
+    for model_id in to_load if all_ok else []:
         ctx = models_meta.get(model_id, {}).get("ctx", 16384)
         rc, out = _load_if_installed(model_id)
         results.append(("load %s @%d" % (model_id, ctx), rc, out))
         if rc != 0 and not out.startswith("SKIP"):
             all_ok = False
+            break
 
     log_event("combo_switch", combo=combo, load_count=len(to_load),
               stop_count=len(to_stop) if isinstance(to_stop, list) else 0, ok=all_ok)
@@ -403,6 +416,7 @@ def combo_switch(combo: str) -> dict:
 # 服务/模型操作（保留原有功能）
 # ============================================================
 
+@coordinated(lambda a: OperationSpec(a["action"] if a["action"] in ("start", "restart", "unpause") else "release", a["name"]))
 def service_action(name: str, action: str) -> dict:
     """服务启停（受管 GPU 容器：comfyui/fooocus/ollama）。"""
     if name not in ("comfyui", "fooocus", "ollama"):
@@ -411,6 +425,8 @@ def service_action(name: str, action: str) -> dict:
     return {"ok": rc == 0, "name": name, "action": action, "rc": rc, "output": out[-300:]}
 
 
+@coordinated(lambda a: OperationSpec("load" if a["action"] == "load" else "release", "ollama", a["name"])
+             if a["action"] in ("load", "stop", "unload") else None)
 def model_action(name: str, action: str) -> dict:
     """模型加载/卸载/查询，name 做格式校验，命令用 shell=False 参数数组防注入。
 
@@ -438,18 +454,10 @@ def model_action(name: str, action: str) -> dict:
     if not ok:
         return {"ok": False, "error": checked}
     if action == "load":
-        gpu = gpu_status()
-        _free_target = get_threshold_value("free_target_mb", 4096)
-        if gpu.get("ok") and gpu.get("free_mb", 99999) < _free_target:
-            log_event("model_load_rejected", model=checked, reason="free_vram<%dMB" % _free_target,
-                      free_mb=gpu.get("free_mb"))
-            return {"ok": False, "name": checked, "action": action,
-                    "error": "显存不足（空闲 %.1fGB < %.1fGB），已拒绝加载以防止 OOM。请先释放显存或切换场景。" % (
-                        gpu.get("free_mb", 0) / 1024, _free_target / 1024)}
-        rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "run", checked,
-                            "--keepalive", "30s"], 300)
+        meta = next((m for m in REGISTRY.get("ollama", {}).get("models", []) if m.get("id") == checked), {})
+        rc, out = load_model_api(checked, meta.get("ctx", 8192), keep="30s")
     elif action in ("stop", "unload"):
-        rc, out = run_args(["docker", "exec", OLLAMA_CONTAINER, "ollama", "stop", checked], 30)
+        rc, out = ollama_stop([checked])
     else:  # info
         try:
             from services.ollama import ollama_ps

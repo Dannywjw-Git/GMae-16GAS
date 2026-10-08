@@ -79,19 +79,30 @@ class QueueSafetyTests(unittest.TestCase):
         stack = ExitStack()
         self.addCleanup(stack.close)
         stack.enter_context(patch.object(queue, "REGISTRY", {"comfyui": {"models": [model]}}))
-        stack.enter_context(patch.object(queue, "budget_engine", side_effect=decisions))
-        stack.enter_context(patch.object(queue, "gpu_guard_evict", return_value=release or {"ok": True}))
+        import engine.eviction_guard as eviction
+        from core.resource_coordinator import ResourceDenied
+        task = self.task()
+        stack.enter_context(patch("engine.budget.budget_engine", side_effect=decisions + [decisions[-1]] * 4))
+        stack.enter_context(patch.object(eviction, "gpu_guard_evict", return_value=release or {"ok": True}))
+        stack.enter_context(patch("engine.coordinator.fresh_gpu", return_value={"ok": True, "total_mb": 16384,
+                                 "used_mb": 1024, "free_mb": 15360}))
+        def check_idle(service):
+            if activity and any(s.get("busy") for s in activity.get("services", {}).values()):
+                raise ResourceDenied("SERVICE_BUSY", "busy")
+        stack.enter_context(patch("engine.coordinator.check_idle", side_effect=check_idle))
+        stack.enter_context(patch("engine.coordinator.time.monotonic", side_effect=[0, 6]))
         stack.enter_context(patch.object(queue, "time"))
+        queue.time.sleep.side_effect = lambda seconds: task.update(cancel_requested=True)
         stack.enter_context(patch("engine.reaper.service_activity", return_value=activity or {"services": {}}))
         stack.enter_context(patch.object(queue, "_load_workflow", return_value={"1": {"inputs": {}}}))
         stack.enter_context(patch.object(queue, "_queue_wait", return_value="failed"))
         submit = stack.enter_context(patch.object(queue, "_queue_submit_comfy", return_value=("pid", None)))
-        task = self.task()
         queue._run_task(task)
         return task, submit
 
     def decision(self, decision="ok", ok=True):
-        return {"ok": ok, "models": [{"id": "target", "decision": decision, "note": "test"}]}
+        return {"ok": ok, "models": [{"id": "target", "source": "comfyui", "vram_gb": 8,
+                                     "decision": decision, "note": "test"}]}
 
     def test_unavailable_budget_never_submits(self):
         task, submit = self.run_task([self.decision(ok=False)])
@@ -111,7 +122,8 @@ class QueueSafetyTests(unittest.TestCase):
     def test_busy_service_is_not_evicted(self):
         _, submit = self.run_task([self.decision("free_L2")], activity={"services": {"comfyui": {"busy": True}}})
         submit.assert_not_called()
-        queue.gpu_guard_evict.assert_not_called()
+        import engine.eviction_guard as eviction
+        eviction.gpu_guard_evict.assert_not_called()
 
     def test_failed_release_never_submits(self):
         _, submit = self.run_task([self.decision("free_L2")], release={"ok": False})

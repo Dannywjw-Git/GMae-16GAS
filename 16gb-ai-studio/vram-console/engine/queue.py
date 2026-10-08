@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 任务队列模块
@@ -11,14 +11,15 @@ import threading
 import time
 import uuid
 import urllib.request
+import urllib.error
 from collections import deque
 from core.logger import log_event, log_error
 from core.config import REGISTRY, BASE_DIR
 from core.registry import registry
-from engine.budget import budget_engine
+from engine.coordinator import OperationSpec, coordinated_operation, _model_budget
+from core.resource_coordinator import ResourceDenied
 from core.exceptions import ConfigError
 from engine.gen_stats import load_gen_stats, save_gen_stats, update_gen_stats
-from engine.eviction_guard import gpu_guard_evict
 
 # 队列状态 — 已迁移到 registry（状态包装）
 _QUEUE_CLIENT_ID = str(uuid.uuid4())
@@ -104,9 +105,12 @@ def queue_enqueue(model: str, params: dict) -> dict:
     return {"ok": True, "task": task}
 
 
-def _queue_submit_comfy(wf):
+def _queue_submit_comfy(wf, submission_id=None):
     """POST ComfyUI /prompt 提交工作流，返回 prompt_id / 错误。"""
-    payload = {"prompt": wf, "client_id": _QUEUE_CLIENT_ID}
+    from engine.coordinator import get_coordinator
+    if not get_coordinator().current_token():
+        raise ResourceDenied("INVALID_LEASE", "提交工作流必须持有资源预留")
+    payload = {"prompt": wf, "client_id": _QUEUE_CLIENT_ID, "prompt_id": submission_id}
     try:
         req = urllib.request.Request("http://127.0.0.1:8188/prompt",
                                      data=json.dumps(payload).encode("utf-8"),
@@ -114,8 +118,10 @@ def _queue_submit_comfy(wf):
         with urllib.request.urlopen(req, timeout=15) as r:
             d = json.loads(r.read().decode("utf-8"))
         return d.get("prompt_id"), None
+    except urllib.error.HTTPError as e:
+        return None, {"message": str(e), "uncertain": e.code >= 500}
     except Exception as e:
-        return None, str(e)
+        return None, {"message": str(e), "uncertain": True}
 
 
 def _queue_wait(prompt_id, task, timeout=3600):
@@ -148,78 +154,93 @@ def _queue_wait(prompt_id, task, timeout=3600):
         except Exception as e:
             log_error("exception_suppressed", error=e, context="queue.py:148")
         time.sleep(3)
-    return "failed"
+    return "uncertain"
+
+
+def _execute_reserved_task(task, lease, spec):
+    """Keep one reservation through submission and execution confirmation."""
+    task["coordination"] = {"token": lease.token, "owner": spec.owner}
+    task["status"] = "precheck"
+    wf = _load_workflow(task["workflow"])
+    if not wf:
+        raise ConfigError("模板读取失败")
+    wf = _apply_params(wf, task["params"])
+    if task.get("cancel_requested"):
+        task["status"] = "canceled"
+        return
+    lease.transition("verifying")
+    _, decision = _model_budget(spec)
+    if decision.get("decision") != "ok":
+        raise ResourceDenied("ADMISSION_CHANGED", "提交前预算发生变化，拒绝提交")
+    task["budget"] = decision
+    task["status"] = "running"
+    task["started"] = int(time.time())
+    submission_id = str(uuid.uuid4())
+    task["submission_id"] = submission_id
+    lease.transition("running", prompt_id=submission_id, job_id=task["id"])
+    try:
+        pid, err = _queue_submit_comfy(wf, submission_id)
+    except Exception as error:
+        task["status"] = "uncertain"
+        task["error"] = "提交异常，执行状态未知: " + str(error)
+        lease.uncertain(task["error"], prompt_id=submission_id)
+        return
+    if not pid:
+        uncertain = not isinstance(err, dict) or err.get("uncertain", True)
+        message = err.get("message", "") if isinstance(err, dict) else str(err or "")
+        task["error"] = "ComfyUI 提交失败: " + message
+        task["status"] = "uncertain" if uncertain else "failed"
+        if uncertain:
+            lease.uncertain("提交响应丢失，执行状态未知", prompt_id=submission_id)
+        return
+    task["prompt_id"] = pid
+    lease.transition("running", prompt_id=pid)
+    task["progress"] = "已提交，资源预留保持至执行结束确认"
+    try:
+        rc = _queue_wait(pid, task)
+    except Exception as error:
+        task["status"] = "uncertain"
+        task["error"] = "结束核验异常，资源预留保留: " + str(error)
+        lease.uncertain(task["error"], prompt_id=pid)
+        return
+    if rc == "uncertain":
+        task["status"] = "uncertain"
+        task["error"] = "执行超时或状态不可用；资源预留保留，等待核验"
+        lease.uncertain(task["error"], prompt_id=pid)
+    else:
+        task["status"] = "canceled" if task.get("cancel_requested") else ("done" if rc == "done" else "failed")
+        lease.transition("completed" if rc == "done" else "failed")
 
 
 def _run_task(task):
-    """执行单个任务：预检 → 释放 → 提交 → 等待完成。"""
+    """Wait for ownership and execute under one lifetime reservation."""
+    spec = OperationSpec("generate", "comfyui", task["model"], owner="job:" + task["id"])
     try:
-        if task.get("cancel_requested"):
-            task["status"] = "canceled"
-            return
-        task["status"] = "precheck"
-        m = next((x for x in REGISTRY.get("comfyui", {}).get("models", []) if x["id"] == task["model"]), None)
-        if not m:
-            raise ConfigError("模型未登记，拒绝执行")
-        budget = budget_engine(force_refresh=True)
-        dec = next((bm for bm in budget.get("models", []) if bm["id"] == task["model"]), None)
-        if not budget.get("ok") or not dec or dec["decision"] == "reject":
-            raise ConfigError("预检拒绝：%s" % (budget.get("error") or (dec or {}).get("note", "模型预算缺失")))
-        if dec["decision"].startswith("free"):
-            from engine.reaper import service_activity
-            activity = service_activity().get("services", {})
-            if any(s.get("busy") for s in activity.values()):
-                raise ConfigError("受管服务正在执行任务，拒绝自动释放")
-            task["status"] = "freeing"
-            task["progress"] = "释放 L1/L2 显存并重新核验…"
-            release = gpu_guard_evict()
-            if not release.get("ok"):
-                raise ConfigError("显存释放失败，拒绝提交")
-            time.sleep(2)
-        try:
-            wf = _load_workflow(task["workflow"])
-        except ConfigError as e:
-            task["status"] = "failed"
-            task["error"] = str(e)
-            return
-        if not wf:
-            task["status"] = "failed"
-            task["error"] = "模板读取失败"
-            return
-        wf = _apply_params(wf, task["params"])
-        if task.get("cancel_requested"):
-            task["status"] = "canceled"
-            return
-        # Do not treat release success or cached telemetry as proof of admission.
-        budget = budget_engine(force_refresh=True)
-        dec = next((bm for bm in budget.get("models", []) if bm["id"] == task["model"]), None)
-        if not budget.get("ok") or not dec or dec["decision"] != "ok":
-            raise ConfigError("提交前核验失败：显存未释放到预算要求或遥测不可用")
-        task["status"] = "running"
-        task["started"] = int(time.time())
-        pid, err = _queue_submit_comfy(wf)
-        if not pid:
-            task["status"] = "failed"
-            task["error"] = "ComfyUI 提交失败: " + (err or "")
-            task["ended"] = int(time.time())
-            return
-        task["prompt_id"] = pid
-        task["progress"] = "已提交，等待执行…"
-        rc = _queue_wait(pid, task)
-        if task.get("cancel_requested"):
-            task["status"] = "canceled"
-        else:
-            task["status"] = "done" if rc == "done" else "failed"
-    except Exception as e:
+        while True:
+            if task.get("cancel_requested"):
+                task["status"] = "canceled"
+                return
+            try:
+                with coordinated_operation(spec) as lease:
+                    _execute_reserved_task(task, lease, spec)
+                return
+            except ResourceDenied as error:
+                task["coordination"] = error.result()
+                if error.code not in ("RESOURCE_BUSY", "SERVICE_BUSY"):
+                    raise
+                task["status"] = "waiting_resource"
+                task["progress"] = str(error)
+                time.sleep(0.25)
+    except Exception as error:
         task["status"] = "failed"
-        task["error"] = str(e)
+        task["error"] = str(error)
     finally:
-        task["ended"] = int(time.time())
+        task["ended"] = int(time.time()) if task["status"] not in ("waiting_resource", "uncertain") else None
         if task["status"] == "done" and task.get("started"):
-            elapsed = task["ended"] - task["started"]
-            update_gen_stats(task["model"], elapsed)
+            update_gen_stats(task["model"], task["ended"] - task["started"])
         log_event("queue_finish", task=task["id"], model=task["model"], status=task["status"],
-                  err=task["error"][-200:] if task["error"] else "")
+                  err=task.get("error", "")[-200:])
+
 
 
 def _queue_worker():
@@ -235,13 +256,32 @@ def _queue_worker():
             _run_task(task)
 
 
+def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool:
+    """Apply trusted terminal evidence only to the matching uncertain task."""
+    with _task_lock:
+        task = _tasks.get(job_id)
+        if not task or task.get("status") != "uncertain":
+            return False
+        if task.get("coordination", {}).get("token") != token:
+            return False
+        if prompt_id not in (task.get("prompt_id"), task.get("submission_id")):
+            return False
+        task["status"] = ("canceled" if task.get("cancel_requested") else
+                          "done" if status == "success" else "failed")
+        task["ended"] = int(time.time())
+        task["progress"] = "已核验对应任务的结束记录"
+        task["error"] = "" if status == "success" else "ComfyUI 执行失败（结束记录已核验）"
+        return True
+
+
 def queue_snapshot() -> dict:
     """队列观察：全部任务（含历史）+ 当前 worker 状态。"""
     with _task_lock:
         tasks = [dict(t) for t in _tasks.values()]
         queue = list(_task_queue)
     tasks.sort(key=lambda t: t.get("created", 0), reverse=True)
-    return {"ok": True, "queue": queue, "tasks": tasks,
+    from engine.coordinator import get_coordinator
+    return {"ok": True, "queue": queue, "tasks": tasks, "coordination": get_coordinator().snapshot(),
             "worker_alive": _queue_state["worker_alive"], "client_id": _QUEUE_CLIENT_ID}
 
 
@@ -259,7 +299,7 @@ def queue_cancel(tid: str) -> dict:
             task["ended"] = int(time.time())
             log_event("queue_cancel", task=tid)
             return {"ok": True, "task": task}
-        if task["status"] in ("precheck", "freeing", "running"):
+        if task["status"] in ("waiting_resource", "precheck", "freeing", "running"):
             task["cancel_requested"] = True
-            return {"ok": True, "note": "运行中，完成/失败后置 canceled", "task": task}
+            return {"ok": True, "note": "取消已请求；执行结束确认前仍保留资源预留", "task": task}
         return {"ok": False, "error": "已结束的任务无法取消"}

@@ -5,8 +5,10 @@ GMae ComfyUI 服务模块
 - 系统状态/队列/已加载模型查询
 - 显存释放（/free 端点）
 """
+from engine.coordinator import OperationSpec, coordinated
 import time
 from core.logger import log_event, log_error
+from core.registry import registry
 from clients.comfyui_client import system_stats, queue_status, free_memory, history
 from clients.docker_client import is_running
 from core.utils import run_args
@@ -22,19 +24,25 @@ def comfy_queue() -> dict:
     return queue_status()
 
 
+@coordinated(lambda a: OperationSpec("release", "comfyui"), shape="dict")
 def comfy_free() -> dict:
     """调用 ComfyUI 官方 /free 端点，卸载模型 + 释放显存缓存。"""
     from gpu.monitor import gpu_status
 
     if not is_running("comfyui"):
         return {"ok": False, "error": "comfyui 容器未运行，无需释放"}
-    before = gpu_status()
+    before = gpu_status(force_refresh=True)
+    old_history = history(max_items=3)
     result = free_memory(unload_models=True, free_memory=True)
     if not result.get("ok"):
         log_error("comfy_free_failed", error=result.get("error"))
         return result
     time.sleep(1)
-    after = gpu_status()
+    after = gpu_status(force_refresh=True)
+    if not after.get("ok") or after.get("stale"):
+        return {"ok": False, "error": "释放后 GPU 遥测不可用，释放效果未确认"}
+    if old_history.get("ok"):
+        registry.set("comfy_freed_history", [i.get("prompt_id") for i in old_history.get("items", [])])
     log_event("comfy_free", http=result.get("http"),
               vram_free_before=before.get("free_mb"), vram_free_after=after.get("free_mb"))
     return {
@@ -58,6 +66,10 @@ def comfy_loaded_models() -> dict:
     hist = history(max_items=3)
     if not hist.get("ok"):
         return {"ok": False, "models": [], "error": hist.get("error")}
+    freed_history = registry.get("comfy_freed_history")
+    if freed_history is not None and [i.get("prompt_id") for i in hist.get("items", [])] == freed_history:
+        return {"ok": True, "models": [], "count": 0, "source": "released_history",
+                "note": "这些历史任务之后已请求释放；新任务准入仍以实时显存验证"}
     # 合并最近工作流使用的所有模型
     all_models = []
     for item in hist.get("items", []):

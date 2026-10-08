@@ -69,6 +69,9 @@ const API = {
 
   // ======== 显存预算与建议 ========
   getBudget() { return this.get('/api/budget'); },
+  getCoordination() { return this.get('/api/coordinator'); },
+  previewResources(body) { return this.post('/api/coordinator/preview', body); },
+  reconcileResources() { return this.post('/api/coordinator/reconcile', {}); },
   getAdvice() { return this.get('/api/advice'); },
   checkAdmission(body) { return this.post('/api/admission', body); },
 

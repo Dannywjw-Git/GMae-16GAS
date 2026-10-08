@@ -13,6 +13,7 @@
 """
 from core.logger import log_error
 from api.router import router
+from api.resource_commands import resource_command
 from api.request import Request
 from api.response import Response
 from services.status import invalidate_status_cache
@@ -27,6 +28,7 @@ from core.event_bus import event_bus
 
 
 @router.post("/api/free")
+@resource_command
 def post_free(req: Request) -> Response:
     """一键释放显存（L1-L4 分级释放）。"""
     result = free_all()
@@ -42,7 +44,7 @@ def post_free(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="vram.py:42")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.get("/api/budget")
@@ -78,6 +80,7 @@ def get_desktop_vram(req: Request) -> Response:
 
 
 @router.post("/api/desktop/kill")
+@resource_command
 def post_desktop_kill(req: Request) -> Response:
     """结束桌面进程。
 
@@ -86,7 +89,7 @@ def post_desktop_kill(req: Request) -> Response:
     """
     result = desktop_kill(req.body_get("pid", ""))
     status_cache.invalidate()
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.get("/api/desktop/helper/status")
@@ -100,7 +103,7 @@ def post_helper_start(req: Request) -> Response:
     """启动 Helper（需 UAC 提权）。"""
     result = helper_start()
     status_cache.invalidate()
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/desktop/helper/stop")
@@ -108,4 +111,4 @@ def post_helper_stop(req: Request) -> Response:
     """停止 Helper。"""
     result = helper_stop()
     status_cache.invalidate()
-    return Response.success(result)
+    return Response.from_result(result)

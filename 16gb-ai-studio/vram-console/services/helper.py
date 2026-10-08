@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae 桌面 Helper 客户端模块（services/helper.py）
@@ -19,6 +19,7 @@ GMae 桌面 Helper 客户端模块（services/helper.py）
 【P1-3 改造说明】
 - subprocess 调用应逐步迁移到 clients/process_client.py
 """
+from engine.coordinator import OperationSpec, coordinated
 import json
 import os
 import time
@@ -284,6 +285,7 @@ def desktop_vram_detail() -> dict:
     return r
 
 
+@coordinated(lambda a: OperationSpec("release", owner="desktop:" + str(a["pid"])), shape="dict")
 def desktop_kill(pid: int) -> dict:
     """结束桌面进程：经 Helper 代理。"""
     if not _helper_health():

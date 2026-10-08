@@ -1,0 +1,240 @@
+"""Bind the ownership ledger to fresh telemetry and existing service adapters."""
+from contextlib import contextmanager
+from dataclasses import dataclass
+from functools import wraps
+import inspect
+import math
+import time
+import uuid
+from typing import Callable, Iterator
+from core.config import REGISTRY
+from core.registry import registry
+from core.resource_coordinator import ResourceCoordinator, ResourceDenied, ResourceLease, ResourceRequest
+from core.logger import log_event
+from gpu.monitor import gpu_status
+
+
+@dataclass(frozen=True)
+class OperationSpec:
+    """Trusted intent; model peak is always resolved from the registry/budget."""
+
+    operation: str
+    service: str = "all"
+    model: str | None = None
+    ctx: int | None = None
+    owner: str | None = None
+
+
+def get_coordinator() -> ResourceCoordinator:
+    """Get the one process-wide ledger, owned by StateRegistry."""
+    with registry.lock("resource_coordinator_init"):
+        coordinator = registry.get("resource_coordinator")
+        if coordinator is None:
+            coordinator = ResourceCoordinator()
+            registry.set("resource_coordinator", coordinator)
+        return coordinator
+
+
+def fresh_gpu() -> dict:
+    """Reject absent, stale or malformed readings instead of inventing capacity."""
+    gpu = gpu_status(force_refresh=True)
+    try:
+        total, used, free = (int(gpu[k]) for k in ("total_mb", "used_mb", "free_mb"))
+        valid = total > 0 and 0 <= used <= total and 0 <= free <= total
+    except (KeyError, TypeError, ValueError, OverflowError):
+        valid = False
+    if not gpu.get("ok") or gpu.get("stale") or not valid:
+        raise ResourceDenied("TELEMETRY_UNAVAILABLE", "新鲜 GPU 遥测不可用，暂停资源操作")
+    return {**gpu, "used_mb": max(used, total - free)}
+
+
+def check_idle(service: str) -> None:
+    """Protect known running work; missing Comfy queue telemetry is not idle."""
+    from services.docker import docker_containers
+    from services.comfy import comfy_queue
+    containers = docker_containers(strict=True)
+    if service in ("all", "comfyui") and "comfyui" in containers:
+        queue = comfy_queue()
+        if not queue.get("ok"):
+            raise ResourceDenied("ACTIVITY_UNKNOWN", "ComfyUI 执行状态不可用，不能加载或释放")
+        running = queue.get("running_count", len(queue.get("running", [])))
+        pending = queue.get("pending_count", len(queue.get("pending", [])))
+        if running or pending:
+            raise ResourceDenied("SERVICE_BUSY", "ComfyUI 存在运行或排队任务，等待执行结束")
+
+
+def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[dict, dict]:
+    from engine.budget import budget_engine
+    context = {spec.model: spec.ctx} if spec.ctx is not None else None
+    result = budget_engine(context, force_refresh=True)
+    item = next((m for m in result.get("models", [])
+                 if m.get("id") == spec.model and m.get("source") == spec.service), None)
+    if not result.get("ok") or item is None:
+        raise ResourceDenied("BUDGET_UNAVAILABLE", result.get("error") or "模型未登记或预算缺失")
+    if item.get("decision") == "reject" and not allow_rejected:
+        raise ResourceDenied("BUDGET_REJECTED", item.get("note", "显存预算不足"), {"budget": item})
+    return result, item
+
+
+def _assess_model(spec: OperationSpec, lease: ResourceLease) -> None:
+    result, item = _model_budget(spec)
+    peak_mb = math.ceil(float(item["vram_gb"]) * 1024)
+    lease.transition("reserved", peak_mb=peak_mb, target_model=spec.model, budget=item)
+    if item["decision"].startswith("free"):
+        from engine.eviction_guard import gpu_guard_evict
+        check_idle("all")
+        lease.transition("releasing", reason=item.get("note"))
+        released = gpu_guard_evict()
+        if not released.get("ok"):
+            raise ResourceDenied("RELEASE_FAILED", "显存释放失败，未提交目标负载", {"release": released})
+        lease.transition("verifying")
+        deadline = time.monotonic() + 5
+        while True:
+            result, item = _model_budget(spec)
+            if item.get("decision") == "ok":
+                break
+            if time.monotonic() >= deadline:
+                raise ResourceDenied("RELEASE_UNVERIFIED", "释放后显存仍未达到预算要求", {"budget": item})
+            time.sleep(0.25)
+    # A second reading is mandatory even if no release was needed.
+    result, item = _model_budget(spec)
+    if item.get("decision") != "ok":
+        raise ResourceDenied("ADMISSION_CHANGED", "执行前预算发生变化，等待重新准入", {"budget": item})
+    lease.transition("reserved", budget=item, available_mb=round(result.get("avail_gb", 0) * 1024))
+
+
+def _assess_start(spec: OperationSpec, lease: ResourceLease, gpu: dict) -> None:
+    config = next((c for c in REGISTRY.get("containers", []) if c.get("name") == spec.service), None)
+    if config is None:
+        raise ResourceDenied("UNREGISTERED_SERVICE", "服务未登记，拒绝启动: " + spec.service)
+    from services.docker import docker_containers
+    if spec.operation == "start" and spec.service in docker_containers(strict=True):
+        return  # Already running; Docker start is idempotent.
+    try:
+        peak_gb = float(config["startup_vram_gb"])
+        reserve_gb = float(REGISTRY.get("system", {}).get("vram_reserve_gb", 2.5))
+        if not math.isfinite(peak_gb) or peak_gb < 0 or not math.isfinite(reserve_gb) or reserve_gb < 0:
+            raise ValueError("invalid startup profile")
+    except (KeyError, TypeError, ValueError):
+        raise ResourceDenied("UNCALIBRATED_STARTUP", "服务启动峰值未校准，请登记 startup_vram_gb")
+    peak_mb = math.ceil(peak_gb * 1024)
+    if gpu["used_mb"] + peak_mb + math.ceil(reserve_gb * 1024) > gpu["total_mb"]:
+        raise ResourceDenied("BUDGET_REJECTED", "服务启动峰值与当前占用超过安全容量")
+    lease.transition("reserved", peak_mb=peak_mb, available_mb=gpu["free_mb"])
+
+
+def assess(spec: OperationSpec, lease: ResourceLease) -> None:
+    """Assess while holding ownership, before executing any managed mutation."""
+    gpu = fresh_gpu()
+    check_idle("all" if spec.operation in ("scene", "combo", "generate", "load") else spec.service)
+    if spec.operation in ("load", "generate"):
+        _assess_model(spec, lease)
+    elif spec.operation in ("start", "restart", "unpause"):
+        _assess_start(spec, lease, gpu)
+    lease.transition("reserved", telemetry={k: gpu[k] for k in ("total_mb", "used_mb", "free_mb")})
+
+
+@contextmanager
+def coordinated_operation(spec: OperationSpec) -> Iterator[ResourceLease]:
+    """Acquire before preflight and keep ownership until the outer operation ends."""
+    coordinator = get_coordinator()
+    request = ResourceRequest(spec.operation, spec.owner or (spec.operation + ":" + uuid.uuid4().hex[:10]),
+                              spec.service, spec.model)
+    try:
+        with coordinator.operation(request, lambda lease: assess(spec, lease)) as lease:
+            log_event("resource_reserved", owner=request.owner, token=lease.token,
+                      operation=spec.operation, service=spec.service, model=spec.model)
+            yield lease
+    except ResourceDenied as error:
+        log_event("resource_rejected", owner=request.owner, code=error.code, reason=str(error))
+        raise
+
+
+def coordinated(factory: Callable[[dict], OperationSpec | None], shape: str = "dict") -> Callable:
+    """Route service mutations through the same ledger; preserve legacy return shapes."""
+    def decorate(function):
+        signature = inspect.signature(function)
+
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            bound = signature.bind(*args, **kwargs)
+            bound.apply_defaults()
+            spec = factory(bound.arguments)
+            if spec is None:
+                return function(*args, **kwargs)
+            try:
+                with coordinated_operation(spec) as lease:
+                    lease.transition("releasing" if spec.operation == "release" else "running")
+                    result = function(*args, **kwargs)
+                    ok = result is None or (result.get("ok", False) if isinstance(result, dict) else result[0] == 0)
+                    if get_coordinator().snapshot()["active"]["phase"] != "uncertain":
+                        lease.transition("completed" if ok else "failed")
+                    return result
+            except ResourceDenied as error:
+                if shape == "tuple":
+                    return -1, error.code + ": " + str(error)
+                return error.result()
+        wrapper.resource_coordinated = True
+        return wrapper
+    return decorate
+
+
+def preview(spec: OperationSpec) -> dict:
+    """Explain current admission without reserving resources or running release."""
+    try:
+        gpu = fresh_gpu()
+        result, item = _model_budget(spec, allow_rejected=True)
+        active = get_coordinator().snapshot()["active"]
+        reason = item.get("note", "")
+        decision = item["decision"]
+        if decision == "reject":
+            context = item.get("specified_ctx")
+            context_map = item.get("context_vram", {})
+            if context and context not in context_map and str(context) not in context_map:
+                raise ResourceDenied("BUDGET_REJECTED", reason, {"budget": item})
+            peak = item.get("vram_gb", 0)
+            config = REGISTRY.get("system", {})
+            minimum = (peak + float(config.get("gpu_base_noise_gb", 1))
+                       + float(config.get("vram_reserve_gb", 2.5))) * 1024
+            if not active or peak <= 0 or minimum > gpu["total_mb"]:
+                raise ResourceDenied("BUDGET_REJECTED", reason, {"budget": item})
+        if active:
+            decision = "waiting_resource"
+            reason = "等待 %s 执行结束或状态核验；之后重新读取显存并准入" % active["owner"]
+        return {"ok": True, "allowed": True, "execution_ready": not active and item["decision"] == "ok",
+                "decision": decision, "reason": reason, "budget": item, "blocker": active,
+                "available_gib": result.get("avail_gb"), "reserve_gib": result.get("reserve_gb"),
+                "note": "预览不预留资源；实际执行必须重新准入。峰值仅适用于登记配置。"}
+    except ResourceDenied as error:
+        return {**error.result(), "allowed": False, "reason": str(error)}
+
+
+def reconcile_uncertain() -> dict:
+    """Resolve only a matching terminal Comfy history record, never an empty queue."""
+    coordinator = get_coordinator()
+    active = coordinator.snapshot()["active"]
+    if not active or active["phase"] != "uncertain":
+        return {"ok": True, "resolved": False, "message": "没有待核验的执行"}
+    prompt_id = active.get("prompt_id")
+    if active.get("service") != "comfyui" or not prompt_id:
+        return {"ok": False, "code": "UNCONFIRMED_EXECUTION",
+                "error": "该后端未提供可核验的任务结束记录，资源预留继续保留"}
+    from clients.comfyui_client import _get
+    from urllib.parse import quote
+    ok, history, error = _get("/history/" + quote(prompt_id, safe=""))
+    record = history.get(prompt_id, {}) if ok else {}
+    terminal = record.get("status", {}).get("status_str") in ("success", "error")
+    if not terminal:
+        return {"ok": False, "code": "UNCONFIRMED_EXECUTION",
+                "error": error or "尚无对应任务的结束记录，资源预留继续保留"}
+    try:
+        fresh_gpu()
+        coordinator.resolve(active["token"], {"terminal": True, "prompt_id": prompt_id,
+                                             "status": record["status"]["status_str"]})
+        from engine.queue import reconcile_task
+        reconcile_task(active.get("job_id"), active["token"], prompt_id,
+                       record["status"]["status_str"])
+        log_event("resource_reconciled", owner=active["owner"], prompt_id=prompt_id)
+        return {"ok": True, "resolved": True, "prompt_id": prompt_id}
+    except ResourceDenied as error:
+        return error.result()

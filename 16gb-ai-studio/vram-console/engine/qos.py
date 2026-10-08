@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 GMae QoS 服务等级引擎
@@ -6,6 +6,7 @@ GMae QoS 服务等级引擎
 - 降级建议生成与执行
 - 自动防死机（用户授权后分级自动释放）
 """
+from engine.coordinator import OperationSpec, coordinated
 import time
 import threading
 from collections import deque
@@ -97,12 +98,13 @@ def qos_check():
     if gpu.get("stale"):
         log_error("qos_check_using_stale", stale_age_s=gpu.get("stale_age_s"),
                   free_mb=gpu.get("free_mb"), message="using stale GPU data for safety")
+        return {"level": "unknown", "error": "GPU 遥测已过期，未执行自动释放"}
     free_mb = gpu.get("free_mb", 99999)
     now = time.time()
     old_level = _qos_state.get("level", "ok")
     if free_mb < QOS_CFG["emergency_threshold_mb"]:
         auto_result = _auto_protect_run(free_mb)
-        if auto_result:
+        if auto_result and auto_result.get("ok", True):
             result = {"level": "emergency", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
                       "actions": auto_result.get("actions", []),
                       "message": "显存危急（%.1fGB），已按自动防死机策略执行分级释放。" % (free_mb / 1024)}
@@ -116,7 +118,8 @@ def qos_check():
         _qos_state["level"] = "emergency"
         return {"level": "emergency", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
                 "auto_protect": _auto_protect_cfg().get("enabled"),
-                "message": ("显存危急（%.1fGB）！已自动执行分级释放。" % (free_mb / 1024)
+                "coordination": auto_result if auto_result else None,
+                "message": ((auto_result or {}).get("error") or "显存危急（%.1fGB），尚未执行自动释放。" % (free_mb / 1024)
                             if _auto_protect_cfg().get("enabled")
                             else "显存危急（%.1fGB）！自动防死机未开启，请立即手动释放。" % (free_mb / 1024))}
     elif free_mb < QOS_CFG["warning_threshold_mb"]:
@@ -178,6 +181,7 @@ def _qos_build_suggestions(free_mb):
     return suggestions
 
 
+@coordinated(lambda a: OperationSpec("release", owner="qos:" + str(a["suggestion_id"])), shape="dict")
 def qos_execute_suggestion(suggestion_id):
     """执行用户选择的降级建议。"""
     from services.ollama import ollama_stop
@@ -189,13 +193,19 @@ def qos_execute_suggestion(suggestion_id):
         return {"ok": False, "error": "suggestion not found: %s" % suggestion_id}
     try:
         if target["type"] == "ollama_stop":
-            ollama_stop([target["model"]])
+            rc, output = ollama_stop([target["model"]])
+            if rc != 0:
+                return {"ok": False, "error": output}
             msg = "已停止 %s" % target["model"]
         elif target["type"] == "comfy_free":
-            comfy_free()
+            result = comfy_free()
+            if not result.get("ok"):
+                return result
             msg = "已释放 ComfyUI 显存"
         elif target["type"] == "fooocus_stop":
-            docker_action("fooocus", "stop")
+            rc, output = docker_action("fooocus", "stop")
+            if rc != 0:
+                return {"ok": False, "error": output}
             msg = "已停止 Fooocus 容器"
         else:
             return {"ok": False, "error": "unknown type"}
@@ -255,12 +265,15 @@ _AUTO_PROTECT_MODE_PLAN = {
 }
 
 
+@coordinated(lambda a: OperationSpec("release", owner="auto-protect"), shape="dict")
 def _auto_protect_run(free_mb):
     """自动防死机主逻辑：由 qos_check 每周期调用。"""
     from services.helper import _auto_protect_cfg
     from services.ollama import ollama_ps, ollama_stop
     from services.comfy import comfy_free
     from services.docker import docker_containers, docker_action, infer_scene
+    from engine.coordinator import fresh_gpu
+    free_mb = fresh_gpu()["free_mb"]
     ap = _auto_protect_cfg()
     if not ap.get("enabled"):
         return None
@@ -303,8 +316,9 @@ def _auto_protect_run(free_mb):
             to_stop = [m.get("model") for m in loaded
                        if m.get("model") and m.get("model") != keep]
             if to_stop:
-                ollama_stop(to_stop)
-                actions.append({"level": "L1", "action": "卸载 Ollama 模型", "target": to_stop})
+                rc, output = ollama_stop(to_stop)
+                if rc == 0:
+                    actions.append({"level": "L1", "action": "卸载 Ollama 模型", "target": to_stop})
         except Exception as e:
             log_error("auto_protect_l1_error", error=str(e))
     if 2 in enabled_levels and "comfyui" in names:
@@ -317,8 +331,9 @@ def _auto_protect_run(free_mb):
             log_error("auto_protect_l2_error", error=str(e))
     if 3 in enabled_levels and "fooocus" in names and scene != "fooocus":
         try:
-            docker_action("fooocus", "stop")
-            actions.append({"level": "L3", "action": "停止 Fooocus 容器"})
+            rc, output = docker_action("fooocus", "stop")
+            if rc == 0:
+                actions.append({"level": "L3", "action": "停止 Fooocus 容器"})
         except Exception as e:
             log_error("auto_protect_l3_error", error=str(e))
     # === L4: 硬释放 — docker stop（WSL2 下 pause 不释放 GPU 内存，直接 stop） ===

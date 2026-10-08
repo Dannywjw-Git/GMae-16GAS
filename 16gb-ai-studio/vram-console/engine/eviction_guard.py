@@ -5,6 +5,7 @@ GMae 显存门卫模块
 - gpu_guard_check: 只读检查（水位 + 场景违规 + 未登记占用）
 - gpu_guard_evict: 用户触发的驱逐（L2，按优先级）
 """
+from engine.coordinator import OperationSpec, coordinated
 import time
 from core.logger import log_event
 from core.config import get_threshold_value
@@ -64,6 +65,7 @@ def gpu_guard_check():
     return g
 
 
+@coordinated(lambda a: OperationSpec("release"), shape="dict")
 def gpu_guard_evict():
     """门卫驱逐（L2，仅对登记簿 managed 中可安全重启的服务，按优先级）：
     ollama 已加载模型 → comfyui /free → fooocus 容器。

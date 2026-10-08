@@ -10,6 +10,7 @@ QoS 与自动保护端点（中间层重构 M3）
 """
 from core.logger import log_error
 from api.router import router
+from api.resource_commands import resource_command
 from core.event_bus import event_bus
 from api.request import Request
 from api.response import Response
@@ -32,6 +33,7 @@ def get_qos_check(req: Request) -> Response:
 
 
 @router.post("/api/qos/execute")
+@resource_command
 def post_qos_execute(req: Request) -> Response:
     """执行指定的 QoS 建议。
 
@@ -49,7 +51,7 @@ def post_qos_execute(req: Request) -> Response:
     except Exception as e:
         log_error("exception_suppressed", error=e, context="qos.py:48")
 
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.get("/api/auto-protect/status")
@@ -66,4 +68,4 @@ def post_auto_protect_config(req: Request) -> Response:
         各级阈值和开关（详见 engine.qos.auto_protect_config）
     """
     result = auto_protect_config(req.body)
-    return Response.success(result)
+    return Response.from_result(result)

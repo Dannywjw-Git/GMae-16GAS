@@ -2,9 +2,9 @@ name: GMae CI
 
 on:
   push:
-    branches: [main, master, develop, refactor/v2, 'audit/**']
+    branches: [main, master, develop, refactor/v2, 'audit/**', 'feat/**']
   pull_request:
-    branches: [main, master, refactor/v2]
+    branches: [main, master, refactor/v2, 'audit/**']
 
 permissions:
   contents: read
@@ -50,3 +50,4 @@ jobs:
         with:
           node-version: '22'
       - run: node scripts/check_frontend.mjs
+      - run: node scripts/test_coordinator_frontend.mjs

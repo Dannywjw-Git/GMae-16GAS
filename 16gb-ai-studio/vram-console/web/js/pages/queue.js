@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
  * Pages - 任务队列页
  * 从 pages.js 拆分，通过 Object.assign 扩展 Pages 对象
  * 依赖全局对象：Utils, EventBus, State, API, Toast, Modal, Icons, Router
@@ -14,8 +14,9 @@ Object.assign(Pages, {
         <div class="page-header__title">任务队列
           <div class="page-header__actions"><button class="btn btn--secondary btn--sm" id="btn-queue-refresh">${Icons.refresh} 刷新</button></div>
         </div>
-        <div class="page-header__subtitle">串行化生成任务队列，预算预检 + 进度反馈</div>
+        <div class="page-header__subtitle">统一资源准入；执行结束确认前保留预算</div>
       </div>
+      <div class="card mb-4"><div class="card__body" id="resource-coordination">正在读取资源状态…</div></div>
       <div class="grid mb-4">
         <div class="col-5">
           <div class="card">
@@ -134,9 +135,7 @@ Object.assign(Pages, {
 
     // 初始加载 + 启动轮询
     await this._loadQueue();
-    const q = await API.getQueue();
-    const hasActive = (q.tasks || q.queue || []).some(t => ['running', 'pending'].includes(t.status || t.state));
-    if (hasActive) this._startQueuePolling();
+    this._startQueuePolling();
   },
 
   /** 模型信息缓存：{modelId: {category, name, vram_gb, ...}} */
@@ -251,34 +250,16 @@ Object.assign(Pages, {
     if (!model) { badge.innerHTML = '<span class="badge badge--neutral">请选择模型</span>'; submitBtn.disabled = true; return; }
     badge.innerHTML = '<span class="badge badge--neutral">⏳ 检测中...</span>';
     try {
-      const category = this._getModelCategory(model);
-      // 统一参数格式
-      const params = { prompt: Utils.$('#task-prompt')?.value || '' };
-      if (category === 'image' || category === 'video') {
-        params.width = parseInt(Utils.$('#task-width')?.value) || 1024;
-        params.height = parseInt(Utils.$('#task-height')?.value) || 1024;
-        params.steps = parseInt(Utils.$('#task-steps')?.value) || 30;
-        params.cfg = parseFloat(Utils.$('#task-cfg')?.value) || 7.0;
-      }
-      if (category === 'video') {
-        params.frames = parseInt(Utils.$('#task-frames')?.value) || 17;
-      }
-      if (category === 'text') {
-        params.temperature = parseFloat(Utils.$('#task-temperature')?.value) || 0.7;
-        params.max_tokens = parseInt(Utils.$('#task-max-tokens')?.value) || 2048;
-      }
-      if (category === 'audio') {
-        params.duration = parseInt(Utils.$('#task-duration')?.value) || 30;
-      }
-
-      // 后端 admission 需要 {action, args: {model, params}}
-      const res = await API.checkAdmission({ action: 'submit_task', args: { model, params } });
+      // Advisory preview uses the registered model profile.
+      const res = await API.previewResources({ source: 'comfyui', model });
       const allowed = res.allowed ?? false;
       const reason = res.reason || res.error?.message || '';
       if (allowed) {
-        const needGb = res.required_free_gb || res.checks?.budget?.required_free_gb || '?';
-        const detail = res.checks?.budget?.detail || '';
-        badge.innerHTML = `<span class="badge badge--success">✅ 显存充足${needGb !== '?' ? `（需保留 ${needGb}GB）` : ''}</span>`;
+        const peak = res.budget?.vram_gb;
+        const label = res.execution_ready ? '登记预算允许执行' : '可排队，执行前重新准入';
+        badge.innerHTML = `<span class="badge badge--${res.execution_ready ? 'success' : 'warning'}">${Utils.escapeHtml(label)}</span>
+          <div>${Utils.escapeHtml(reason)}${peak ? ` · 登记峰值 ${Utils.escapeHtml(String(peak))} GiB` : ''}</div>
+          <div class="text-muted">此估计仅适用于登记配置；修改尺寸、帧数等参数需重新校准。</div>`;
         submitBtn.disabled = false;
       } else {
         badge.innerHTML = `<span class="badge badge--danger">❌ ${Utils.escapeHtml(reason || '显存不足')}</span>`;
@@ -286,7 +267,7 @@ Object.assign(Pages, {
       }
     } catch (e) {
       badge.innerHTML = '<span class="badge badge--neutral">⚠️ 预算检测不可用</span>';
-      submitBtn.disabled = false;
+      submitBtn.disabled = true;
     }
   },
 
@@ -297,7 +278,11 @@ Object.assign(Pages, {
     let res;
     try {
       res = await API.getQueue();
+      if (!res || res.ok === false || !Array.isArray(res.tasks || res.queue || [])) {
+        throw new Error('Queue state unavailable');
+      }
     } catch (e) {
+      this._renderCoordination({});
       const errList = Utils.$('#task-list');
       if (errList) errList.innerHTML = '<div class="empty-state"><div class="empty-state__title">队列接口不可用</div></div>';
       return;
@@ -305,11 +290,12 @@ Object.assign(Pages, {
     const all = res.tasks || res.queue || [];
     this._lastQueueTasks = all;
     const visible = all.filter(t => !this._hiddenTaskIds.has(t.id || t.task_id));
-    const STATUS_ACTIVE = ['queued', 'precheck', 'freeing', 'running'];
+    const STATUS_ACTIVE = ['queued', 'waiting_resource', 'precheck', 'freeing', 'running'];
     const STATUS_DONE = ['done', 'completed', 'failed', 'canceled'];
+    this._renderCoordination(res.coordination || {});
     const st = t => t.status || t.state || '';
     const running = visible.filter(t => ['precheck', 'freeing', 'running'].includes(st(t))).length;
-    const waiting = visible.filter(t => st(t) === 'queued').length;
+    const waiting = visible.filter(t => ['queued', 'waiting_resource'].includes(st(t))).length;
     const doneCnt = visible.filter(t => STATUS_DONE.includes(st(t))).length;
     const setText = (id, v) => { const el = Utils.$('#' + id); if (el) el.textContent = v; };
     setText('q-running', running);
@@ -330,7 +316,7 @@ Object.assign(Pages, {
     // 任务列表（DOM 不存在说明已切走页面，停止轮询自愈）
     const list = Utils.$('#task-list');
     if (!list) { this._stopQueuePolling(); return; }
-    const badgeCls = x => ({ running: 'info', precheck: 'info', freeing: 'info', queued: 'neutral', done: 'success', completed: 'success', failed: 'danger', canceled: 'neutral' }[x] || 'neutral');
+    const badgeCls = x => ({ running: 'info', precheck: 'info', freeing: 'info', queued: 'neutral', waiting_resource: 'warning', uncertain: 'danger', done: 'success', completed: 'success', failed: 'danger', canceled: 'neutral' }[x] || 'neutral');
     list.innerHTML = visible.length ? `
       <table class="table">
         <thead><tr><th>#</th><th>模型</th><th>状态</th><th>进度/信息</th><th>提交时间</th><th>操作</th></tr></thead>
@@ -359,8 +345,8 @@ Object.assign(Pages, {
     Modal.confirm({
       title: '取消任务', message: '确认取消该任务？', confirmText: '取消任务', danger: true,
       onConfirm: async () => {
-        const res = await API.cancelTask({ task_id: id });
-        if (res.ok) { Toast.success('任务已取消'); this._loadQueue(); }
+        const res = await API.cancelTask({ id });
+        if (res.ok) { Toast.success(res.note || '取消请求已登记'); this._loadQueue(); }
         else Toast.error(res.error?.message || '取消失败');
       },
     });
@@ -390,5 +376,40 @@ Object.assign(Pages, {
 
   _stopQueuePolling() {
     if (this._queuePollTimer) { clearInterval(this._queuePollTimer); this._queuePollTimer = null; }
+  },
+
+  _renderCoordination(snapshot) {
+    const element = Utils.$('#resource-coordination');
+    if (!element) return;
+    if (!Object.prototype.hasOwnProperty.call(snapshot, 'active')) {
+      element.innerHTML = '<strong>资源状态不可用</strong><div>请刷新后重试；当前未确认资源可以申请。</div>';
+      return;
+    }
+    const active = snapshot.active;
+    if (!active) {
+      element.innerHTML = '<strong>资源可申请</strong><div>每个任务执行前都会重新读取显存、验证预算并登记预留。</div>';
+      return;
+    }
+    const labels = { assessing: '检查资源', reserved: '已预留', releasing: '释放冲突负载', verifying: '核验显存',
+      running: '执行中', stopping: '等待停止确认', uncertain: '执行状态待核验', completed: '完成核验', failed: '操作失败' };
+    element.innerHTML = `<strong>${Utils.escapeHtml(labels[active.phase] || active.phase)}</strong>
+      <div>${Utils.escapeHtml(active.owner || '')}${(active.target_model || active.model) ? ' · ' + Utils.escapeHtml(active.target_model || active.model) : ''}
+      · 预留 ${Utils.escapeHtml(String((snapshot.reserved_mb || 0) / 1024))} GiB</div>
+      <div>${Utils.escapeHtml(active.reason || '其他加载与释放请求需等待当前操作结束，然后重新准入。')}</div>
+      ${active.phase === 'uncertain' ? '<button class="btn btn--secondary btn--sm" id="btn-resource-reconcile">核验执行状态</button>' : ''}`;
+    const button = Utils.$('#btn-resource-reconcile');
+    if (button) button.onclick = async () => {
+      button.disabled = true;
+      try {
+        const result = await API.reconcileResources();
+        if (result.ok) Toast.success(result.resolved ? '执行结束已确认，资源预留已解除' : result.message);
+        else Toast.error(result.error?.message || '尚无法确认执行结束，继续保留预留');
+      } catch (error) {
+        Toast.error('核验接口不可用，继续保留预留');
+      } finally {
+        button.disabled = false;
+        await this._loadQueue();
+      }
+    };
   }
 });

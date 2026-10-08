@@ -43,6 +43,20 @@ class Response:
         )
 
     @classmethod
+    def from_result(cls, result: Any) -> "Response":
+        """Preserve rejected operation semantics at the HTTP boundary."""
+        if isinstance(result, dict) and result.get("ok") is False:
+            code = result.get("code", "OPERATION_FAILED")
+            status = 409 if code in ("RESOURCE_BUSY", "SERVICE_BUSY", "UNCONFIRMED_EXECUTION") else 422
+            if code in ("TELEMETRY_UNAVAILABLE", "ACTIVITY_UNKNOWN", "BUDGET_UNAVAILABLE"):
+                status = 503
+            if code == "COMMAND_QUEUE_FULL":
+                status = 429
+            message = result.get("error") or result.get("output") or "操作失败"
+            return cls.error(code, str(message), details=result, http_status=status)
+        return cls.success(result)
+
+    @classmethod
     def error(cls, code: str, message: str, details: Optional[dict] = None,
               http_status: int = 400) -> "Response":
         """错误响应（v1 格式 JSON）。"""

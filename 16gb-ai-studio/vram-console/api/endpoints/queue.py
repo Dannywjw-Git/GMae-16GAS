@@ -69,7 +69,7 @@ def post_queue(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="queue.py:43")
-    return Response.success(result)
+    return Response.from_result(result)
 
 
 @router.post("/api/queue/cancel")
@@ -92,4 +92,4 @@ def post_queue_cancel(req: Request) -> Response:
         )
     except Exception as e:
         log_error("exception_suppressed", error=e, context="queue.py:66")
-    return Response.success(result)
+    return Response.from_result(result)
