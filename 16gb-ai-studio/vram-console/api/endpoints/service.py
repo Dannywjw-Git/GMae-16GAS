@@ -6,6 +6,7 @@
 - POST /api/model — 模型操作（load/unload/info）
 - POST /api/container/stop — 停止容器
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

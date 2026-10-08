@@ -5,6 +5,7 @@
 - POST /api/scene — 切换场景
 - POST /api/combo — 切换组合
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

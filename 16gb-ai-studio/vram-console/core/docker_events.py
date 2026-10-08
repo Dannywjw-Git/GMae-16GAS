@@ -36,6 +36,7 @@ Docker 事件监听模块（S1.2 Docker Events API）
     docker_events.stop()
 """
 
+from core.logger import log_error
 import subprocess
 import json
 import threading

@@ -8,6 +8,7 @@ QoS 与自动保护端点（中间层重构 M3）
 - GET  /api/auto-protect/status — 自动保护状态
 - POST /api/auto-protect/config — 自动保护配置
 """
+from core.logger import log_error
 from api.router import router
 from core.event_bus import event_bus
 from api.request import Request

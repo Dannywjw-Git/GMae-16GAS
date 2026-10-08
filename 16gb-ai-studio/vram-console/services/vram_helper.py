@@ -21,6 +21,7 @@ GMae 桌面 Helper 服务端脚本（services/vram_helper.py）
 - 也可手动运行：python vram_helper.py --token <token>
 - 独立运行，不依赖主服务进程
 """
+import logging
 import json
 import os
 import subprocess
@@ -71,7 +72,7 @@ def _idle_monitor() -> None:
             try:
                 os._exit(0)
             except Exception as e:
-                log_error("exception_suppressed", error=e, context="vram_helper.py:60")
+                logging.getLogger(__name__).exception("Exception in vram_helper.py:60")
             return
 
 
@@ -84,7 +85,7 @@ def _log(msg: str) -> None:
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(line + "\n")
     except Exception as e:
-        log_error("exception_suppressed", error=e, context="vram_helper.py:73")
+        logging.getLogger(__name__).exception("Exception in vram_helper.py:73")
 
 
 def _read_token() -> str:
@@ -162,7 +163,7 @@ def desktop_kill(pid: int) -> dict:
             capture_output=True, text=True, timeout=8)
         name = (pr.stdout or "").strip()
     except Exception as e:
-        log_error("exception_suppressed", error=e, context="vram_helper.py:152")
+        logging.getLogger(__name__).exception("Exception in vram_helper.py:152")
     if name.lower() in PROTECT:
         return {"ok": False, "error": "refuse: protected system process: " + name}
     try:

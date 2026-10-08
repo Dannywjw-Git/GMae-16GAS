@@ -8,6 +8,7 @@ GMae 调度中心认证模块
 - 密码重置验证码（6位数字，10分钟有效期）
 """
 
+from core.logger import log_error
 import os
 import json
 import time
@@ -237,6 +238,7 @@ def _clear_user_sessions(email: str) -> None:
     expired = [sid for sid, s in SESSIONS.items() if s.get("user_email") == email]
     for sid in expired:
         SESSIONS.pop(sid, None)
+    _save_sessions()
 
 
 def parse_cookie(cookie_header: str) -> dict:

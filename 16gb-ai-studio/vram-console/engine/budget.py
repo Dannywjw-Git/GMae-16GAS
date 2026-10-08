@@ -6,6 +6,7 @@ GMae 显存预算引擎模块
 - vram_advice: 高负载智能建议 + 未归因显存诊断
 """
 import time
+import math
 from core.logger import log_event
 from core.config import (REGISTRY, VRAM_BASELINE_NOISE_MB, COMFY_MODEL_RESIDENT_THRESHOLD_MB,
                          VRAM_DESKTOP_PROCESS_MIN_MB, VRAM_UNKNOWN_MIN_MB)
@@ -50,7 +51,7 @@ def _diagnose_desktop_processes(unattributed_mb: int) -> dict:
         if ok and r.get("ok"):
             for p in (r.get("processes") or []):
                 try:
-                    mb = int(float(p.get("MB", 0) or 0) * 1024)
+                    mb = int(float(p.get("MB", 0) or 0))
                 except (TypeError, ValueError):
                     mb = 0
                 try:
@@ -212,10 +213,18 @@ def vram_advice() -> dict:
     }
 
 
-def budget_engine(context_overrides: dict | None = None) -> dict:
+def _profile_peak_gb(value):
+    try:
+        value = float(value)
+        return value if math.isfinite(value) and value > 0 else 0
+    except (TypeError, ValueError):
+        return 0
+
+
+def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool = False) -> dict:
     """Step 4 显存预算引擎（蓝图 §6）：核算每个已知模型「能不能跑、要释放多少、差多少」。
     context_overrides: {model_id: context_size} — 用户在预演模式指定的 context 大小，
-                       优先从 model.context_vram 查找对应显存，找不到则用默认值+KV cache估算。
+                       只接受已校准 context，找不到则拒绝准入。
     公式（蓝图 6.1）：avail = total − 底噪 − 保留 − 其他进程占用(非受管)
          能跑 = 请求模型标称 + 不可释放占用 ≤ total − reserve
     决策四选一（6.2）：ok / free_L1 / free_L2 / reject（连释放都不够 → 差多少 GB）
@@ -223,15 +232,33 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
     from services.ollama import ollama_ps
     from services.comfy import comfy_loaded_models
     sys_cfg = REGISTRY.get("system", {})
-    total_mb = int(float(sys_cfg.get("gpu_vram_total_gb", 16)) * 1024)
-    noise_mb = int(float(sys_cfg.get("gpu_base_noise_gb", 1.0)) * 1024)
-    reserve_mb = int(float(sys_cfg.get("vram_reserve_gb", 2.5)) * 1024)
+    try:
+        noise_mb = int(float(sys_cfg.get("gpu_base_noise_gb", 1.0)) * 1024)
+        reserve_mb = int(float(sys_cfg.get("vram_reserve_gb", 2.5)) * 1024)
+        if noise_mb < 0 or reserve_mb < 0:
+            raise ValueError("negative memory allowance")
+    except (TypeError, ValueError, OverflowError):
+        return {"ok": False, "error": "显存噪声或安全余量配置无效", "models": [], "loaded_models": []}
+    gpu = gpu_status(force_refresh=force_refresh)
+    if not gpu.get("ok") or gpu.get("stale"):
+        return {"ok": False, "error": "新鲜 GPU 遥测不可用，暂停新任务准入", "models": [], "loaded_models": []}
+    try:
+        total_mb = int(gpu["total_mb"])
+        used_mb = int(gpu["used_mb"])
+        free_mb = int(gpu["free_mb"])
+        if total_mb <= 0 or not 0 <= used_mb <= total_mb or not 0 <= free_mb <= total_mb:
+            raise ValueError("invalid GPU memory counters")
+        # Use the more conservative counter if telemetry does not conserve memory.
+        used_mb = max(used_mb, total_mb - free_mb)
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return {"ok": False, "error": "GPU 显存计数无效，暂停新任务准入", "models": [], "loaded_models": []}
     safe_ceiling_mb = total_mb - reserve_mb
-    gpu = gpu_status()
     procs = gpu_processes()
     gen_stats = load_gen_stats()
     unreleasable_mb = (procs.get("unknown_mb") or 0) + (procs.get("desktop_used_mb") or 0)
-    releasable_mb = procs.get("known_total_mb") or 0
+    # Attributed memory is an estimate, never an extra pool on top of capacity.
+    releasable_mb = min(max(0, procs.get("known_total_mb") or 0), max(0, used_mb - noise_mb))
+    retained_mb = max(noise_mb + unreleasable_mb, used_mb - releasable_mb)
     ol_loaded = set()
     for m in ollama_ps().get("models", []):
         ol_loaded.add(m.get("model") or m.get("name"))
@@ -246,8 +273,9 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
     for src_key, loaded_set in (("ollama", ol_loaded), ("comfyui", cf_loaded)):
         for m in REGISTRY.get(src_key, {}).get("models", []):
             mid = m["id"]
-            default_vram = float(m.get("vram_gb", 0))
-            context_vram_map = m.get("context_vram", {}) or {}
+            default_vram = _profile_peak_gb(m.get("vram_gb", 0))
+            context_vram_map = {k: _profile_peak_gb(v) for k, v in (m.get("context_vram", {}) or {}).items()
+                                if _profile_peak_gb(v) > 0}
             specified_ctx = (context_overrides or {}).get(mid)
             ctx_note = ""
             if specified_ctx and str(specified_ctx) in context_vram_map:
@@ -260,30 +288,42 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
                 vram = default_vram
             excl = bool(m.get("exclusive", False))
             loaded = mid in loaded_set
-            if loaded:
+            uncalibrated_ctx = bool(specified_ctx and str(specified_ctx) not in context_vram_map
+                                    and specified_ctx not in context_vram_map)
+            invalid_estimate = not math.isfinite(vram) or vram <= 0
+            if invalid_estimate:
+                vram = 0  # Keep the rejected result JSON-safe; never convert NaN/inf to time.
+            # vram_gb represents the task's peak estimate, not a zero-cost cache hit.
+            # Until phase-aware profiles exist, loaded targets keep the conservative estimate.
+            direct_peak_mb = used_mb + int(vram * 1024) if not invalid_estimate else 0
+            after_release_peak_mb = retained_mb + int(vram * 1024) if not invalid_estimate else 0
+            other_loaded = (ol_loaded | cf_loaded) - {mid}
+            exclusive_conflict = excl and bool(other_loaded)
+            if invalid_estimate or uncalibrated_ctx:
+                decision, need_free, gap = "reject", 0, 0
+                note = "显存估计无效或 context 未校准，请先评测"
+            elif loaded:
+                decision = "ok" if direct_peak_mb <= safe_ceiling_mb and not exclusive_conflict else "reject"
+                need_free, gap = 0, round(max(0, direct_peak_mb - safe_ceiling_mb) / 1024, 1)
+                note = "已加载；仍保留任务峰值预算" if decision == "ok" else "已加载但任务峰值预算不足或存在独占冲突"
+            elif direct_peak_mb <= safe_ceiling_mb and not exclusive_conflict:
                 decision, need_free, gap = "ok", 0, 0
-                note = "已加载（利用缓存）"
+                note = "可直接加载（含当前驻留占用）"
+            elif after_release_peak_mb <= safe_ceiling_mb:
+                decision = "free_L2" if src_key == "comfyui" else "free_L1"
+                need_free = round(max(0, direct_peak_mb - safe_ceiling_mb) / 1024, 1)
+                gap = 0
+                note = "需释放受管负载并重新核验实时显存"
             else:
-                needed = int(vram * 1024 + noise_mb + unreleasable_mb)
-                if needed <= safe_ceiling_mb:
-                    decision, need_free, gap = "ok", 0, 0
-                    note = "可直接加载（不触发释放）"
-                else:
-                    gap0 = needed - safe_ceiling_mb
-                    if releasable_mb >= gap0:
-                        decision = "free_L2" if src_key == "comfyui" else "free_L1"
-                        need_free = round(gap0 / 1024, 1)
-                        gap = 0
-                        note = "释放 %s GB（%s）后可加载" % (round(gap0 / 1024, 1),
-                                                       "ComfyUI /free" if src_key == "comfyui" else "Ollama 停模型")
-                    else:
-                        decision = "reject"
-                        need_free = round(gap0 / 1024, 1)
-                        gap = round((gap0 - releasable_mb) / 1024, 1)
-                        note = "差 %s GB，连释放都不够" % gap
+                decision = "reject"
+                need_free = round(max(0, direct_peak_mb - safe_ceiling_mb) / 1024, 1)
+                gap = round((after_release_peak_mb - safe_ceiling_mb) / 1024, 1)
+                note = "释放后仍差 %s GB" % gap
             gs = gen_stats.get(mid, {})
             avg_sec = gs.get("avg_seconds")
-            if avg_sec:
+            if invalid_estimate:
+                est_text = "峰值未校准，无法估算"
+            elif avg_sec:
                 est_text = "基于 %d 次历史生成，平均约 %s" % (
                     gs.get("count", 0),
                     ("%d分%d秒" % (avg_sec // 60, avg_sec % 60)) if avg_sec >= 60 else ("%d秒" % avg_sec))
@@ -305,13 +345,13 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
         rm = next((x for x in REGISTRY.get("ollama", {}).get("models", []) if x["id"] == mid), None)
         loaded_models.append({"source": "ollama", "id": mid,
                               "name": rm.get("name", mid) if rm else mid,
-                              "vram_gb": rm.get("vram_gb", 0) if rm else 0,
+                              "vram_gb": _profile_peak_gb(rm.get("vram_gb", 0)) if rm else 0,
                               "exclusive": bool(rm.get("exclusive", False)) if rm else False})
     for mid in cf_loaded:
         rm = next((x for x in REGISTRY.get("comfyui", {}).get("models", []) if x["id"] == mid), None)
         loaded_models.append({"source": "comfyui", "id": mid,
                               "name": rm.get("name", mid) if rm else mid,
-                              "vram_gb": rm.get("vram_gb", 0) if rm else 0,
+                              "vram_gb": _profile_peak_gb(rm.get("vram_gb", 0)) if rm else 0,
                               "exclusive": bool(rm.get("exclusive", False)) if rm else False})
     loaded_models.sort(key=lambda x: x.get("vram_gb", 0), reverse=True)
 
@@ -324,7 +364,8 @@ def budget_engine(context_overrides: dict | None = None) -> dict:
         "used_gb": round(gpu.get("used_mb", 0) / 1024, 1) if gpu.get("ok") else None,
         "unreleasable_gb": round(unreleasable_mb / 1024, 1),
         "releasable_gb": round(releasable_mb / 1024, 1),
-        "avail_gb": round(max(0, safe_ceiling_mb - noise_mb - unreleasable_mb) / 1024, 1),
+        "avail_gb": round(max(0, safe_ceiling_mb - used_mb) / 1024, 1),
+        "after_release_avail_gb": round(max(0, safe_ceiling_mb - retained_mb) / 1024, 1),
         "models": models,
         "loaded_models": loaded_models,
         "ts": int(time.time()),

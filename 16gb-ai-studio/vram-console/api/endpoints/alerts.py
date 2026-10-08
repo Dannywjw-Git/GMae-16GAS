@@ -9,6 +9,7 @@
 - POST /api/alerts/resolve — 手动解决（移除）活跃告警
 - POST /api/alerts/submit — 提交告警（测试/集成用）
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

@@ -82,8 +82,8 @@ def gpu_guard_evict():
     if "fooocus" in docker_containers():
         rc, out = docker_action("fooocus", "stop")
         results.append(("stop fooocus (L2c)", rc, out))
-    gpu2 = gpu_status()
+    gpu2 = gpu_status(force_refresh=True)
     log_event("gpu_guard_evict", free_before=gpu.get("free_mb"), free_after=gpu2.get("free_mb"))
-    return {"ok": True,
+    return {"ok": all(rc == 0 for _, rc, _ in results),
             "actions": [{"step": n, "rc": rc, "output": o[-200:]} for n, rc, o in results],
             "free_before": gpu.get("free_mb"), "free_after": gpu2.get("free_mb")}

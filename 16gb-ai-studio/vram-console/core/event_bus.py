@@ -39,6 +39,7 @@
     # 统计最近 5 分钟各类别事件数量
     stats = event_bus.count_by_category(seconds=300)
 """
+import logging
 import json
 import time
 import threading
@@ -92,7 +93,7 @@ class EventBus:
         try:
             self._log_file.parent.mkdir(parents=True, exist_ok=True)
         except Exception as e:
-            log_error("exception_suppressed", error=e, context="event_bus.py:87")
+            logging.getLogger(__name__).exception("Exception in event_bus.py:87")
 
         # 启动时从持久化文件加载最近的事件（最多 max_events 条）
         self._load_from_file()

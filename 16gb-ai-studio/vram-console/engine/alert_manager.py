@@ -17,6 +17,7 @@
 - check_escalation(): 检查并执行告警升级（持续未解决自动升级）
 """
 
+from core.logger import log_error
 import threading
 import time
 import json

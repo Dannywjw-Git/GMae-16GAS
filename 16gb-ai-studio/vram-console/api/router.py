@@ -9,6 +9,7 @@ GMae HTTP 路由注册器（中间层重构 M1）
 """
 from typing import Callable, Optional, Tuple, List, Dict
 from api.request import Request
+from api.response import Response
 
 
 # 端点函数类型

@@ -12,8 +12,8 @@ import sys
 import time
 
 # 导入 server.py 的函数
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import sys, os\nsys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\nimport server
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import server
 
 
 def test_1_invalid_model():

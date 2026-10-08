@@ -6,6 +6,7 @@
 - GET /api/scan — 扫描模型文件
 - POST /api/scan/register — 登记扫描到的模型
 """
+from core.logger import log_error
 from typing import Optional
 from api.router import router
 from api.request import Request

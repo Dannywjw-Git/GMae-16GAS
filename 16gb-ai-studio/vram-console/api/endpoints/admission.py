@@ -4,6 +4,7 @@
 准入闸门端点（中间层重构 M3）
 - POST /api/admission — 准入闸门检查（判断某个动作是否可以执行）
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

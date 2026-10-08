@@ -11,6 +11,7 @@
 - POST /api/desktop/helper/start — 启动 Helper
 - POST /api/desktop/helper/stop — 停止 Helper
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

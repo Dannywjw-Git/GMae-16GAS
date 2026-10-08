@@ -4,6 +4,7 @@
 显存门卫端点（中间层重构 M3）
 - POST /api/guard — 门卫操作（check / evict / kick）
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response
