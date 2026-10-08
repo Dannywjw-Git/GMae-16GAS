@@ -119,6 +119,8 @@ const API = {
   // ======== 任务队列 ========
   getQueue() { return this.get('/api/queue'); },
   submitTask(body) { return this.post('/api/queue', body); },
+  getMeasuredPresets() { return this.get('/api/queue/presets'); },
+  submitMeasuredPreset(body) { return this.post('/api/queue/presets', body); },
   cancelTask(body) { return this.post('/api/queue/cancel', body); },
 
   // ======== 门卫 ========

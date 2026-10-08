@@ -12,3 +12,5 @@ docs/evidence/mixed-durable-queue-20261008/*.json text eol=lf
 docs/evidence/mixed-durable-queue-20261008/*.py -text
 docs/evidence/ollama-crash-recovery-20261008/*.json text eol=lf
 docs/evidence/ollama-crash-recovery-20261008/*.py -text
+docs/evidence/measured-mixed-demo-20261008/*.json text eol=lf
+docs/evidence/measured-mixed-demo-20261008/*.py -text

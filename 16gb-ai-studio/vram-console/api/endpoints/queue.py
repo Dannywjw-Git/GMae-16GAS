@@ -15,6 +15,28 @@ from core.event_bus import event_bus
 from core.logger import log_error
 
 
+@router.get('/api/queue/presets')
+def get_queue_presets(req: Request) -> Response:
+    from engine.measured_presets import public_catalog
+    return Response.success(public_catalog())
+
+
+@router.post('/api/queue/presets')
+def post_queue_preset(req: Request) -> Response:
+    from engine.measured_presets import resolve_preset
+    try:
+        if not isinstance(req.body, dict) or set(req.body) - {'preset_id', 'idempotency_key'}:
+            raise ValueError('预设提交只接受 preset_id 与 idempotency_key')
+        preset = resolve_preset(req.body_get('preset_id'))
+    except ValueError as error:
+        return Response.error('PROFILE_REQUIRED', str(error), http_status=422)
+    key = req.body_get('idempotency_key')
+    result = (queue_enqueue_ollama(preset['request'], key) if preset['source'] == 'ollama'
+              else queue_enqueue(preset['model'], preset['params'], key))
+    status_cache.invalidate()
+    return Response.from_result(result)
+
+
 @router.get("/api/queue")
 def get_queue(req: Request) -> Response:
     """任务队列快照（当前队列状态 + 历史任务）。"""

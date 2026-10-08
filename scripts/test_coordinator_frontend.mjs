@@ -90,7 +90,59 @@ await Pages._loadQueue();
 assert.match(elements.get('#task-list').innerHTML, /队列接口不可用/);
 assert.match(elements.get('#resource-coordination').innerHTML, /资源状态不可用/);
 
+queueResponse = {ok: true, tasks: [{id: 'ollama-id', model: 'qwen', source: 'ollama', status: 'done',
+  result: {response: '<script>untrusted output</script>', metrics: {eval_count: 24}}}], coordination: {active: null}};
+await Pages._loadQueue();
+assert.match(elements.get('#task-list').innerHTML, /文本结果（24 tokens）/);
+assert.match(elements.get('#task-list').innerHTML, /&lt;script&gt;untrusted output&lt;\/script&gt;/);
+assert.doesNotMatch(elements.get('#task-list').innerHTML, /<script>/);
+Pages._expandedTaskOutputs = new Set(['ollama-id']);
+await Pages._loadQueue();
+assert.match(elements.get('#task-list').innerHTML, /data-task-output="ollama-id" open/);
 Pages._loadQueue = () => {};
 await Pages._cancelTask('full-task-id');
 assert.equal(JSON.stringify(calls.pop()), JSON.stringify({id: 'full-task-id'}));
 console.log('Coordinator frontend behavior checks passed');
+
+// Measured presets preserve retry identity, cannot edit the server payload,
+// and treat discovery as evidence only rather than a live permission check.
+elements.set('#measured-preset', {value: 'preset-id', innerHTML: ''});
+elements.set('#measured-preset-info', {innerHTML: ''});
+elements.set('#btn-submit-preset', {disabled: true});
+context.crypto = {getRandomValues: array => {array.fill(7); return array;}};
+let catalogResponse = {ok: true, presets: [{id: 'preset-id', model: '<model>', context_length: 8192,
+  prompt_tokens: 6182, max_output_tokens: 32, measured_peak_mb: 8321, envelope_mb: 8833,
+  evidence_sha256: 'a'.repeat(64)}], limitation: '<fixed request>'};
+context.API.getMeasuredPresets = async () => catalogResponse;
+const submissions = [];
+context.API.submitMeasuredPreset = async body => {submissions.push(body); return {ok: false, error: {message: 'timeout'}};};
+await Pages._loadMeasuredPresets();
+assert.equal(elements.get('#btn-submit-preset').disabled, false);
+assert.match(elements.get('#measured-preset').innerHTML, /&lt;model&gt;/);
+assert.match(elements.get('#measured-preset-info').innerHTML, /8833/);
+assert.match(elements.get('#measured-preset-info').innerHTML, /&lt;fixed request&gt;/);
+await Pages._submitMeasuredPreset();
+await Pages._submitMeasuredPreset();
+assert.deepEqual(Object.keys(submissions[0]).sort(), ['idempotency_key', 'preset_id']);
+assert.equal(submissions[0].idempotency_key, submissions[1].idempotency_key);
+context.API.submitMeasuredPreset = async body => {submissions.push(body); return {ok: true};};
+await Pages._submitMeasuredPreset();
+assert.equal(submissions[2].idempotency_key, submissions[0].idempotency_key);
+assert.equal(Pages._pendingPresetSubmission, null);
+catalogResponse = {ok: false, error: {message: '<offline>'}};
+await Pages._loadMeasuredPresets();
+assert.equal(elements.get('#btn-submit-preset').disabled, true);
+assert.match(elements.get('#measured-preset-info').innerHTML, /&lt;offline&gt;/);
+await Pages._submitMeasuredPreset();
+assert.equal(submissions.length, 3);
+let resolveOldCatalog;
+let catalogCalls = 0;
+context.API.getMeasuredPresets = () => ++catalogCalls === 1
+  ? new Promise(resolve => {resolveOldCatalog = resolve;}) : Promise.resolve({ok: true, presets: []});
+const oldCatalog = Pages._loadMeasuredPresets();
+await Pages._loadMeasuredPresets();
+resolveOldCatalog({ok: true, presets: [{id: 'preset-id'}]});
+await oldCatalog;
+assert.equal(elements.get('#btn-submit-preset').disabled, true);
+assert.equal(Pages._measuredPresets.length, 0);
+console.log('Measured preset submission checks passed');
