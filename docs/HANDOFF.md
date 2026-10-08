@@ -1,5 +1,15 @@
 # GMae 阶段交接
 
+## 2026-10-08：修复命令超时被误判为已结束
+
+- 代码 commit：`302f3d2`；分支 `feat/durable-task-lifecycle-20261008`，[Draft PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。
+- 修复：适配器可能将 CLI 超时转换为普通失败，导致操作日志误确认。现在资源命令有持久尝试 ID，成功回执保存后才确认；超时、非零退出和回执失败保留未知命令及预留，外层不能强制确认。
+- 验证：完整 388 项通过，新增 8 项命令边界测试，包含真实受控 Python 子进程超时；名称检查 0 阻断错误、65 项既有警告；diff 检查通过。没有向真实 GPU 服务发出变更。
+- 上一提交 `959c33e` 的 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721501538) 与 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721343629) 成功；本次提交 CI 待核验。
+- 未完成：尝试 ID 不是后端执行身份，主进程退出后独立回执保存与无任务 ID 操作自动解除仍需开发，真实 GPU 验证未完成。
+- 请 Chat Agent 评审：普通失败与执行未知的边界、只读命令区分、脚本命令覆盖和外层确认的约束。
+- 下一步：引入可在主进程退出后继续保存结果的受控命令执行者，并基于可信回执实现有限自动恢复；未知远程请求继续保留阻挡。
+
 ## 2026-10-08：手动资源操作持久保护
 
 - 代码 commit：`2837690`。分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。
