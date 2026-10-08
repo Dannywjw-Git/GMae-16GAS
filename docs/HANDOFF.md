@@ -1,5 +1,17 @@
 # GMae 阶段交接
 
+## 2026-10-08：真实 Ollama 控制进程崩溃恢复
+
+完整实现及证据 `d616b7641d61a3fc84a6f2bf7c257fc2fe3686d4`，见 [Draft PR #18](https://github.com/Dannywjw-Git/GMae-16GAS/pull/18)。分支 `feat/ollama-supervised-recovery-20261008`，基于 PR #17 最终 HEAD `7f724dfb642ce5f1697c226b3ff9d47611ab337f`，其两项 CI `37746766711` / `37746762138` success。新实现提交的两项 CI `37749032688` / `37749152183` 均 completed success；后续文档 HEAD 单独核验，不沿用旧结果。首轮/成功复核采集版本分别为 `44948e423913373e4123581580ec1b7c1c16c390` / `3db1c5bc19c8015d177479ce234de028ef8cf642`。
+
+已实现：复用独立命令执行器，从原账本读取固定Ollama意图，原子claim并独立保存完整回执；恢复验证原任务/请求摘要/精确argv/confirmed rc0及完整响应后关闭日志和预留。缺失、错误或截断风险保留未知，不用空模型列表猜测成功、不重放；Windows故障注入使用原生创建时间/可执行文件与固定句柄，区分venv启动器PID。
+
+自动化：完整622项通过（17.63秒），包含错误/缺失回执、固定请求、进程指纹与故障链篡改拒绝。真实GPU：故障前实际used6245MiB、submitting/inflight且无持久响应；仅终止自行启动控制进程（退出1），新端重新取得原锁后任务/预留uncertain，第一次核验仍拒绝。原独立执行器保存回执后原任务done、原日志/唯一命令confirmed、预留解除；273样本零错误、峰值8319MiB、6182/24输入/输出token。[完整报告、失败首轮、raw及源码摘要](ollama-controller-crash-2026-10-08.md)。最后受管释放Qwen并核验空模型/物理回收，账本无未确认工作。
+
+首轮因Windows启动器/实际控制PID不同，在注入前采集失败，原请求正常完成；失败raw、完成侧记录及释放证据保留，不计为成功故障试验。尚未验证：机器/执行器同时死亡、永久网络失联、GPU驱动崩溃、即时取消、其他平台真实GPU故障。启动核验有界，稍后回执可再次POST核验；没有新增常驻恢复看门狗或全局exactly-once保证。
+
+需要Chat Agent独立评审：委托读取边界/原子claim、精确任务/argv/请求匹配、回执/任务/日志写入顺序、未知保持、Windows原生进程身份和真实故障链。下一阶段优先混合任务界面、同口径直接后端基线及安装/Release/演示交付；机器/执行器丢失另列验收，不继续无界扩展框架。
+
 ## 2026-10-08：持久 Ollama 与真实混合队列
 
 完整实现及证据 `f461996e8e4ac5e5018268e704f2ad50e85769bd`，见 [Draft PR #17](https://github.com/Dannywjw-Git/GMae-16GAS/pull/17)。分支 `feat/durable-ollama-queue-20261008`，基于 PR #16 最终 HEAD `ac99f4ab1bef8cf4c22b6be80aa1ae8e16787af4`，其两项 CI `37744002579` / `37743996518` success。新实现精确提交两项 CI `37746463880` / `37746408677` 均 success；后续文档 HEAD 另行核验，不沿用旧提交结果。首轮/复核真实采集分别为 `5f9f4e40ef8283bb0fac07a21ae512d0592b7bd8` / `b498ec63c879703cc7408d380592e16adc856425`。
