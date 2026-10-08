@@ -26,6 +26,8 @@ PR：[审计整改 #1](https://github.com/Dannywjw-Git/GMae-16GAS/pull/1)、[统
 
 当前阶段：[独立命令执行与有限容器恢复 Draft PR #4](https://github.com/Dannywjw-Git/GMae-16GAS/pull/4)，代码提交 `843853f`，基于 PR #3 的 `19ee61b`。
 
+最新开发阶段：[实际工作流绑定与 Profile 基础 Draft PR #5](https://github.com/Dannywjw-Git/GMae-16GAS/pull/5)，提交 `bb84ccd`，基于 PR #4 的 `a1a2313`。基础提交两项 CI 成功；新阶段 CI 运行中。正式测量准入接入与真实 GPU 实验仍未完成。
+
 PR #3 当前代码的 CI：[PR 检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719023821)、[分支检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719020765)。证据仅对应上述提交；后续改动须重新核验适用检查。
 
 ## 当前最高优先级
