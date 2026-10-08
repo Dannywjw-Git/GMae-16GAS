@@ -2,7 +2,7 @@
 
 ## 2026-10-08：指定任务取消与协议核验
 
-- 分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)，具体代码 commit 见同次提交历史。
+- 代码 commit：`4f35a27`。分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。
 - 实现：仅调用指定任务 `/api/jobs/{id}/cancel`，匹配任务、预留 token 与后端 ID；不回退全局中断。保存取消确认后仍等待结束历史，或严格队列缺失及新鲜 GPU 读数，再落盘终态并解除预留。未知/不支持响应继续阻挡。
 - 验证：完整 371 项通过，新增 19 项取消与恢复测试；名称检查 0 阻断错误。上一代码/文档提交 `552d03c` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720265556) 和 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720261049) 已成功，本次提交须重新核验 CI。
 - 本机真实协议核验：ComfyUI 0.34.0，先确认随机任务 UUID 不存在，再发指定任务取消，预期无操作响应通过；[公开证据](evidence/comfyui-cancel-protocol-2026-10-08.json) 不含用户任务内容。没有提交生成或取消现有任务。
