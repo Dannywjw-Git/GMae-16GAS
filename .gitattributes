@@ -1,3 +1,6 @@
 # Keep public raw evidence byte hashes stable across Windows/POSIX checkouts.
 docs/evidence/*.json text eol=lf
 docs/evidence/collectors/*.py text eol=lf
+
+docs/evidence/interleaved-queue-20261008/*.json text eol=lf
+docs/evidence/interleaved-queue-20261008/*.py -text

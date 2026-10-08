@@ -1,0 +1,2579 @@
+{
+  "kind": "real_profiled_queue_trial",
+  "recorded_at": "2026-10-08T06:43:50.389718+00:00",
+  "samples": [
+    {
+      "monotonic_s": 47688.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47688.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47688.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47689.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47689.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47689.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47689.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47690.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47690.406,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47690.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47690.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47691.14,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47691.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47691.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47691.89,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47692.14,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47692.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47692.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47692.89,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47693.14,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47693.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47693.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47693.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47694.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47694.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47694.625,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47694.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47695.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47695.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47695.625,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47695.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47696.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47696.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47696.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47696.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47697.171,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47697.437,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47697.703,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47697.968,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47698.234,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47698.5,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47698.765,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47699.031,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47699.296,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47699.546,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47699.812,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47700.078,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47700.328,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47700.593,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47700.859,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47701.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47701.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47701.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47701.921,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47702.187,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47702.453,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47702.718,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47702.968,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47703.218,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47703.484,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47703.734,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47703.984,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47704.25,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47704.515,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47704.781,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47705.046,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47705.296,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47705.562,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47705.828,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47706.093,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47706.343,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47706.609,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47706.843,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47707.093,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47707.343,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47707.609,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47707.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47708.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47708.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47708.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47708.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47709.171,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47709.437,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47709.703,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47709.953,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47710.218,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47710.484,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47710.75,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47711.0,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47711.25,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47711.5,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47711.75,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47712.0,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47712.25,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47712.484,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47712.75,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47713.0,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47713.265,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47713.5,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47713.765,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47714.015,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47714.265,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47714.531,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47714.796,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47715.062,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47715.312,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47715.562,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47715.828,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47716.078,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47716.328,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47716.578,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47716.828,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47717.078,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47717.343,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47717.609,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47717.859,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47718.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47718.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47718.625,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47718.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47719.109,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47719.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47719.64,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47719.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47720.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47720.421,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47720.687,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47720.937,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47721.187,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47721.437,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47721.687,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47721.937,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47722.203,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47722.453,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47722.718,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47722.968,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47723.234,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47723.484,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47723.75,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47724.0,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47724.25,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47724.531,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47724.781,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47725.046,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47725.296,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47725.546,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47725.796,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47726.046,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47726.296,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47726.546,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47726.812,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47727.062,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47727.328,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47727.578,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47727.828,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47728.078,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47728.328,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47728.593,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47728.859,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47729.109,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47729.375,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47729.609,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47729.89,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47730.14,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47730.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47730.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47730.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47731.171,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47731.421,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47731.687,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47731.937,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47732.203,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47732.468,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47732.718,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47732.984,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47733.25,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47733.484,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47733.75,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47734.015,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47734.265,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47734.515,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47734.765,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47735.031,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47735.296,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47735.562,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47735.828,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47736.093,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47736.359,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47736.625,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47736.875,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47737.125,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47737.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47737.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47737.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47738.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47738.406,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47738.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47738.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47739.171,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47739.421,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47739.687,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47739.953,
+      "total_mb": 16380,
+      "used_mb": 8050,
+      "free_mb": 8058,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47740.218,
+      "total_mb": 16380,
+      "used_mb": 8050,
+      "free_mb": 8058,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47740.484,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47740.734,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47741.0,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47741.265,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47741.531,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47741.765,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47742.015,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47742.281,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47742.531,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47742.781,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47743.031,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47743.296,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47743.562,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47743.828,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47744.093,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47744.359,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47744.625,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47744.89,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47745.156,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47745.406,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47745.656,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47745.906,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47746.171,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47746.437,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47746.703,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47746.953,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47747.218,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47747.484,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47747.75,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47748.0,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47748.25,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47748.484,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47748.765,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47749.031,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47749.281,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47749.531,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47749.796,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47750.062,
+      "total_mb": 16380,
+      "used_mb": 8048,
+      "free_mb": 8060,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47750.328,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47750.578,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47750.843,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47751.109,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47751.375,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47751.64,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47751.906,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47752.156,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47752.406,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47752.656,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47752.906,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47753.156,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47753.421,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47753.671,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47753.937,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47754.171,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47754.437,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47754.718,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47754.984,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47755.25,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47755.484,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47755.75,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47756.015,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47756.265,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47756.531,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47756.781,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47757.031,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47757.296,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47757.546,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47757.796,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47758.046,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47758.312,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47758.562,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47758.812,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47759.062,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47759.328,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47759.578,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47759.828,
+      "total_mb": 16380,
+      "used_mb": 8034,
+      "free_mb": 8074,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47760.093,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47760.359,
+      "total_mb": 16380,
+      "used_mb": 8102,
+      "free_mb": 8006,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 47760.625,
+      "total_mb": 16380,
+      "used_mb": 8166,
+      "free_mb": 7942,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47760.875,
+      "total_mb": 16380,
+      "used_mb": 8166,
+      "free_mb": 7942,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47761.14,
+      "total_mb": 16380,
+      "used_mb": 8166,
+      "free_mb": 7942,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47761.406,
+      "total_mb": 16380,
+      "used_mb": 8166,
+      "free_mb": 7942,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 47761.656,
+      "total_mb": 16380,
+      "used_mb": 8710,
+      "free_mb": 7398,
+      "utilization": 94
+    },
+    {
+      "monotonic_s": 47761.906,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 94
+    },
+    {
+      "monotonic_s": 47762.156,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47762.406,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47762.656,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47762.906,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 47763.156,
+      "total_mb": 16380,
+      "used_mb": 8038,
+      "free_mb": 8070,
+      "utilization": 0
+    }
+  ],
+  "sampling_errors": [],
+  "comparative_result": false,
+  "residency_before": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791441830398148208,
+    "monotonic_ns": 47637570138475,
+    "load_epoch": 2,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "79d30b7d-a41c-406c-902d-576f08275912",
+    "ok": true
+  },
+  "baseline": {
+    "monotonic_s": 47688.343,
+    "total_mb": 16380,
+    "used_mb": 8049,
+    "free_mb": 8059,
+    "utilization": 1
+  },
+  "managed_unload_calls": 0,
+  "task_id": "80905a36fab44aef839a5c4abac9af5b",
+  "effective_workflow": {
+    "1": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      }
+    },
+    "2": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "A small red ceramic teapot on a plain wooden table, studio lighting"
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "clip": [
+          "1",
+          1
+        ],
+        "text": "worst quality, low quality, blurry, distorted, ugly, watermark, text"
+      }
+    },
+    "4": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "batch_size": 1,
+        "height": 512,
+        "width": 512
+      }
+    },
+    "5": {
+      "class_type": "KSampler",
+      "inputs": {
+        "cfg": 6.0,
+        "denoise": 1.0,
+        "latent_image": [
+          "4",
+          0
+        ],
+        "model": [
+          "1",
+          0
+        ],
+        "negative": [
+          "3",
+          0
+        ],
+        "positive": [
+          "2",
+          0
+        ],
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "seed": 57,
+        "steps": 8
+      }
+    },
+    "6": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "5",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      }
+    },
+    "7": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "filename_prefix": "sdxl_t2i",
+        "images": [
+          "6",
+          0
+        ]
+      }
+    }
+  },
+  "profile_reference": {
+    "margin_mb": 512,
+    "profile_key": "332bc75a458b14306ee391a680fe3abbb769dc4cd14cb0bab0f84aca03b438c5",
+    "raw_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+    "resident_raw_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+    "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02"
+  },
+  "task_status": "done",
+  "duration_s": 75.0,
+  "budget": {
+    "avg_seconds": 54.9,
+    "context_vram": {},
+    "decision": "ok",
+    "default_ctx": 0,
+    "est_time_text": "基于 13 次历史生成，平均约 54秒",
+    "exclusive": false,
+    "gap_gb": 0,
+    "gen_count": 13,
+    "id": "SDXL",
+    "loaded": true,
+    "measured_profile": {
+      "basis": "verified_resident_growth_plus_margin",
+      "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+      "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+      "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+      "increment_mb": 1184,
+      "limitation": "observed peaks plus margin are not an OOM guarantee",
+      "limitations": [
+        "single trial",
+        "sampling may miss peaks",
+        "includes background memory"
+      ],
+      "margin_mb": 512,
+      "match_policy": "seed_and_output_name_invariant",
+      "memory_scope": "measured_resident_increment",
+      "ok": true,
+      "peak_mb": 1184,
+      "profile_status": "raw_evidence_and_live_identity_verified",
+      "residency_epoch": 2,
+      "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+      "resident_model_mb": 6618,
+      "sample_count": 1,
+      "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02"
+    },
+    "name": "SDXL",
+    "need_free_gb": 0,
+    "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+    "profile_status": "raw_evidence_and_live_identity_verified",
+    "resident_model_mb": 6618,
+    "source": "comfyui",
+    "specified_ctx": null,
+    "vram_gb": 1.15625,
+    "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02"
+  },
+  "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+  "error": "",
+  "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+  "backend_terminal": "success",
+  "sampler_cache_hit": false,
+  "coordination": {
+    "gpu_id": 0,
+    "policy": "serial",
+    "active": null,
+    "reserved_mb": 0,
+    "sequence": 10,
+    "events": [
+      {
+        "sequence": 1,
+        "monotonic_s": 47688.359,
+        "event": "acquired",
+        "operation": "generate",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "service": "comfyui",
+        "model": "SDXL",
+        "peak_mb": 0,
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "phase": "assessing",
+        "started_monotonic_s": 47688.359
+      },
+      {
+        "sequence": 2,
+        "monotonic_s": 47756.531,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "peak_mb": 1184,
+          "target_model": "SDXL",
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          }
+        }
+      },
+      {
+        "sequence": 3,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "budget": {
+            "source": "comfyui",
+            "id": "SDXL",
+            "name": "SDXL",
+            "vram_gb": 1.15625,
+            "exclusive": false,
+            "loaded": true,
+            "decision": "ok",
+            "need_free_gb": 0,
+            "gap_gb": 0,
+            "note": "已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验",
+            "avg_seconds": 54.9,
+            "gen_count": 13,
+            "est_time_text": "基于 13 次历史生成，平均约 54秒",
+            "context_vram": {},
+            "default_ctx": 0,
+            "specified_ctx": null,
+            "measured_profile": {
+              "ok": true,
+              "peak_mb": 1184,
+              "basis": "verified_resident_growth_plus_margin",
+              "sample_count": 1,
+              "workflow_sha256": "86842c4a7ec3e2d7feae9d7aa7b7cf8cede1459b3561886e81edfe54adaa1f02",
+              "calibration_workflow_sha256": "e70a760ebf73689745aca6c80a15905a270a3813eb6d31fdc3e6910a2d4d66c9",
+              "match_policy": "seed_and_output_name_invariant",
+              "evidence_sha256": "bdedca01f4fc3bb0f15c9802a43193fa4ccbc9a9ba953dc4e9554607bcf9ac2d",
+              "margin_mb": 512,
+              "limitation": "observed peaks plus margin are not an OOM guarantee",
+              "increment_mb": 1184,
+              "resident_model_mb": 6618,
+              "cold_evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+              "memory_scope": "measured_resident_increment",
+              "residency_instance": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+              "residency_epoch": 2,
+              "profile_status": "raw_evidence_and_live_identity_verified",
+              "limitations": [
+                "single trial",
+                "sampling may miss peaks",
+                "includes background memory"
+              ]
+            },
+            "profile_status": "raw_evidence_and_live_identity_verified",
+            "resident_model_mb": 6618
+          },
+          "available_mb": 5530
+        }
+      },
+      {
+        "sequence": 4,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {
+          "telemetry": {
+            "total_mb": 16380,
+            "used_mb": 8321,
+            "free_mb": 8059
+          }
+        }
+      },
+      {
+        "sequence": 5,
+        "monotonic_s": 47758.406,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "reserved",
+        "details": {}
+      },
+      {
+        "sequence": 6,
+        "monotonic_s": 47758.421,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "verifying",
+        "details": {}
+      },
+      {
+        "sequence": 7,
+        "monotonic_s": 47760.296,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 8,
+        "monotonic_s": 47760.312,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "running",
+        "details": {
+          "prompt_id": "0f700238-f9c5-4959-b61c-3f95241ed9af",
+          "job_id": "80905a36fab44aef839a5c4abac9af5b",
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 9,
+        "monotonic_s": 47763.328,
+        "event": "transition",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "phase": "completed",
+        "details": {
+          "journal_id": "60545576c2e3479d949fb3bbb8d41fb3"
+        }
+      },
+      {
+        "sequence": 10,
+        "monotonic_s": 47763.343,
+        "event": "released",
+        "token_sha256": "7c581763c340ebed5fecf8ff81bf395568cf17bdb7ffe80127117f90c32b8f3d",
+        "owner": "job:80905a36fab44aef839a5c4abac9af5b",
+        "outcome": "completed"
+      }
+    ],
+    "recovery_pending": []
+  },
+  "residency_after": {
+    "schema_version": 1,
+    "backend_instance_id": "0792aa9e-7646-48f3-82a2-3fbb69f19ff2",
+    "recorded_at_ns": 1791441905470186554,
+    "monotonic_ns": 47712647817954,
+    "load_epoch": 2,
+    "active_loads": 0,
+    "observation_failures": 0,
+    "activity": {
+      "running": 0,
+      "pending": 0
+    },
+    "components": [
+      {
+        "known": true,
+        "role": "vae",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 167307726,
+        "model_bytes": 167307726,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "unet",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 5134967368,
+        "model_bytes": 5134967368,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      },
+      {
+        "known": true,
+        "role": "clip",
+        "filename": "sd_xl_base_1.0.safetensors",
+        "path_sha256": "4452eca0bd451e716c52a5c5623fe06c0bcf0cc0f4279911dcb21499cbf84fa8",
+        "file_identity": [
+          72,
+          6192449487643215,
+          6938078334,
+          1788096268927614500,
+          1788096268927614500
+        ],
+        "resident_bytes": 1636620296,
+        "model_bytes": 1636620296,
+        "fully_resident": true,
+        "patched": false,
+        "artifact_digest_verified": false
+      }
+    ],
+    "unknown_components": 0,
+    "residency_complete": true,
+    "warm_admission_enabled": false,
+    "limitation": "metadata provenance only; host artifact digest and measured phase profile still required",
+    "activity_after": {
+      "running": 0,
+      "pending": 0
+    },
+    "observer_code_sha256": "aef21136db8b7d2655cab2d0c529897d4631ff02223fbae3f7809b0a7bd95b8f",
+    "request_id": "ddf5f468-1335-4673-8a72-a948ccf377eb",
+    "ok": true
+  },
+  "observed_device_peak_mb": 8710
+}
