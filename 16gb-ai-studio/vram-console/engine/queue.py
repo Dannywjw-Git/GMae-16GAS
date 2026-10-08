@@ -6,6 +6,7 @@ GMae 任务队列模块
 - 生成时间统计（预演模式"预计时间"用）
 """
 import json
+import math
 import os
 import threading
 import time
@@ -21,6 +22,7 @@ from core.resource_coordinator import ResourceDenied
 from core.exceptions import ConfigError
 from core.task_store import TaskStore, TaskConflict
 from core.task_dispatch import TaskDispatcher, DispatchUncertain
+from core.workload_profile import workload_fingerprint
 from engine.gen_stats import load_gen_stats, save_gen_stats, update_gen_stats
 
 # 队列状态 — 已迁移到 registry（状态包装）
@@ -121,28 +123,58 @@ def _load_workflow(workflow_name):
 
 
 def _apply_params(wf, params):
-    """按 input 名匹配替换模板参数（不硬编码节点号）。"""
-    wf = json.loads(json.dumps(wf))
+    """Bind supported parameters; never silently ignore a requested control."""
+    if not isinstance(params, dict):
+        raise ValueError('params 必须是对象')
+    aliases = {'frames': ('length', 'frames', 'num_frames'),
+               'duration': ('seconds', 'duration', 'max_duration'),
+               'cfg': ('cfg', 'cfg_scale')}
+    integer_keys = {'seed', 'width', 'height', 'steps', 'frames', 'batch_size'}
+    allowed = integer_keys | {'prompt', 'cfg', 'filename_prefix', 'duration'}
+    if set(params) - allowed:
+        raise ValueError('不支持的任务参数: ' + ', '.join(sorted(set(params) - allowed)))
+    normalized = {}
+    for key, value in params.items():
+        if key in ('prompt', 'filename_prefix'):
+            if not isinstance(value, str):
+                raise ValueError(key + ' 必须是字符串')
+        else:
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                raise ValueError(key + ' 必须是有限数值')
+            if key in integer_keys:
+                if int(value) != value:
+                    raise ValueError(key + ' 必须是整数')
+                value = int(value)
+            if value < 0 or (key not in ('seed', 'cfg') and value == 0):
+                raise ValueError(key + ' 超出有效范围')
+        normalized[key] = value
+    wf = json.loads(json.dumps(wf, allow_nan=False))
     prompt_done = False
+    applied = set()
     for node in wf.values():
+        if not isinstance(node, dict):
+            raise ValueError('工作流节点必须是对象')
         ins = node.get("inputs")
         if not isinstance(ins, dict):
             continue
-        if "prompt" in params and not prompt_done:
+        if "prompt" in normalized and not prompt_done:
             if "text" in ins:
-                ins["text"] = params["prompt"]
+                ins["text"] = normalized["prompt"]
                 prompt_done = True
             elif "caption" in ins:
-                ins["caption"] = params["prompt"]
+                ins["caption"] = normalized["prompt"]
                 prompt_done = True
-        if "seed" in params and "seed" in ins:
-            ins["seed"] = int(params["seed"])
-        if "width" in params and "width" in ins:
-            ins["width"] = int(params["width"])
-        if "height" in params and "height" in ins:
-            ins["height"] = int(params["height"])
-        if "filename_prefix" in params and "filename_prefix" in ins:
-            ins["filename_prefix"] = params["filename_prefix"]
+        if prompt_done:
+            applied.add('prompt')
+        for key, value in normalized.items():
+            if key == 'prompt':
+                continue
+            for target in aliases.get(key, (key,)):
+                if target in ins and not isinstance(ins[target], list):
+                    ins[target] = value
+                    applied.add(key)
+    if set(normalized) - applied:
+        raise ValueError('工作流没有可绑定的参数: ' + ', '.join(sorted(set(normalized) - applied)))
     return wf
 
 
@@ -152,15 +184,19 @@ def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
     if not m:
         return {"ok": False, "error": "unknown model: " + model}
     wf_name = m.get("workflow")
-    if not wf_name or not _load_workflow(wf_name):
+    template = _load_workflow(wf_name) if wf_name else None
+    if not template:
         return {"ok": False, "error": "工作流模板缺失: %s（需先在 ComfyUI 前端导出到 vram-console/workflows/）" % wf_name}
     if not isinstance(params, dict):
         return {'ok': False, 'code': 'INVALID_INTENT', 'error': 'params 必须是对象'}
     try:
+        effective = _apply_params(template, params)
+        fingerprint = workload_fingerprint(effective)
         queue_restore()
         with _task_lock:
             record, created = _store().accept(
-                {'model': model, 'workflow': wf_name, 'params': params}, idempotency_key)
+                {'model': model, 'workflow': wf_name, 'params': params,
+                 'effective_workflow': effective, 'workflow_sha256': fingerprint}, idempotency_key)
             tid = record['id']
             task = _tasks.get(tid) or _runtime_task(record)
             _tasks[tid] = task
@@ -241,13 +277,24 @@ def _queue_wait(prompt_id, task, timeout=3600):
     return "uncertain"
 
 
+def _effective_workflow(task):
+    """New tasks use their committed payload; legacy tasks bind once before execution."""
+    wf = task.get('effective_workflow')
+    if wf is None:
+        template = _load_workflow(task['workflow'])
+        if not template:
+            raise ConfigError('模板读取失败')
+        wf = _apply_params(template, task['params'])
+        _persist(task, effective_workflow=wf, workflow_sha256=workload_fingerprint(wf))
+    if workload_fingerprint(wf) != task.get('workflow_sha256'):
+        raise ValueError('已保存的工作流摘要不匹配，拒绝执行')
+    return json.loads(json.dumps(wf, allow_nan=False))
+
+
 def _execute_reserved_task(task, lease, spec):
     """Keep one reservation through submission and execution confirmation."""
     _persist(task, 'precheck', coordination={"token": lease.token, "owner": spec.owner})
-    wf = _load_workflow(task["workflow"])
-    if not wf:
-        raise ConfigError("模板读取失败")
-    wf = _apply_params(wf, task["params"])
+    wf = _effective_workflow(task)
     if task.get("cancel_requested"):
         _persist(task, 'canceled', ended=int(time.time()))
         lease.transition('completed')
@@ -256,7 +303,8 @@ def _execute_reserved_task(task, lease, spec):
     _, decision = _model_budget(spec)
     if decision.get("decision") != "ok":
         raise ResourceDenied("ADMISSION_CHANGED", "提交前预算发生变化，拒绝提交")
-    _persist(task, budget=decision, started=int(time.time()))
+    _persist(task, budget={**decision, 'workflow_sha256': workload_fingerprint(wf),
+                          'profile_status': 'registry_estimate_unverified'}, started=int(time.time()))
     if '_version' in task:
         def submit_durable(workflow, submission_id):
             with _task_lock:
@@ -344,8 +392,13 @@ def _run_task(task):
         with _task_lock:
             if task['status'] in TaskStore.TERMINAL:
                 return
+            if task.get('cancel_requested'):
+                _persist(task, 'canceled', ended=int(time.time()))
+                return
             if task['status'] == 'queued':
                 _persist(task, 'precheck')
+            # Validate/freeze before assessment can release any resident model.
+            _effective_workflow(task)
         while True:
             if task.get("cancel_requested"):
                 _persist(task, 'canceled', ended=int(time.time()))

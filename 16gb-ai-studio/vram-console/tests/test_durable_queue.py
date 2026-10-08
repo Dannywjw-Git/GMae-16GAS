@@ -25,7 +25,7 @@ def runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(queue, '_task_queue', state['task_queue'])
     monkeypatch.setattr(queue, '_start_worker', lambda: None)
     monkeypatch.setattr(queue, 'REGISTRY', {'comfyui': {'models': [{'id': 'm', 'workflow': 'test.json'}]}})
-    monkeypatch.setattr(queue, '_load_workflow', lambda name: {'1': {'inputs': {'text': 'test'}}})
+    monkeypatch.setattr(queue, '_load_workflow', lambda name: {'1': {'inputs': {'text': 'test', 'seed': 1}}})
     monkeypatch.setattr(coordinator, 'assess', lambda *args: None)
     monkeypatch.setattr(queue, '_model_budget', lambda spec: ({}, {'decision': 'ok'}))
     monkeypatch.setattr(queue, 'update_gen_stats', lambda *args: None)
@@ -61,6 +61,35 @@ def test_enqueue_retry_and_cancel_survive_restart(runtime):
     restart()
     assert not queue._task_queue
     assert queue._tasks[first['task']['id']]['status'] == 'canceled'
+
+
+def test_saved_payload_survives_template_change_and_restart(runtime, monkeypatch):
+    first = queue.queue_enqueue('m', {'prompt': 'original'}, 'immutable')
+    restart()
+    monkeypatch.setattr(queue, '_load_workflow', lambda name: {'1': {'inputs': {'text': 'changed'}}})
+    submitted = []
+    monkeypatch.setattr(queue, '_queue_submit_comfy', lambda wf, sid: (submitted.append(wf) or 'pid', None))
+    current = queue._tasks[first['task']['id']]
+    queue._run_task(current)
+    assert current['status'] == 'done'
+    assert submitted[0]['1']['inputs']['text'] == 'original'
+    assert current['budget']['workflow_sha256'] == first['task']['workflow_sha256']
+
+
+def test_corrupted_payload_never_submits(runtime, monkeypatch):
+    first = queue.queue_enqueue('m', {})
+    task = queue._tasks[first['task']['id']]
+    task['effective_workflow']['1']['inputs']['text'] = 'tampered'
+    submit = Mock()
+    monkeypatch.setattr(queue, '_queue_submit_comfy', submit)
+    queue._run_task(task)
+    assert task['status'] == 'failed'
+    submit.assert_not_called()
+
+
+def test_unbound_parameter_rejected_before_durable_accept(runtime):
+    assert queue.queue_enqueue('m', {'steps': 5})['code'] == 'INVALID_INTENT'
+    assert not TaskStore(runtime).snapshot()
 
 
 def test_real_queue_dispatch_commits_before_rpc_and_terminal_before_release(runtime, monkeypatch):
