@@ -2,7 +2,7 @@
 
 ## 2026-10-08：可信驻留增量进入正式准入
 
-分支 `feat/phase-profile-budget-20261008`，基于 PR #12 HEAD `ff64af370448f503800b2b8f3d28bfa3f8f2fdbf`，该精确 HEAD CI `37736591386`、`37736587150` 均 success。实现提交 `1f554d02c044ac91788139a69fcf40708e017b5a` 的 push CI `37737604664`、重新加载复核提交 `5f5df235505f4f39c45417d82da283f38b04e2fa` 的 push CI `37738104032` 均 success；新 HEAD 另行核验。
+最终实现及原始证据提交 `359dd97f151169289bfb7a4245f9f330db6cc0d8`，见 [Draft PR #13](https://github.com/Dannywjw-Git/GMae-16GAS/pull/13)。该提交 CI `37738566490` 运行中、`37738561388` 排队（写入时快照）；后续文档 HEAD 另行核验。分支 `feat/phase-profile-budget-20261008`，基于 PR #12 HEAD `ff64af370448f503800b2b8f3d28bfa3f8f2fdbf`，该精确 HEAD CI `37736591386`、`37736587150` 均 success。实现提交 `1f554d02c044ac91788139a69fcf40708e017b5a` 的 push CI `37737604664`、重新加载复核提交 `5f5df235505f4f39c45417d82da283f38b04e2fa` 的 push CI `37738104032` 均 success；新 HEAD 另行核验。
 
 已实现：显式 cold/resident 双证据安装及入队固定引用，实际模型摘要/环境与 fresh 完整来源绑定；增长及余量与物理模型体积分离，保留大模型互斥。未知、部分、活动变化、实例/来源不匹配不能采用 warm，已安装证据变化拒绝执行。完整同来源同字节状态重核验后允许同实例重新加载复用。前端明确任务额外显存口径。新模式只安装到独立可选目录，未自动修改其他服务配置。
 
