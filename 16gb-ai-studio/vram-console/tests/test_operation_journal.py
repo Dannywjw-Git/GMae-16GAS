@@ -156,3 +156,106 @@ adapter()
     assert marker.read_text() == 'entered'
     pending = OperationJournal(path).pending()
     assert len(pending) == 1 and pending[0]['state'] == 'inflight'
+
+
+def test_command_receipt_is_committed_before_spawn(journal, monkeypatch):
+    from core import utils
+
+    def run(args, **kwargs):
+        pending = journal.pending()
+        commands = OperationJournal(journal.store.path).commands(pending[0]['id'])
+        assert len(commands) == 1 and commands[0]['state'] == 'inflight'
+        assert commands[0]['intent'] == args
+        return subprocess.CompletedProcess(args, 0, 'ok', '')
+
+    monkeypatch.setattr(utils.subprocess, 'run', run)
+    with coordinator.coordinated_operation(coordinator.OperationSpec('release')) as lease:
+        lease.transition('releasing')
+        operation_id = journal.pending()[0]['id']
+        assert utils.run_args(['docker', 'stop', 'managed-test']) == (0, 'ok')
+        assert journal.commands(operation_id)[0]['state'] == 'confirmed'
+        lease.transition('completed')
+    assert not journal.pending()
+
+
+def test_command_intent_failure_prevents_process_spawn(journal, monkeypatch):
+    from core import utils
+    with sqlite3.connect(journal.store.path) as connection:
+        connection.execute("CREATE TRIGGER fail_command BEFORE INSERT ON resource_commands "
+                           "BEGIN SELECT RAISE(ABORT, 'command storage failed'); END")
+    spawn = Mock()
+    monkeypatch.setattr(utils.subprocess, 'run', spawn)
+    with coordinator.coordinated_operation(coordinator.OperationSpec('release')) as lease:
+        lease.transition('releasing')
+        rc, _ = utils.run_args(['docker', 'stop', 'managed-test'])
+        assert rc == -2
+        lease.transition('failed')
+    spawn.assert_not_called()
+
+
+def test_real_command_timeout_cannot_be_reclassified_as_known_failure(journal):
+    from core import utils
+
+    @coordinator.coordinated(lambda args: coordinator.OperationSpec('release'))
+    def adapter():
+        rc, output = utils.run_args([sys.executable, '-c', 'import time; time.sleep(10)'], timeout=0.1)
+        return {'ok': rc == 0, 'output': output}
+
+    assert adapter()['ok'] is False
+    active = coordinator.get_coordinator().snapshot()['active']
+    assert active['phase'] == 'uncertain'
+    commands = journal.commands(active['journal_id'])
+    assert commands[0]['state'] == 'uncertain' and commands[0]['return_code'] == -1
+    with pytest.raises(ResourceDenied):
+        with coordinator.get_coordinator().operation(ResourceRequest('start', 'next')):
+            pytest.fail('timeout must retain ownership')
+
+
+def test_failed_command_receipt_write_retains_inflight_identity(journal, monkeypatch):
+    from core import utils
+    with sqlite3.connect(journal.store.path) as connection:
+        connection.execute("CREATE TRIGGER fail_receipt BEFORE UPDATE ON resource_commands "
+                           "BEGIN SELECT RAISE(ABORT, 'receipt storage failed'); END")
+    monkeypatch.setattr(utils.subprocess, 'run', lambda args, **kwargs:
+                        subprocess.CompletedProcess(args, 0, 'accepted', ''))
+    with coordinator.coordinated_operation(coordinator.OperationSpec('release')) as lease:
+        lease.transition('releasing')
+        assert utils.run_args(['docker', 'stop', 'managed-test'])[0] == -2
+    active = coordinator.get_coordinator().snapshot()['active']
+    assert active['phase'] == 'uncertain'
+    assert journal.commands(active['journal_id'])[0]['state'] == 'inflight'
+
+
+def test_unconfirmed_command_prevents_forced_operation_confirmation(journal):
+    operation_id = journal.begin({'operation': 'release', 'owner': 'test', 'service': 'all'})
+    journal.command_begin(operation_id, ['docker', 'stop', 'managed-test'])
+    from core.task_store import TaskConflict
+    with pytest.raises(TaskConflict, match='unconfirmed'):
+        journal.finish(operation_id, True, {'terminal': True})
+    assert journal.pending()
+
+
+def test_read_only_docker_query_does_not_create_mutation_receipt(journal, monkeypatch):
+    from core import utils
+    monkeypatch.setattr(utils.subprocess, 'run', lambda args, **kwargs:
+                        subprocess.CompletedProcess(args, 1, '', 'unavailable'))
+    with coordinator.coordinated_operation(coordinator.OperationSpec('release')) as lease:
+        lease.transition('releasing')
+        operation_id = journal.pending()[0]['id']
+        assert utils.run_args(['docker', 'ps'])[0] == 1
+        assert not journal.commands(operation_id)
+        lease.transition('failed')
+    assert not journal.pending()
+
+
+@pytest.mark.parametrize('return_code', [1, -9])
+def test_nonzero_mutation_exit_keeps_receipt_unknown(journal, monkeypatch, return_code):
+    from core import utils
+    monkeypatch.setattr(utils.subprocess, 'run', lambda args, **kwargs:
+                        subprocess.CompletedProcess(args, return_code, '', 'failure'))
+    with coordinator.coordinated_operation(coordinator.OperationSpec('release')) as lease:
+        lease.transition('releasing')
+        assert utils.run_args(['docker', 'stop', 'managed-test'])[0] == return_code
+    active = coordinator.get_coordinator().snapshot()['active']
+    assert active['phase'] == 'uncertain'
+    assert journal.commands(active['journal_id'])[0]['return_code'] == return_code
