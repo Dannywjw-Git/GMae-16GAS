@@ -54,3 +54,30 @@ def test_analysis_keeps_short_prompt_limit_and_conservative_count():
     assert result['whole_device_peak_mb']==8380
     assert result['production_profile'] is False
     assert 'short prompt' in result['limitation']
+
+
+def test_long_prompt_is_deterministic_and_does_not_claim_token_count():
+    first=calibration.request_for(8192,'long')
+    assert first==calibration.request_for(8192,'long')
+    assert len(first['prompt'])>len(calibration.request_for(2048,'long')['prompt'])
+    assert first['options']['num_ctx']==8192 and first['options']['num_predict']==32
+
+
+def test_blob_mutation_is_rejected(monkeypatch):
+    digest='a'*64
+    outputs=iter(['container','1:2:3:4:5',digest+'  blob','1:2:4:4:5'])
+    monkeypatch.setattr(calibration,'docker_read',lambda args: next(outputs))
+    with pytest.raises(ValueError,match='changed'):
+        calibration.artifact_identity(dict(modelfile='FROM /models/blobs/sha256-'+digest,details={}))
+
+
+def test_blob_digest_mismatch_is_rejected(monkeypatch):
+    outputs=iter(['container','stat','b'*64+'  blob','stat','container'])
+    monkeypatch.setattr(calibration,'docker_read',lambda args: next(outputs))
+    with pytest.raises(ValueError,match='content'):
+        calibration.artifact_identity(dict(modelfile='FROM /models/blobs/sha256-'+'a'*64,details={}))
+
+
+def test_missing_blob_identity_cannot_fall_back_to_model_name():
+    with pytest.raises(ValueError,match='identify'):
+        calibration.artifact_identity(dict(modelfile='FROM qwen3.5:9b',details={}))

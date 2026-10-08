@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 import subprocess
 import threading
@@ -21,11 +22,41 @@ MODEL='qwen3.5:9b'
 PROMPT='In one short sentence, explain why GPU memory scheduling matters.'
 
 
-def request_for(ctx):
+def request_for(ctx, prompt_kind='short'):
     if type(ctx) is not int or ctx not in (2048,8192):
         raise ValueError('controlled calibration supports 2048 or 8192 context only')
-    return dict(model=MODEL,prompt=PROMPT,think=False,stream=False,keep_alive='30m',
+    if prompt_kind not in ('short', 'long'):
+        raise ValueError('unknown controlled prompt')
+    prompt = PROMPT if prompt_kind == 'short' else (
+        'Read the following notes and summarize their common point in one sentence.\n'
+        + 'GPU memory budgets coordinate model loading and task execution safely.\n' * (ctx // 16)
+        + '\n' + PROMPT)
+    return dict(model=MODEL,prompt=prompt,think=False,stream=False,keep_alive='30m',
                 options=dict(num_ctx=ctx,num_predict=32,temperature=0,seed=20261008))
+
+
+def docker_read(args, timeout=120):
+    return subprocess.check_output(['docker', *args], timeout=timeout, encoding='utf-8').strip()
+
+
+def artifact_identity(show):
+    """Hash actual GGUF blob; avoid publishing custom system prompts/modelfile."""
+    matches = re.findall(r'^FROM\s+"?(/[^"\s]+/sha256-[0-9a-f]{64})"?\s*$',
+                         show.get('modelfile', ''), re.MULTILINE)
+    if len(matches) != 1:
+        raise ValueError('cannot identify installed model blob')
+    path = matches[0]
+    instance = docker_read(['inspect', '--format', '{{.Id}}', 'ollama'])
+    before = docker_read(['exec', 'ollama', 'stat', '-c', '%d:%i:%s:%Y:%Z', path])
+    digest = docker_read(['exec', 'ollama', 'sha256sum', path]).split()[0]
+    after = docker_read(['exec', 'ollama', 'stat', '-c', '%d:%i:%s:%Y:%Z', path])
+    if before != after or docker_read(['inspect', '--format', '{{.Id}}', 'ollama']) != instance:
+        raise ValueError('artifact/container changed during hashing')
+    if digest != path.rsplit('sha256-', 1)[1]:
+        raise ValueError('model content does not match blob address')
+    return dict(container_id=instance, blob_sha256=digest, blob_stat=before,
+                blob_path_sha256=hashlib.sha256(path.encode()).hexdigest(),
+                model_details=show['details'])
 
 
 def planning_registry(ctx,size):
@@ -44,10 +75,12 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--ctx',type=int,required=True)
     parser.add_argument('--output',required=True)
-    args=parser.parse_args();body=request_for(args.ctx);output=Path(args.output)
+    parser.add_argument('--prompt-kind', choices=('short','long'), default='short')
+    args=parser.parse_args();body=request_for(args.ctx,args.prompt_kind);output=Path(args.output)
     if output.exists(): raise ValueError('refusing overwrite of evidence')
     document=dict(kind='real_ollama_calibration',recorded_at=datetime.now(timezone.utc).isoformat(),
                   request=body,reserve_mb=2560,production_profile_installed=False,samples=[],sampling_errors=[])
+    document['prompt_kind']=args.prompt_kind
     stop=threading.Event();worker=None
     owner=ProcessOwnership(APP/'data/tasks.sqlite3').acquire()
     previous=(coordinator.REGISTRY,budget.REGISTRY)
@@ -59,6 +92,13 @@ def main():
         config,peak_mb=planning_registry(args.ctx,model['size'])
         document['model_artifact']={k:model[k] for k in ('name','size','digest')}
         document['backend_version']=get_json('http://127.0.0.1:11434/api/version')['version']
+        show_request=urllib.request.Request('http://127.0.0.1:11434/api/show',
+            data=json.dumps({'model':MODEL}).encode(),headers={'Content-Type':'application/json'})
+        with urllib.request.urlopen(show_request,timeout=10) as response: show=json.load(response)
+        document['artifact_identity']=artifact_identity(show)
+        document['container_backend_version']=docker_read(['exec','ollama','ollama','--version'])
+        if document['container_backend_version'] != 'ollama version is '+document['backend_version']:
+            raise ValueError('host/container version mismatch')
         document['planning_peak_mb']=peak_mb
         document['planning_basis']='file_size_times_1.2_plus_2560MiB_unverified'
         document['preparation']=prepare_unloaded_condition(peak_mb+2560)
