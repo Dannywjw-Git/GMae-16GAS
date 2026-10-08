@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import pytest
+from copy import deepcopy
 ROOT=Path(__file__).resolve().parents[3]
 sys.path.insert(0,str(ROOT/'scripts'))
 spec=importlib.util.spec_from_file_location('gmae_ollama_calibration',ROOT/'scripts/measure_ollama_workload.py')
@@ -22,3 +23,34 @@ def test_planning_copy_does_not_forge_verified_production_profile():
     assert model['vram_verified'] is False and model['context_vram']=={'8192':peak/1024}
     assert original==before
     assert calibration.request_for(8192)['think'] is False
+
+
+def example_raw():
+    return dict(kind='real_ollama_calibration',status='success',sampler_stopped=True,
+                sampling_errors=[],request=calibration.request_for(2048),
+                model_artifact=dict(digest='test-only'),
+                resident_after=[dict(context_length=2048,digest='test-only',size_vram=5000)],
+                response_metrics=dict(done=True,eval_count=32,prompt_eval_count=24),
+                baseline=dict(monotonic_s=1,total_mb=16380),
+                samples=[dict(monotonic_s=2,total_mb=16380,used_mb=8000,free_mb=8000)],
+                observed_whole_device_peak_mb=8380,duration_s=1)
+
+
+@pytest.mark.parametrize('change',[
+    lambda raw: raw.update(sampling_errors=['TimeoutError']),
+    lambda raw: raw['resident_after'][0].update(context_length=8192),
+    lambda raw: raw['samples'][0].update(monotonic_s=1),
+    lambda raw: raw.update(observed_whole_device_peak_mb=8000),
+])
+def test_analysis_rejects_incomplete_or_inconsistent_evidence(change):
+    from analyze_ollama_calibration import analyze
+    raw=deepcopy(example_raw());change(raw)
+    with pytest.raises(ValueError): analyze(raw)
+
+
+def test_analysis_keeps_short_prompt_limit_and_conservative_count():
+    from analyze_ollama_calibration import analyze
+    result=analyze(example_raw())
+    assert result['whole_device_peak_mb']==8380
+    assert result['production_profile'] is False
+    assert 'short prompt' in result['limitation']

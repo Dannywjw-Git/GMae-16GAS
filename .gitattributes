@@ -4,3 +4,5 @@ docs/evidence/collectors/*.py text eol=lf
 
 docs/evidence/interleaved-queue-20261008/*.json text eol=lf
 docs/evidence/interleaved-queue-20261008/*.py -text
+docs/evidence/ollama-context-20261008/*.json text eol=lf
+docs/evidence/ollama-context-20261008/*.py -text

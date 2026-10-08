@@ -1,0 +1,42 @@
+{
+  "kind": "real_ollama_release",
+  "readings": [
+    {
+      "models": [],
+      "gpu": {
+        "monotonic_s": 49301.531,
+        "total_mb": 16380,
+        "used_mb": 1403,
+        "free_mb": 14705,
+        "utilization": 3
+      }
+    }
+  ],
+  "resident_before": [
+    {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "size": 5729167604,
+      "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-10-08T07:40:30.386483937Z",
+      "size_vram": 5729167604,
+      "context_length": 8192
+    }
+  ],
+  "command_result": [
+    0,
+    "qwen3.5:9b:rc0"
+  ],
+  "pending_operations": 0,
+  "status": "success"
+}
