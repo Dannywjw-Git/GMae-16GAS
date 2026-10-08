@@ -2,7 +2,7 @@
 
 ## 2026-10-08：正式队列持久化接入
 
-- 分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。本节随实现提交，具体 commit 以 PR 历史为准。
+- 代码 commit：`7e664bc`。分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。后续文档提交另见 PR 历史。
 - 实现：幂等入队、状态检查点、请求前落盘、启动前恢复未知任务预留、结束证据先落盘再释放，以及取消意图保存。多个未知任务的预留交接在同一锁内完成。
 - 验证：完整 352 项测试通过；新增 7 项实际队列路径测试。前端模块及协调器行为检查通过，Python 名称检查 0 阻断错误（66 项既有警告）。本提交 CI 待 GitHub 核验。
 - 限制：运行中取消尚不立即中断后端；未验证真实 GPU/ComfyUI；手动资源操作尚无完整重启恢复；未实现跨进程 GPU 锁。详见 [生命周期说明](durable-task-lifecycle.md)。
