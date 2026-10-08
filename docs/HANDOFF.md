@@ -2,7 +2,7 @@
 
 ## 2026-10-08：独立命令执行者与有限容器恢复
 
-- 代码 commit：`843853f`；独立分支 `feat/command-supervisor-20261008`，基于持久任务分支 `19ee61b`。Draft PR 创建后补充链接。
+- 代码 commit：`843853f`；独立分支 `feat/command-supervisor-20261008`，基于持久任务分支 `19ee61b`。[Draft PR #4](https://github.com/Dannywjw-Git/GMae-16GAS/pull/4)。
 - 实现：执行者独立保存结果，事务领取防止重复执行，结果与回执同事务；正式命令路径已接入。限定单条受管容器命令可凭匹配成功回执和新鲜 GPU 读数核验，启动时有限核验，不重放中断流程。
 - 验证：完整 407 项通过，新增 19 项进程/核验测试；Python 名称检查 0 阻断错误、65 项既有警告；源码编译与 diff 检查通过。父进程立即退出、重复执行者竞争和回执写入失败的受控进程测试通过。
 - 基础分支 `19ee61b` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721742295) 与 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721739320) 成功；新分支 CI 待核验。

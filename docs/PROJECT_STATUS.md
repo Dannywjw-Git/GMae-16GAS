@@ -24,6 +24,8 @@
 
 PR：[审计整改 #1](https://github.com/Dannywjw-Git/GMae-16GAS/pull/1)、[统一协调 #2](https://github.com/Dannywjw-Git/GMae-16GAS/pull/2)、[持久账本基础 #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。均为草稿，主分支尚未合并。
 
+当前阶段：[独立命令执行与有限容器恢复 Draft PR #4](https://github.com/Dannywjw-Git/GMae-16GAS/pull/4)，代码提交 `843853f`，基于 PR #3 的 `19ee61b`。
+
 PR #3 当前代码的 CI：[PR 检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719023821)、[分支检查](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37719020765)。证据仅对应上述提交；后续改动须重新核验适用检查。
 
 ## 当前最高优先级
