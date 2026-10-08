@@ -236,8 +236,17 @@ def reconcile_uncertain() -> dict:
     from clients.comfyui_client import _get
     from urllib.parse import quote
     ok, history, error = _get("/history/" + quote(prompt_id, safe=""))
-    record = history.get(prompt_id, {}) if ok else {}
-    terminal = record.get("status", {}).get("status_str") in ("success", "error")
+    record = history.get(prompt_id, {}) if ok and isinstance(history, dict) else {}
+    if not isinstance(record, dict):
+        record = {}
+    status = record.get('status', {}).get('status_str')
+    terminal = status in ('success', 'error')
+    if not terminal and active.get('job_id'):
+        from engine.queue import cancellation_evidence
+        from clients.comfyui_client import canceled_job_absent
+        if (cancellation_evidence(active['job_id'], active['token'], prompt_id) and
+                canceled_job_absent(prompt_id)):
+            terminal, status = True, 'canceled'
     if not terminal:
         return {"ok": False, "code": "UNCONFIRMED_EXECUTION",
                 "error": error or "尚无对应任务的结束记录，资源预留继续保留"}
@@ -245,10 +254,10 @@ def reconcile_uncertain() -> dict:
         fresh_gpu()
         from engine.queue import reconcile_task
         if active.get('job_id') and not reconcile_task(
-                active['job_id'], active['token'], prompt_id, record['status']['status_str']):
+                active['job_id'], active['token'], prompt_id, status):
             return {'ok': False, 'code': 'TASK_EVIDENCE_MISMATCH', 'error': '任务身份不匹配，保留预留'}
         coordinator.resolve(active["token"], {"terminal": True, "prompt_id": prompt_id,
-                                             "status": record["status"]["status_str"]})
+                                             "status": status})
         log_event("resource_reconciled", owner=active["owner"], prompt_id=prompt_id)
         return {"ok": True, "resolved": True, "prompt_id": prompt_id}
     except ResourceDenied as error:

@@ -198,6 +198,18 @@ def _queue_wait(prompt_id, task, timeout=3600):
     url = "http://127.0.0.1:8188/history/%s" % prompt_id
     deadline = time.time() + timeout
     while time.time() < deadline:
+        if task.get('cancel_requested'):
+            cancellation = task.get('backend_cancel', {})
+            if (cancellation.get('acknowledged') is not True and
+                    cancellation.get('code') not in ('CANCEL_UNSUPPORTED', 'INVALID_BACKEND_ID')):
+                _cancel_backend(task)
+            cancellation = task.get('backend_cancel', {})
+            if cancellation.get('acknowledged') is True and cancellation.get('prompt_id') == prompt_id:
+                from clients.comfyui_client import canceled_job_absent
+                if canceled_job_absent(prompt_id):
+                    from engine.coordinator import fresh_gpu
+                    fresh_gpu()
+                    return 'canceled'
         try:
             with urllib.request.urlopen(url, timeout=8) as r:
                 h = json.loads(r.read().decode("utf-8"))
@@ -401,6 +413,16 @@ def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool
         return True
 
 
+def cancellation_evidence(job_id, token, prompt_id):
+    """Only a stored ack bound to this owned task can justify queue absence."""
+    with _task_lock:
+        task = _tasks.get(job_id)
+        if not task or not task.get('cancel_requested') or task.get('coordination', {}).get('token') != token:
+            return False
+        acknowledgment = task.get('backend_cancel', {})
+        return acknowledgment.get('acknowledged') is True and acknowledgment.get('prompt_id') == prompt_id
+
+
 def queue_snapshot() -> dict:
     """队列观察：全部任务（含历史）+ 当前 worker 状态。"""
     with _task_lock:
@@ -433,5 +455,34 @@ def queue_cancel(tid: str) -> dict:
             return {"ok": True, "task": task}
         if task["status"] in ("waiting_resource", "precheck", "freeing", "submitting", "running", "uncertain"):
             _persist(task, cancel_requested=True)
-            return {"ok": True, "note": "取消已请求；执行结束确认前仍保留资源预留", "task": task}
-        return {"ok": False, "error": "已结束的任务无法取消"}
+        else:
+            return {"ok": False, "error": "已结束的任务无法取消"}
+    result = _cancel_backend(task)
+    return {'ok': True, 'note': '取消意图已保存；执行结束确认前仍保留资源预留',
+            'backend_cancel': result, 'task': dict(task)}
+
+
+def _cancel_backend(task):
+    """Special capability for canceling the owned job, not a new GPU operation."""
+    from engine.coordinator import get_coordinator
+    from clients.comfyui_client import cancel_job
+    with _task_lock:
+        active = get_coordinator().snapshot()['active']
+        prompt_id = task.get('prompt_id') or task.get('submission_id')
+        if (not task.get('cancel_requested') or not prompt_id or not active or
+                active.get('service') != 'comfyui' or
+                active.get('job_id') != task['id'] or active.get('prompt_id') != prompt_id or
+                active['token'] != task.get('coordination', {}).get('token')):
+            return {'ok': False, 'code': 'CANCEL_DEFERRED', 'error': '等待对应任务取得执行身份'}
+        if task.get('backend_cancel', {}).get('acknowledged') is True:
+            return task['backend_cancel']
+    result = cancel_job(prompt_id)
+    with _task_lock:
+        if task.get('backend_cancel', {}).get('acknowledged') is True:
+            return task['backend_cancel']
+        if task['status'] not in TaskStore.TERMINAL:
+            if '_version' in task:
+                saved = _store().get(task['id'])
+                task['_version'] = saved['version']
+            _persist(task, backend_cancel=result)
+    return result

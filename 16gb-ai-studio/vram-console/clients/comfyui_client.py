@@ -8,9 +8,61 @@ GMae ComfyUI API 客户端
 """
 import json
 import urllib.request
+import urllib.error
+from urllib.parse import quote
+import uuid
 from core.logger import log_error
 
 COMFY_BASE = "http://127.0.0.1:8188"
+
+
+def cancel_job(prompt_id: str) -> dict:
+    """Only the atomic job-ID API; never fall back to global /interrupt.
+
+    cancelled=True acknowledges dispatch, not execution termination. Old
+    backends without this route remain unsupported rather than unsafe.
+    """
+    try:
+        if not isinstance(prompt_id, str) or str(uuid.UUID(prompt_id)) != prompt_id:
+            raise ValueError('noncanonical task ID')
+    except (ValueError, AttributeError):
+        return {'ok': False, 'code': 'INVALID_BACKEND_ID', 'error': '后端任务 ID 必须为完整 UUID'}
+    path = '/api/jobs/' + quote(prompt_id, safe='') + '/cancel'
+    try:
+        request = urllib.request.Request(COMFY_BASE + path, data=b'{}',
+                                         headers={'Content-Type': 'application/json'}, method='POST')
+        with urllib.request.urlopen(request, timeout=5) as response:
+            result = json.loads(response.read().decode('utf-8'))
+        if not isinstance(result, dict) or type(result.get('cancelled')) is not bool:
+            raise ValueError('invalid cancellation acknowledgment')
+        return {'ok': True, 'prompt_id': prompt_id, 'acknowledged': result['cancelled'],
+                'note': '取消已发送，仍须确认执行结束' if result['cancelled'] else '后端未执行取消，仍须核验任务状态'}
+    except urllib.error.HTTPError as error:
+        return {'ok': False, 'code': 'CANCEL_UNSUPPORTED' if error.code in (404, 405) else 'CANCEL_UNCONFIRMED',
+                'error': '后端不支持指定任务取消' if error.code in (404, 405) else str(error)}
+    except Exception as error:
+        return {'ok': False, 'code': 'CANCEL_UNCONFIRMED', 'error': str(error)}
+
+
+def canceled_job_absent(prompt_id: str) -> bool:
+    """Fresh strict queue evidence, usable only after this ID's cancel ack.
+
+    A missing job without acknowledged cancellation is never terminal evidence.
+    Malformed snapshots fail closed, unlike the UI's best-effort brief parser.
+    """
+    ok, result, _ = _get('/queue')
+    if not ok or not isinstance(result, dict):
+        return False
+    ids = []
+    for key in ('queue_running', 'queue_pending'):
+        items = result.get(key)
+        if not isinstance(items, list):
+            return False
+        for item in items:
+            if not isinstance(item, (list, tuple)) or len(item) < 2 or not isinstance(item[1], str):
+                return False
+            ids.append(item[1])
+    return prompt_id not in ids
 
 # ComfyUI 模型加载节点 -> (模型类别, 取值字段)。覆盖标准/GGUF/多 CLIP 加载器。
 LOADER_SPEC = {

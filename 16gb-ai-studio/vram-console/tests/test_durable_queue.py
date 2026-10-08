@@ -10,6 +10,8 @@ from core.resource_coordinator import ResourceCoordinator, ResourceDenied, Resou
 from core.task_store import TaskStore
 from engine import queue, coordinator
 
+_real_wait = queue._queue_wait
+
 
 @pytest.fixture
 def runtime(tmp_path, monkeypatch):
@@ -27,6 +29,8 @@ def runtime(tmp_path, monkeypatch):
     monkeypatch.setattr(queue, '_model_budget', lambda spec: ({}, {'decision': 'ok'}))
     monkeypatch.setattr(queue, 'update_gen_stats', lambda *args: None)
     monkeypatch.setattr(queue, '_queue_wait', lambda *args: 'done')
+    monkeypatch.setattr('clients.comfyui_client.cancel_job', lambda prompt_id: {
+        'ok': False, 'code': 'CANCEL_UNSUPPORTED'})
     yield path
     registry.delete('task_store')
 
@@ -177,3 +181,68 @@ def test_cancel_during_rpc_is_not_lost_and_does_not_release_early(runtime, monke
         future.result(timeout=5)
     assert TaskStore(runtime).get(current['id'])['status'] == 'canceled'
     assert coordinator.get_coordinator().snapshot()['active'] is None
+
+
+def test_targeted_cancel_waits_for_absence_then_persists_before_release(runtime, monkeypatch):
+    from io import BytesIO
+    accepted = queue.queue_enqueue('m', {})
+    current = queue._tasks[accepted['task']['id']]
+    sent = []
+    state = {'absent': False}
+
+    def cancel(prompt_id):
+        sent.append(prompt_id)
+        return {'ok': True, 'prompt_id': prompt_id, 'acknowledged': True}
+
+    def submit(workflow, sid):
+        assert queue.queue_cancel(current['id'])['ok']
+        assert coordinator.get_coordinator().snapshot()['active'] is not None
+        return sid, None
+
+    def sleep(seconds):
+        assert TaskStore(runtime).get(current['id'])['status'] == 'running'
+        assert coordinator.get_coordinator().snapshot()['active'] is not None
+        state['absent'] = True
+
+    monkeypatch.setattr('clients.comfyui_client.cancel_job', cancel)
+    monkeypatch.setattr('clients.comfyui_client.canceled_job_absent', lambda pid: state['absent'])
+    monkeypatch.setattr(coordinator, 'fresh_gpu', lambda: {})
+    monkeypatch.setattr(queue, '_queue_submit_comfy', submit)
+    monkeypatch.setattr(queue, '_queue_wait', _real_wait)
+    monkeypatch.setattr(queue.urllib.request, 'urlopen', lambda *args, **kwargs: BytesIO(b'{}'))
+    monkeypatch.setattr(queue.time, 'sleep', sleep)
+    queue._run_task(current)
+    assert sent == [current['prompt_id']]
+    assert TaskStore(runtime).get(current['id'])['status'] == 'canceled'
+    assert coordinator.get_coordinator().snapshot()['active'] is None
+
+
+def test_restored_cancel_ack_requires_fresh_absence_before_resolve(runtime, monkeypatch):
+    accepted = queue.queue_enqueue('m', {})
+    row = queue._store().get(accepted['task']['id'])
+    row = queue._store().checkpoint(row['id'], row['version'], 'precheck')
+    row = queue._store().checkpoint(row['id'], row['version'], 'submitting', {'submission_id': 'target'})
+    queue._store().checkpoint(row['id'], row['version'], 'uncertain', {
+        'cancel_requested': True, 'backend_cancel': {'prompt_id': 'target', 'acknowledged': True}})
+    restart()
+    monkeypatch.setattr('clients.comfyui_client._get', lambda path: (True, {}, ''))
+    monkeypatch.setattr('clients.comfyui_client.canceled_job_absent', lambda pid: False)
+    monkeypatch.setattr(coordinator, 'fresh_gpu', lambda: {})
+    assert coordinator.reconcile_uncertain()['code'] == 'UNCONFIRMED_EXECUTION'
+    assert coordinator.get_coordinator().snapshot()['active'] is not None
+    monkeypatch.setattr('clients.comfyui_client.canceled_job_absent', lambda pid: True)
+    assert coordinator.reconcile_uncertain()['resolved']
+    assert TaskStore(runtime).get(row['id'])['status'] == 'canceled'
+
+
+def test_cancel_cannot_address_another_owners_job(runtime, monkeypatch):
+    accepted = queue.queue_enqueue('m', {})
+    current = queue._tasks[accepted['task']['id']]
+    current.update(cancel_requested=True, prompt_id='target', coordination={'token': 'other-token'})
+    coordinator.get_coordinator().restore_uncertain(
+        ResourceRequest('generate', 'different-owner', 'comfyui'),
+        {'job_id': 'other-job', 'prompt_id': 'target'})
+    cancel = Mock()
+    monkeypatch.setattr('clients.comfyui_client.cancel_job', cancel)
+    assert queue._cancel_backend(current)['code'] == 'CANCEL_DEFERRED'
+    cancel.assert_not_called()

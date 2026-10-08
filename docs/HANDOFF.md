@@ -1,5 +1,15 @@
 # GMae 阶段交接
 
+## 2026-10-08：指定任务取消与协议核验
+
+- 分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)，具体代码 commit 见同次提交历史。
+- 实现：仅调用指定任务 `/api/jobs/{id}/cancel`，匹配任务、预留 token 与后端 ID；不回退全局中断。保存取消确认后仍等待结束历史，或严格队列缺失及新鲜 GPU 读数，再落盘终态并解除预留。未知/不支持响应继续阻挡。
+- 验证：完整 371 项通过，新增 19 项取消与恢复测试；名称检查 0 阻断错误。上一代码/文档提交 `552d03c` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720265556) 和 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720261049) 已成功，本次提交须重新核验 CI。
+- 本机真实协议核验：ComfyUI 0.34.0，先确认随机任务 UUID 不存在，再发指定任务取消，预期无操作响应通过；[公开证据](evidence/comfyui-cancel-protocol-2026-10-08.json) 不含用户任务内容。没有提交生成或取消现有任务。
+- 尚未验证：真实 GPU 运行中断与崩溃恢复、性能收益；手动操作持久恢复与跨进程所有权仍未完成。
+- 请 Chat Agent 评审：匹配取消确认与严格队列缺失是否足以作为该协议下的结束证据；不支持旧版后端时的行为，以及取消竞争和预留保留是否正确。
+- 下一步：解决手动操作重启后丢失预留的问题，再开展受控真实任务验证与参数化 Profile。
+
 ## 2026-10-08：正式队列持久化接入
 
 - 代码 commit：`7e664bc`。分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。后续文档提交另见 PR 历史。

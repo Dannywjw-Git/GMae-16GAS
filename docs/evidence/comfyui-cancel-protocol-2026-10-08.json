@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-08",
+  "validation_kind": "backend protocol and read-only source inspection",
+  "backend": "ComfyUI",
+  "version": "0.34.0",
+  "source_commit": "12d5279438bfefc058a269eae805ceab6047777f",
+  "server_py_sha256": "74573b10465505b88b618da86059878e3a56418f84c7dae4073c8824aee35a6c",
+  "source_features": {
+    "client_prompt_id_supported": true,
+    "job_specific_cancel_route": true,
+    "atomic_interrupt_if_running": true
+  },
+  "protocol_probe": {
+    "target": "fresh random UUID verified absent by GET /api/jobs/{id} returning 404",
+    "request": "POST /api/jobs/{id}/cancel with empty JSON object",
+    "unknown_id_verified": true,
+    "cancel_ok": true,
+    "cancel_acknowledged": false,
+    "existing_jobs_targeted": false,
+    "generation_submitted": false
+  },
+  "gpu_execution_validation": false,
+  "limitations": [
+    "Does not prove interruption of an executing GPU job",
+    "Does not prove GPU performance or end-to-end crash recovery",
+    "No global interrupt or container modification was performed"
+  ]
+}
