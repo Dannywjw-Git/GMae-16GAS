@@ -148,7 +148,8 @@ def measured_budget(workflow, reference):
                 if not snapshot.get('ok'):
                     raise ValueError('fresh residency unavailable')
                 phase = match_resident_phase(resident, snapshot, _live_artifact_identity(environment))
-                result = {**result, **phase, 'peak_mb': phase['increment_mb'],
+                result = {**result, **phase, 'cold_evidence_sha256': result['evidence_sha256'],
+                          'peak_mb': phase['increment_mb'],
                           'memory_scope': 'measured_resident_increment',
                           'residency_instance': snapshot['backend_instance_id'],
                           'residency_epoch': snapshot['load_epoch']}

@@ -64,4 +64,5 @@ def match_resident_phase(profile, snapshot, artifact_identity):
                 component['path_sha256'] != artifact_identity['path_sha256']):
             raise ValueError('host artifact metadata does not match loaded source')
     return dict(increment_mb=profile['increment_mb'], resident_model_mb=profile['resident_model_mb'],
-                basis='verified_resident_growth_plus_margin', evidence_sha256=profile['evidence']['raw_data_sha256'])
+                basis='verified_resident_growth_plus_margin', evidence_sha256=profile['evidence']['raw_data_sha256'],
+                calibration_workflow_sha256=profile['workflow_sha256'])

@@ -155,11 +155,13 @@ def resident_installed(installed, monkeypatch):
 
 
 def test_opted_in_resident_profile_retains_physical_model_size(resident_installed):
-    raw, _, _ = resident_installed
+    raw, _, resident = resident_installed
     result = profile_admission.measured_budget(raw['workflow'],profile_admission.select_profile(raw['workflow']))
     assert result['peak_mb'] == 1184
     assert result['resident_model_mb'] > 5120
     assert result['memory_scope'] == 'measured_resident_increment'
+    assert result['calibration_workflow_sha256'] == resident['workflow_sha256']
+    assert result['cold_evidence_sha256'] != result['evidence_sha256']
 
 
 def test_missing_observer_falls_back_to_conservative_profile(resident_installed,monkeypatch):
