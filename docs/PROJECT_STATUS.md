@@ -2,7 +2,7 @@
 
 ## 2026-10-08：Qwen 有限上下文真实校准
 
-完整实现及证据 `f0874e9e83427c1aa85c95f166a563cc2a830627`，生成采集版本 `f6c2c64baa4715977c85f2f3017551208582de6a`，见 [Draft PR #15](https://github.com/Dannywjw-Git/GMae-16GAS/pull/15)。分支 `feat/ollama-real-profile-20261008`，基于 PR #14 最终 HEAD `849d5162ce78d5369b4ddb7dd1a3230bdcd9307b`；该精确基线两项 CI `37740730904` / `37740725158` success。新实现提交 CI `37742021025` / `37741982610` 当前运行中，文档后续 HEAD 另行核验，不能沿用基线成功。
+完整实现及证据 `f0874e9e83427c1aa85c95f166a563cc2a830627`，生成采集版本 `f6c2c64baa4715977c85f2f3017551208582de6a`，见 [Draft PR #15](https://github.com/Dannywjw-Git/GMae-16GAS/pull/15)。分支 `feat/ollama-real-profile-20261008`，基于 PR #14 最终 HEAD `849d5162ce78d5369b4ddb7dd1a3230bdcd9307b`；该精确基线两项 CI `37740730904` / `37740725158` success。新实现提交两项 CI `37742021025` / `37741982610` 均 success。交接/请求约束细化提交 `163acfd1fcd109dcc8ddae09a24d88f3ac127e53` 的 CI `37742131446` success、`37742135860` 当前运行中；后续 HEAD 以 PR 检查为准，不能沿用旧提交结果。
 
 已实现：原账本/单机 GPU 所有权下显式未验证 bootstrap、受管 SDXL 释放及物理低水位、固定有限 Qwen 请求、实际上下文/摘要核验、未知不重放；独立记录 Qwen 释放命令、模型列表和实际 GPU 回收。生产注册表未自动修改。
 
