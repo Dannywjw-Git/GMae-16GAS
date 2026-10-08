@@ -110,11 +110,31 @@ def test_saved_ollama_response_recovers_without_backend_replay(ollama_runtime,mo
     record=store.checkpoint(record['id'],record['version'],'running',dict(
         backend_completion=dict(model=request['model'],metrics=metrics),
         result=dict(response=response['response'],response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics)))
+    from core.operation_journal import OperationJournal
+    journal=OperationJournal(path)
+    journal.begin(dict(operation='generate',owner='job:'+record['id'],service='ollama',model=request['model']))
+    registry.set('operation_journal',journal)
     rpc=Mock();monkeypatch.setattr(queue,'_ollama_generate',rpc)
     restart()
     assert store.get(record['id'])['status']=='done'
     assert not queue._task_queue and coordinator.get_coordinator().snapshot()['active'] is None
+    assert journal.pending()==[]
     rpc.assert_not_called()
+
+
+def test_terminal_ollama_receipt_finishes_pending_operation_on_startup(ollama_runtime,monkeypatch):
+    from core.operation_journal import OperationJournal
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);task=queue._tasks[first['task']['id']]
+    monkeypatch.setattr(queue,'_ollama_generate',lambda body:ollama_response(body))
+    queue._run_task(task)
+    journal=OperationJournal(path)
+    journal.begin(dict(operation='generate',owner='job:'+task['id'],service='ollama',model=request['model']))
+    registry.delete('operation_journal')
+    registry.set('resource_coordinator',ResourceCoordinator())
+    coordinator.restore_resource_operations()
+    assert journal.pending()==[]
+    assert coordinator.get_coordinator().snapshot()['active'] is None
 
 
 def test_ollama_completion_storage_failure_retains_ownership(ollama_runtime,monkeypatch):
