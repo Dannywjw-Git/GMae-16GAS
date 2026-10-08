@@ -10,6 +10,10 @@
 
 ## 可核验进度
 
+最新试验分支 `feat/reproducible-profile-trials-20261008`：完整 461 项离线测试通过；新增两次真实 SDXL 生成、模型摘要与缓存状态，构建未启用正式准入的证据 Profile 原型。[重复试验报告](reproducible-profile-trials-2026-10-08.md)。尚无调度性能对比结论，正式准入和参数网格仍待完成。
+
+代码提交 `6d7a299`，见 [Draft PR #8](https://github.com/Dannywjw-Git/GMae-16GAS/pull/8)，新 CI 待核验；基础 PR #7 当前 `aac6334` 的两项 CI 成功。
+
 最新阶段：`feat/profile-admission-evidence-20261008` 增加参数变化拒绝复用静态预算，完整 452 项测试通过。首次 SDXL 512×512、8 步真实 GPU 基线成功，195 个原始样本；[报告及证据](real-gpu-baseline-2026-10-08.md)。测量 Profile 准入及真实混合负载对照仍未完成，单次结果不能证明调度收益。
 
 代码提交 `45ceb28`，见 [Draft PR #7](https://github.com/Dannywjw-Git/GMae-16GAS/pull/7)，新 CI 待核验。前序 PR #5 的 `2452a2f` 与 PR #6 的 `9f3c97d` 两项 CI 均成功。
