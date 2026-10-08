@@ -1,0 +1,24 @@
+{
+  "kind": "readonly_whole_device_budget_diagnostic",
+  "formal_admission_verified": false,
+  "measured_peak_with_margin_mb": 10490,
+  "source_evidence_sha256": "7d0c0eae76781c3e7e5e4e641c8e5f5453741bf58935f4ac44d71a608f74bd50",
+  "budget": {
+    "ok": true,
+    "total_gb": 16.0,
+    "used_gb": 8.4,
+    "avail_gb": 4.9,
+    "reserve_gb": 2.5,
+    "noise_gb": 1.0
+  },
+  "target": {
+    "id": "SDXL",
+    "source": "comfyui",
+    "loaded": false,
+    "vram_gb": 10.244140625,
+    "decision": "free_L2",
+    "need_free_gb": 5.4,
+    "gap_gb": 0,
+    "note": "需释放受管负载并重新核验实时显存"
+  }
+}

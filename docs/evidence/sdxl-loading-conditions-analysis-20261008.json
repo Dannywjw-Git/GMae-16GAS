@@ -1,0 +1,114 @@
+{
+  "kind": "observed_loading_condition_analysis",
+  "groups": [
+    {
+      "execution_configuration_sha256": "332bc75a458b14306ee391a680fe3abbb769dc4cd14cb0bab0f84aca03b438c5",
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 4060 Ti:144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9:16380",
+        "driver": "591.86",
+        "model_digest": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b",
+        "backend": "5699374d8d22f983547219f202511669eaa3eaa165e32bba8e5c65fde2dc700c"
+      },
+      "conditions": {
+        "model_unloaded_low_torch_verified": {
+          "trials": 1,
+          "median_duration_s": 40.890999999995984,
+          "min_duration_s": 40.890999999995984,
+          "max_duration_s": 40.890999999995984,
+          "observed_device_peak_mb": 9011,
+          "max_observed_growth_mb": 7238
+        },
+        "resident_memory_observed_model_identity_unproven": {
+          "trials": 1,
+          "median_duration_s": 1.5780000000013388,
+          "min_duration_s": 1.5780000000013388,
+          "max_duration_s": 1.5780000000013388,
+          "observed_device_peak_mb": 9105,
+          "max_observed_growth_mb": 672
+        }
+      }
+    },
+    {
+      "execution_configuration_sha256": "a044f3adce154a5b2c938a6a038a30b6727fdcf622d89cfbb1a153c7fee34ef7",
+      "environment": {
+        "gpu": "NVIDIA GeForce RTX 4060 Ti:144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9:16380",
+        "driver": "591.86",
+        "model_digest": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b",
+        "backend": "5699374d8d22f983547219f202511669eaa3eaa165e32bba8e5c65fde2dc700c"
+      },
+      "conditions": {
+        "model_unloaded_low_torch_verified": {
+          "trials": 1,
+          "median_duration_s": 37.75,
+          "min_duration_s": 37.75,
+          "max_duration_s": 37.75,
+          "observed_device_peak_mb": 9977,
+          "max_observed_growth_mb": 8178
+        },
+        "resident_memory_observed_model_identity_unproven": {
+          "trials": 1,
+          "median_duration_s": 2.5780000000013388,
+          "min_duration_s": 2.5780000000013388,
+          "max_duration_s": 2.5780000000013388,
+          "observed_device_peak_mb": 9978,
+          "max_observed_growth_mb": 1536
+        }
+      }
+    }
+  ],
+  "trials": [
+    {
+      "raw_sha256": "fc86fd456ab63b75e740043af9ca35b879b16ce22cd5335893b5caa09d3d7a17",
+      "condition": "model_unloaded_low_torch_verified",
+      "duration_s": 40.890999999995984,
+      "baseline_device_mb": 1773,
+      "baseline_torch_resident_bytes": 8519680,
+      "observed_device_peak_mb": 9011,
+      "observed_growth_mb": 7238,
+      "sample_count": 156,
+      "sampler_cache_hit": false
+    },
+    {
+      "raw_sha256": "dcef91d5e8bfae075f2509443ec05835518810e4dbde0e54fd93b71e9519abe0",
+      "condition": "resident_memory_observed_model_identity_unproven",
+      "duration_s": 1.5780000000013388,
+      "baseline_device_mb": 8433,
+      "baseline_torch_resident_bytes": 6947425310,
+      "observed_device_peak_mb": 9105,
+      "observed_growth_mb": 672,
+      "sample_count": 7,
+      "sampler_cache_hit": false
+    },
+    {
+      "raw_sha256": "abff4f0b261a8d1ead2908c22d6e4bc0048676f3d2e80f422c723d59e2e75583",
+      "condition": "model_unloaded_low_torch_verified",
+      "duration_s": 37.75,
+      "baseline_device_mb": 1799,
+      "baseline_torch_resident_bytes": 8519680,
+      "observed_device_peak_mb": 9977,
+      "observed_growth_mb": 8178,
+      "sample_count": 146,
+      "sampler_cache_hit": false
+    },
+    {
+      "raw_sha256": "7d0c0eae76781c3e7e5e4e641c8e5f5453741bf58935f4ac44d71a608f74bd50",
+      "condition": "resident_memory_observed_model_identity_unproven",
+      "duration_s": 2.5780000000013388,
+      "baseline_device_mb": 8442,
+      "baseline_torch_resident_bytes": 6947425310,
+      "observed_device_peak_mb": 9978,
+      "observed_growth_mb": 1536,
+      "sample_count": 11,
+      "sampler_cache_hit": false
+    }
+  ],
+  "scheduler_benefit_proven": false,
+  "residency_identity_proven": false,
+  "limitations": [
+    "samples can miss transient peaks",
+    "CPU/disk caches uncontrolled",
+    "loading conditions differ; no scheduler speedup claim",
+    "observed growth is not a reusable warm admission budget",
+    "small uncontrolled-background experiment; no statistical guarantee"
+  ]
+}
