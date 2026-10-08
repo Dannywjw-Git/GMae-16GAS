@@ -14,21 +14,15 @@ from engine.coordinator import restore_resource_operations, get_coordinator
 from engine import queue
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', required=True)
-    parser.add_argument('--seed', type=int, required=True)
-    parser.add_argument('--timeout', type=int, default=300)
-    parser.add_argument('--profile-dir')
-    args = parser.parse_args()
-    if args.profile_dir:
-        os.environ['GMAE_PROFILE_DIR'] = str(Path(args.profile_dir).resolve())
-    if args.seed < 0 or args.timeout <= 0:
+def run_trial(seed, output, timeout, owner):
+    """One formal trial; caller retains the real process lock across a sequence."""
+    if not isinstance(owner, ProcessOwnership) or owner.handle is None:
+        raise RuntimeError('GPU ownership required')
+    if seed < 0 or timeout <= 0:
         raise ValueError('invalid trial arguments')
-    output = Path(args.output)
+    output = Path(output)
     if output.exists():
         raise ValueError('refusing to overwrite evidence')
-    owner = ProcessOwnership(APP / 'data' / 'tasks.sqlite3').acquire()
     restore_resource_operations()
     queue.queue_restore()
     if get_coordinator().snapshot()['active'] is not None:
@@ -70,16 +64,18 @@ def main():
     started = time.monotonic()
     try:
         params = dict(prompt='A small red ceramic teapot on a plain wooden table, studio lighting',
-                      width=512, height=512, steps=8, cfg=6.0, seed=args.seed)
+                      width=512, height=512, steps=8, cfg=6.0, seed=seed)
         result = queue.queue_enqueue('SDXL', params)
         if not result.get('ok'):
             raise RuntimeError(str(result))
         task_id = result['task']['id']
         document['task_id'] = task_id
-        while time.monotonic() - started < args.timeout:
+        while time.monotonic() - started < timeout:
             saved = queue._store().get(task_id)
             if saved['status'] in queue.TaskStore.TERMINAL:
                 checkpoint = saved['checkpoint']
+                document['effective_workflow'] = saved['intent']['effective_workflow']
+                document['profile_reference'] = saved['intent'].get('profile_reference')
                 document.update(task_status=saved['status'], duration_s=time.monotonic() - started,
                     budget=checkpoint.get('budget'), prompt_id=checkpoint.get('prompt_id'),
                     error=checkpoint.get('error', ''), workflow_sha256=saved['intent']['workflow_sha256'])
@@ -115,6 +111,21 @@ def main():
         # OS ownership lives to process exit, including any daemon queue worker.
         print(json.dumps(dict(evidence=str(output), sha256=hashlib.sha256(payload).hexdigest(),
                               task_status=document.get('task_status'))))
+    return document
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', required=True)
+    parser.add_argument('--seed', type=int, required=True)
+    parser.add_argument('--timeout', type=int, default=300)
+    parser.add_argument('--profile-dir')
+    args = parser.parse_args()
+    if args.profile_dir:
+        os.environ['GMAE_PROFILE_DIR'] = str(Path(args.profile_dir).resolve())
+    owner = ProcessOwnership(APP / 'data' / 'tasks.sqlite3').acquire()
+    run_trial(args.seed,args.output,args.timeout,owner)
+    # Retain ownership until process exit, including daemon workers on failure.
 
 
 if __name__ == '__main__':
