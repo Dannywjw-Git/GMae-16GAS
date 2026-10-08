@@ -1,5 +1,15 @@
 # GMae 阶段交接
 
+## 2026-10-08：独立命令执行者与有限容器恢复
+
+- 代码 commit：`843853f`；独立分支 `feat/command-supervisor-20261008`，基于持久任务分支 `19ee61b`。Draft PR 创建后补充链接。
+- 实现：执行者独立保存结果，事务领取防止重复执行，结果与回执同事务；正式命令路径已接入。限定单条受管容器命令可凭匹配成功回执和新鲜 GPU 读数核验，启动时有限核验，不重放中断流程。
+- 验证：完整 407 项通过，新增 19 项进程/核验测试；Python 名称检查 0 阻断错误、65 项既有警告；源码编译与 diff 检查通过。父进程立即退出、重复执行者竞争和回执写入失败的受控进程测试通过。
+- 基础分支 `19ee61b` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721742295) 与 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37721739320) 成功；新分支 CI 待核验。
+- 未验证：真实 GPU/Docker 故障与性能实验；执行者自身退出、机器重启及远程请求超时仍可能未知；混合操作、脚本、容器内 exec 与跨进程 GPU 排他未获完整恢复保证。
+- 请 Chat Agent 独立评审：原子领取与执行前后崩溃窗口、主进程退出后回执持续性、限定 command_only 契约与拒绝范围、恢复证明的是命令结束而非 GPU 空闲。
+- 下一步：补齐多实例所有权，进入参数化 Profile 阶段并准备受控真实 GPU 实验；不等独立评审自动开始，也不将进程测试当作 GPU 证据。
+
 ## 2026-10-08：修复命令超时被误判为已结束
 
 - 代码 commit：`302f3d2`；分支 `feat/durable-task-lifecycle-20261008`，[Draft PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。
