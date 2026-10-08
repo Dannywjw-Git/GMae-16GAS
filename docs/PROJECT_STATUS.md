@@ -12,6 +12,8 @@ Work Agent 负责主要技术执行，独立 Chat Agent 负责战略、架构复
 
 这些数据不证明编排加速；驻留时仍增长 672/1,536 MiB，warm 准入尚未实现。当前最高瓶颈为可信模型/组件驻留与分阶段预算，[下一阶段设计](phase-profile-design.md) 明确失败关闭条件。基础 PR #9 精确 HEAD `2ef4329b9d792ec9848cc9c0c435c6bcb22ca411` 的 CI `37730589456`、`37730586264` 均 success。
 
+本阶段代码精确提交 `56f1ac22c0ac3e06a55f6ecfebc343ce9f57a37e` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37732016319) 和 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37732004418) 均 success。CI 记录为写入时快照；后续文档 HEAD 须按 PR 当前检查另行核验，不沿用旧结果。
+
 分支 `feat/measured-profile-admission-20261008`，基于 PR #8 的 `52b762c`。测量 Profile 已接入正式队列与实际参数预演，入队固定 raw 摘要及余量，运行前重新核验数据和实际部署身份。完整 470 项测试通过（15.55 秒），前端检查通过。[实现、复现与原始证据](measured-profile-admission-2026-10-08.md)。代码提交 `26bcdf6`，见 [Draft PR #9](https://github.com/Dannywjw-Git/GMae-16GAS/pull/9)。新 HEAD CI 尚待核验。
 
 真实 GPU seed 46 完成：任务 done、后端 success、采样器未缓存、无活动预留；预算 9,649 MiB、整卡观测峰值 9,146 MiB、549 样本、0 错误，端到端 143.5 秒。前一次 seed 45 准入失败及特定手动核验证据保留。不得将失败改为通过，也不能宣称性能提升。

@@ -4,6 +4,7 @@
 
 - 分支 `feat/phase-profile-calibration-20261008`，基于 PR #9 的 `2ef4329`；代码 commit `56f1ac2`，[Draft PR #10](https://github.com/Dannywjw-Git/GMae-16GAS/pull/10)，新 HEAD CI 待核验。
 - 基础 PR #9 精确 HEAD `2ef4329b9d792ec9848cc9c0c435c6bcb22ca411` 的 PR CI `37730589456` 与 push CI `37730586264` 均 success。
+- 本阶段代码 `56f1ac22c0ac3e06a55f6ecfebc343ce9f57a37e` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37732016319) 和 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37732004418) 均 success。后续文档 HEAD 由 PR 当前检查单独核验；此处仅保存适用代码的事实快照。
 - 实现：采集器实际 width/height/steps/cfg、独立卸载条件及 fresh torch/物理容量核验；拒绝其他/未知工作；独立分析验证原始数据并按配置/环境分组。只读预算诊断可复现。未修改正式准入安全策略。
 - 自动化：完整 489 项通过（15.61 秒），新增 19 项；名称 0 阻断/65 既有警告，编译和 diff 检查通过。
 - 真实 GPU：512 卸载/驻留生成窗口 40.891/1.578 秒，峰值 9,011/9,105 MiB；768 为 37.750/2.578 秒，峰值 9,977/9,978 MiB。四次成功、未缓存采样器、0 错误，原始样本 156/7/146/11。时间不含初始身份核验与卸载，不能称作 GMae 加速。[报告](phase-profile-calibration-2026-10-08.md)。
