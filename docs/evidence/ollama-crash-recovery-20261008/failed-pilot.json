@@ -1,0 +1,82 @@
+{
+  "kind": "real_ollama_controller_crash_trial",
+  "recorded_at": "2026-10-08T08:07:05.309283+00:00",
+  "samples": [
+    {
+      "monotonic_s": 52683.218,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 52683.468,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 52683.718,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 52683.984,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 52684.234,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 52684.484,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 52684.75,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 52685.0,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 52685.25,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 52685.484,
+      "total_mb": 16380,
+      "used_mb": 1409,
+      "free_mb": 14699,
+      "utilization": 1
+    }
+  ],
+  "sampling_errors": [],
+  "controller_pid": 35692,
+  "status": "failed",
+  "error": "controller identity mismatch",
+  "sampler_stopped": true,
+  "observed_whole_device_peak_mb": 1681
+}

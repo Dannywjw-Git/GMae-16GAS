@@ -137,6 +137,63 @@ def test_terminal_ollama_receipt_finishes_pending_operation_on_startup(ollama_ru
     assert coordinator.get_coordinator().snapshot()['active'] is None
 
 
+def delegated_pending(ollama_runtime):
+    from pathlib import Path
+    import sys
+    from core.operation_journal import OperationJournal
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);store=TaskStore(path)
+    record=store.get(first['task']['id'])
+    for status in ('precheck','submitting'):
+        record=store.checkpoint(record['id'],record['version'],status,{'submission_id':'local-only'})
+    journal=OperationJournal(path)
+    operation=journal.begin(dict(operation='generate',owner='job:'+record['id'],service='ollama',model=request['model']))
+    args=[sys.executable,str(Path(queue.BASE_DIR)/'core/ollama_worker.py'),str(path.resolve()),record['id'],record['intent']['workflow_sha256']]
+    command=journal.command_begin(operation,args,supervised=True)
+    assert journal.command_claim(command)==args
+    registry.set('operation_journal',journal)
+    return store,record,request,journal,command
+
+
+def test_exact_delegated_receipt_recovers_without_rpc(ollama_runtime,monkeypatch):
+    import json
+    store,record,request,journal,command=delegated_pending(ollama_runtime)
+    journal.command_finish(command,0,json.dumps(ollama_response(request)))
+    rpc=Mock();monkeypatch.setattr(queue,'_ollama_generate',rpc)
+    monkeypatch.setattr(coordinator,'fresh_gpu',lambda:dict(total_mb=16380,used_mb=1,free_mb=16379))
+    restart()
+    assert coordinator.reconcile_uncertain()['resolved']
+    assert store.get(record['id'])['status']=='done' and journal.pending()==[]
+    assert coordinator.get_coordinator().snapshot()['active'] is None
+    rpc.assert_not_called()
+
+
+@pytest.mark.parametrize('fault',['missing','wrong_model','failed_command'])
+def test_bad_delegated_receipt_keeps_unknown_hold(ollama_runtime,monkeypatch,fault):
+    import json
+    store,record,request,journal,command=delegated_pending(ollama_runtime)
+    if fault!='missing':
+        response=ollama_response(request)
+        if fault=='wrong_model': response['model']='other'
+        journal.command_finish(command,1 if fault=='failed_command' else 0,json.dumps(response))
+    monkeypatch.setattr(coordinator,'fresh_gpu',lambda:dict(total_mb=16380,used_mb=1,free_mb=16379))
+    restart()
+    assert coordinator.reconcile_uncertain()['code']=='UNCONFIRMED_EXECUTION'
+    assert store.get(record['id'])['status']=='uncertain'
+    assert coordinator.get_coordinator().snapshot()['active'] is not None
+
+
+def test_delegated_worker_reads_only_exact_saved_intent(ollama_runtime):
+    import json
+    from core.ollama_worker import execute
+    store,record,request,journal,command=delegated_pending(ollama_runtime)
+    fetch=Mock(return_value=ollama_response(request))
+    result=execute(store.path,record['id'],record['intent']['workflow_sha256'],fetch)
+    assert json.loads(result)['done'] and fetch.call_args.args[0]==request
+    with pytest.raises(ValueError): execute(store.path,record['id'],'0'*64,fetch)
+    assert fetch.call_count==1
+
+
 def test_ollama_completion_storage_failure_retains_ownership(ollama_runtime,monkeypatch):
     path,request=ollama_runtime
     first=queue.queue_enqueue_ollama(request);task=queue._tasks[first['task']['id']]

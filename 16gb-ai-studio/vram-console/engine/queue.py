@@ -377,14 +377,34 @@ def _effective_workflow(task):
 
 
 def _ollama_generate(request):
-    """Synchronous owned RPC; response loss is ambiguous, never retried."""
+    """Independent supervisor persists the RPC receipt even if parent exits."""
+    from pathlib import Path
+    import sys
     from engine.coordinator import get_coordinator
-    if not get_coordinator().current_token():
+    active=get_coordinator().snapshot()['active']
+    journal=registry.get('operation_journal')
+    if (not get_coordinator().current_token() or not active or active.get('service')!='ollama'
+            or not active.get('job_id') or not active.get('journal_id') or journal is None):
         raise ResourceDenied('INVALID_LEASE','Ollama 提交必须持有预留')
-    rpc=urllib.request.Request('http://127.0.0.1:11434/api/generate',
-        data=json.dumps(request).encode(),headers={'Content-Type':'application/json'})
-    with urllib.request.urlopen(rpc,timeout=300) as response:
-        return json.load(response)
+    from core.command_worker import run_supervised
+    args=[sys.executable,str(Path(BASE_DIR)/'core/ollama_worker.py'),str(_store().path.resolve()),
+          active['job_id'],workload_fingerprint(request)]
+    _,(rc,output)=run_supervised(journal,active['journal_id'],args,315)
+    if rc!=0: raise RuntimeError('delegated Ollama completion unavailable')
+    return json.loads(output)
+
+
+def _ollama_completion(request,response):
+    import hashlib
+    if (not isinstance(response,dict) or response.get('done') is not True
+            or response.get('model')!=request['model'] or type(response.get('eval_count')) is not int
+            or not 0<response['eval_count']<=request['options']['num_predict']
+            or not isinstance(response.get('response'),str)):
+        raise ValueError('Ollama 完整生成回执无法核验')
+    metrics={key:response.get(key) for key in ('done','done_reason','eval_count',
+        'prompt_eval_count','total_duration','load_duration','eval_duration','prompt_eval_duration')}
+    return dict(backend_completion=dict(model=response['model'],metrics=metrics),
+        result=dict(response=response['response'],response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics))
 
 
 def _confirmed_ollama_completion(task):
@@ -405,24 +425,13 @@ def _confirmed_ollama_completion(task):
 
 def _execute_ollama_task(task,lease,request):
     """Write-ahead synchronous dispatch; local ID is not a backend history ID."""
-    import hashlib
     _persist(task,'submitting',submission_id=str(uuid.uuid4()),backend_correlation_supported=False)
     try:
         lease.transition('running',job_id=task['id'])
         response=_ollama_generate(request)
-        if (not isinstance(response,dict) or response.get('done') is not True
-                or response.get('model')!=request['model']
-                or type(response.get('eval_count')) is not int
-                or not 0<response['eval_count']<=request['options']['num_predict']
-                or not isinstance(response.get('response'),str)):
-            raise ValueError('Ollama 完整生成回执无法核验')
-        metrics={key:response.get(key) for key in ('done','done_reason','eval_count',
-            'prompt_eval_count','total_duration','load_duration','eval_duration','prompt_eval_duration')}
         # Persist the response before terminal state. A crash in this window must
         # retain unknown ownership until the durable response is inspected.
-        _persist(task,'running',backend_completion=dict(model=response['model'],metrics=metrics),
-            result=dict(response=response['response'],
-                response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics))
+        _persist(task,'running',**_ollama_completion(request,response))
         _persist(task,'canceled' if task.get('cancel_requested') else 'done',ended=int(time.time()),
             progress='后端完整生成回执已持久化；取消为请求结束后确认，未即时中断')
         lease.transition('completed')
@@ -632,6 +641,41 @@ def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool
                  ended=int(time.time()), progress='已核验对应任务的结束记录',
                  error='' if status == 'success' else 'ComfyUI 执行失败（结束记录已核验）')
         return True
+
+
+def reconcile_ollama_task(active,journal):
+    """Consume only the exact worker's durable complete receipt, without RPC."""
+    from pathlib import Path
+    import sys
+    with _task_lock:
+        task=_tasks.get(active['job_id'])
+        if (not task or task.get('source')!='ollama' or task.get('model')!=active.get('model')
+                or task.get('coordination',{}).get('token')!=active['token']
+                or task['status'] not in ('uncertain','done','canceled')):
+            raise ValueError('Ollama task ownership mismatch')
+        expected=[sys.executable,str(Path(BASE_DIR)/'core/ollama_worker.py'),str(_store().path.resolve()),
+                  task['id'],task['workflow_sha256']]
+        commands=journal.commands(active['journal_id'])
+        matches=[row for row in commands if row['intent']==expected]
+        if len(matches)!=1: raise ValueError('exact delegated worker receipt unavailable')
+        command=matches[0]
+        if command['state']!='confirmed' or command['return_code']!=0:
+            raise ValueError('delegated worker completion not confirmed')
+        result=journal.command_result(command['id'])
+        if result is None or result[0]!=0: raise ValueError('durable response unavailable')
+        response=json.loads(result[1])
+        fields=_ollama_completion(_effective_workflow(task),response)
+        if task['status'] in TaskStore.TERMINAL:
+            if not _confirmed_ollama_completion(task) or any(task.get(key)!=value for key,value in fields.items()):
+                raise ValueError('terminal task receipt mismatch')
+            return command['id']
+        latest=_store().get(task['id'])
+        task.update(_runtime_task(latest))
+        _persist(task,'uncertain',**fields)
+        if not _confirmed_ollama_completion(task): raise ValueError('response integrity unverified')
+        _persist(task,'canceled' if task.get('cancel_requested') else 'done',ended=int(time.time()),
+                 progress='独立执行回执核验并恢复；没有重放请求')
+        return command['id']
 
 
 def cancellation_evidence(job_id, token, prompt_id):

@@ -1,0 +1,19 @@
+{
+  "source_commits": {
+    "44948e4": "44948e423913373e4123581580ec1b7c1c16c390",
+    "3db1c5b": "3db1c5bc19c8015d177479ce234de028ef8cf642"
+  },
+  "files": {
+    "analyzer.py": "06fe508ed91536d4d1bed314ea39df269b0aa822c8534cffb6a3bd8385a3a2aa",
+    "collector-pilot.py": "749509173d6d6bc4e0cadd59331a96bbe6ba47acd0f98b8bde81f89c9138888e",
+    "collector-verified.py": "6ccbdeb33ca2a46b84a532c38ef9114d004f1c2d9207934c823f52917d56adf5",
+    "failed-pilot.json": "4f35a1d76d3252f6c584cdcc627e490559cc55c24c9eb78b090913bccd1d29d8",
+    "ollama_worker.py": "72a69847e5d77feaf905e95c15aabb3543dc31f591b6a87ee95e2a6ec76164ac",
+    "pilot-normal-task.json": "124d49ab35231eeb8cd42a98688cfd333ee4f8bda7be258f9d16125cfcfa63f3",
+    "pilot-parent.json": "272a214b303f207246857bd4c622711cdb742d5263304e8eac0dc784fd135835",
+    "release-pilot.json": "0765408a2d232efb89878875c099642182b50dc2f638113cbd1071c89e11f24f",
+    "release-verified.json": "d9c84c3108215601b072b940e53cd696dfb4f75cb2fd8c5a418d574cb939260a",
+    "summary.json": "903d365fad9bd55932b3b2d9a65c1892b98d1bc0f2184e1b23fd0dfc055c6ae7",
+    "verified.json": "dedcb66f60ddfd0e8e9ad90aa52c17d5e15dd19784a66052427b2f3f7aab37e0"
+  }
+}
