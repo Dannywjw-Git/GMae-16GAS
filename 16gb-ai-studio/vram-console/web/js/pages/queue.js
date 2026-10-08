@@ -8,6 +8,7 @@ Object.assign(Pages, {
   async queue() {
     this._stopQueuePolling();                 // 防重入：清掉上一次轮询
     this._hiddenTaskIds = new Set();          // 重置本地视图隐藏集合
+    this._expandedTaskOutputs = new Set();
     const container = Utils.$('#app-content');
     container.innerHTML = `
       <div class="page-header">
@@ -399,7 +400,7 @@ Object.assign(Pages, {
             const timeStr = ts ? (typeof ts === 'number' ? new Date(ts * 1000).toLocaleString() : Utils.formatTime(ts)) : '—';
             const info = t.progress || (t.error ? t.error : '');
             const output = t.source === 'ollama' && typeof t.result?.response === 'string'
-              ? `<details><summary>文本结果（${Utils.escapeHtml(t.result.metrics?.eval_count ?? '?')} tokens）</summary><pre style="white-space:pre-wrap">${Utils.escapeHtml(t.result.response)}</pre></details>` : '';
+              ? `<details data-task-output="${Utils.escapeHtml(id)}"${this._expandedTaskOutputs?.has(id) ? ' open' : ''}><summary>文本结果（${Utils.escapeHtml(t.result.metrics?.eval_count ?? '?')} tokens）</summary><pre style="white-space:pre-wrap">${Utils.escapeHtml(t.result.response)}</pre></details>` : '';
             return `
             <tr>
               <td class="text-mono">${String(i + 1).padStart(3, '0')}</td>
@@ -412,6 +413,14 @@ Object.assign(Pages, {
           }).join('')}
         </tbody>
       </table>` : '<div class="empty-state"><div class="empty-state__icon">' + (Icons.list || '') + '</div><div class="empty-state__title">暂无任务</div><div class="empty-state__desc">提交一个生成任务开始使用</div></div>';
+    for (const details of list.querySelectorAll?.('details[data-task-output]') || []) {
+      details.ontoggle = () => {
+        if (!details.isConnected) return;
+        this._expandedTaskOutputs ||= new Set();
+        if (details.open) this._expandedTaskOutputs.add(details.dataset.taskOutput);
+        else this._expandedTaskOutputs.delete(details.dataset.taskOutput);
+      };
+    }
   },
 
   /** 取消任务（queued 立即取消；运行中标记请求取消） */
