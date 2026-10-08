@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 4060 Ti:144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9:16380",
+    "driver": "591.86",
+    "model_digest": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b",
+    "backend": "5699374d8d22f983547219f202511669eaa3eaa165e32bba8e5c65fde2dc700c"
+  },
+  "workflow_sha256": "62cd9cde8f64628e943580f522a76fa5b2124d7ddeca6d964b3087f3afc33850",
+  "peak_mb_samples": [
+    9137
+  ],
+  "margin_mb": 512,
+  "evidence": {
+    "kind": "real_gpu",
+    "raw_data_sha256": "be8ba7d210012a47c48cfb79282f74713c7c3df5ae3daf83d54bc1ba0df54a29",
+    "recorded_at": "2026-10-08T04:35:09.929593+00:00"
+  },
+  "memory_scope": "sampled_whole_device_upper_envelope",
+  "limitations": [
+    "single trial",
+    "sampling may miss peaks",
+    "includes background memory"
+  ],
+  "trial_condition": "resident_model_attempt",
+  "formal_admission_enabled": false
+}

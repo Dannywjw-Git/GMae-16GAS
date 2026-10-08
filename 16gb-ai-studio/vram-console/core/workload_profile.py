@@ -75,3 +75,63 @@ def match_profile(profile, workflow, environment):
             'workflow_sha256': profile['workflow_sha256'],
             'evidence_sha256': digest, 'margin_mb': margin,
             'limitation': 'observed peaks plus margin are not an OOM guarantee'}
+
+
+def profile_from_evidence(raw_bytes, margin_mb):
+    """Build a conservative whole-device envelope from one complete raw trial.
+
+    Raw sample consistency is checked; provenance authenticity still requires
+    review of the capture process. Whole-device peaks deliberately include noise.
+    """
+    if not isinstance(raw_bytes, bytes):
+        raise ValueError('raw evidence must be bytes')
+    raw = json.loads(raw_bytes)
+    if (raw.get('kind') != 'real_gpu_baseline' or raw.get('terminal_status') != 'success'
+            or raw.get('sampler_cache_hit') is not False or raw.get('sampling_errors') != []):
+        raise ValueError('successful uncached trial without sampling errors required')
+    workflow = raw['workflow']
+    if workload_fingerprint(workflow) != raw.get('workflow_sha256'):
+        raise ValueError('workflow digest mismatch')
+    if (not isinstance(raw.get('model_artifact'), dict) or
+            not isinstance(raw.get('backend_environment'), dict) or
+            not raw['backend_environment'].get('launch_args_sha256')):
+        raise ValueError('complete model and launch identities required')
+    gpu = raw['gpu_identity']
+    model_digest = raw['model_artifact']['sha256']
+    launch_digest = raw['backend_environment']['launch_args_sha256']
+    for digest in (model_digest, launch_digest, gpu['uuid_sha256']):
+        if not isinstance(digest, str) or len(digest) != 64 or any(c not in '0123456789abcdef' for c in digest):
+            raise ValueError('complete artifact/environment identity required')
+    samples = raw['samples']
+    if not isinstance(samples, list) or len(samples) < 2:
+        raise ValueError('multiple samples required')
+    previous = -math.inf
+    total = raw['baseline']['total_mb']
+    if type(total) is not int or total <= 0:
+        raise ValueError('invalid device capacity')
+    for sample in samples:
+        timestamp = sample['monotonic_s']
+        if (isinstance(timestamp, bool) or not isinstance(timestamp, (int, float))
+                or not math.isfinite(timestamp) or timestamp <= previous):
+            raise ValueError('sample timestamps must be strictly increasing')
+        previous = timestamp
+        if sample['total_mb'] != total or type(sample['used_mb']) is not int or not 0 <= sample['used_mb'] <= total:
+            raise ValueError('invalid memory samples')
+    peak = max(sample['used_mb'] for sample in samples)
+    if peak != raw.get('observed_device_peak_mb'):
+        raise ValueError('declared peak differs from raw samples')
+    system = raw['backend_environment']['system']
+    backend = {key: system[key] for key in ('comfyui_version', 'python_version', 'pytorch_version')}
+    backend['launch_args_sha256'] = launch_digest
+    environment = dict(gpu=gpu['name'] + ':' + gpu['uuid_sha256'] + ':' + str(total),
+                       driver=gpu['driver'], model_digest=model_digest,
+                       backend=workload_fingerprint({'backend': backend}))
+    profile = dict(schema_version=1, environment=environment,
+        workflow_sha256=raw['workflow_sha256'], peak_mb_samples=[peak], margin_mb=margin_mb,
+        evidence=dict(kind='real_gpu', raw_data_sha256=hashlib.sha256(raw_bytes).hexdigest(),
+                      recorded_at=raw['recorded_at']),
+        memory_scope='sampled_whole_device_upper_envelope',
+        limitations=['single trial', 'sampling may miss peaks', 'includes background memory'])
+    if not match_profile(profile, workflow, environment)['ok']:
+        raise ValueError('invalid profile envelope')
+    return profile

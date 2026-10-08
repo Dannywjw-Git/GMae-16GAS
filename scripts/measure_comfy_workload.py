@@ -41,9 +41,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True)
     parser.add_argument('--timeout', type=int, default=600)
+    parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--resident-baseline', action='store_true',
+                        help='explicit small resident-model trial; not a cold-load budget')
     args = parser.parse_args()
     if args.timeout <= 0:
         raise ValueError('timeout must be positive')
+    if args.seed < 0:
+        raise ValueError('seed must be nonnegative')
     output = Path(args.output)
     if output.exists():
         raise ValueError('refusing to overwrite experiment evidence')
@@ -65,8 +70,16 @@ def main():
         if get_json('http://127.0.0.1:11434/api/ps').get('models'):
             raise RuntimeError('Ollama has resident models; refusing mixed baseline')
         system = get_json('http://127.0.0.1:8188/system_stats')
-        system.get('system', {}).pop('argv', None)
+        launch_args = system.get('system', {}).pop('argv', None)
+        system['launch_args_sha256'] = hashlib.sha256(json.dumps(launch_args, sort_keys=True).encode()).hexdigest()
         document['backend_environment'] = system
+        model_path = '/opt/ComfyUI/models/checkpoints/sd_xl_base_1.0.safetensors'
+        digest_result = subprocess.run(['docker', 'exec', 'comfyui', 'sha256sum', model_path],
+            capture_output=True, text=True, timeout=120, check=True)
+        model_digest = digest_result.stdout.split()[0]
+        if len(model_digest) != 64 or any(c not in '0123456789abcdef' for c in model_digest):
+            raise ValueError('invalid model digest')
+        document['model_artifact'] = dict(filename='sd_xl_base_1.0.safetensors', sha256=model_digest)
         identity = subprocess.run(['nvidia-smi', '--id=0',
             '--query-gpu=name,uuid,driver_version', '--format=csv,noheader'],
             capture_output=True, text=True, timeout=10, check=True).stdout.strip()
@@ -74,14 +87,18 @@ def main():
         document['gpu_identity'] = dict(name=name, driver=driver,
             uuid_sha256=hashlib.sha256(gpu_uuid.encode()).hexdigest())
         baseline = gpu_sample()
-        if baseline['free_mb'] < 8192 + 2560 or baseline['utilization'] > 20:
+        required_free = 4096 if args.resident_baseline else 8192 + 2560
+        if baseline['free_mb'] < required_free or baseline['utilization'] > 20:
             raise RuntimeError('insufficient capacity or active GPU workload')
+        document['trial_condition'] = ('resident_model_attempt' if args.resident_baseline
+                                       else 'cache_condition_uncontrolled')
+        document['required_free_mb'] = required_free
         document['baseline'] = baseline
         params = dict(prompt='A small red ceramic teapot on a plain wooden table, studio lighting',
-                      width=512, height=512, steps=8, cfg=6.0, seed=42)
+                      width=512, height=512, steps=8, cfg=6.0, seed=args.seed)
         wf = _apply_params(json.loads((APP / 'workflows' / 'sdxl_t2i.json').read_text()), params)
         document.update(workflow=wf, workflow_sha256=workload_fingerprint(wf),
-                        parameters=params, admission_budget_mb=8192, reserve_mb=2560)
+                        parameters=params, experimental_cold_planning_estimate_mb=8192, reserve_mb=2560)
         store = TaskStore(db)
         if OperationJournal(db).pending():
             raise RuntimeError('resource journal contains unconfirmed operations')
@@ -122,6 +139,10 @@ def main():
                     {'experiment_terminal': status})
                 document.update(terminal_status=status, duration_s=time.monotonic() - started,
                                 output_node_ids=sorted((row.get('outputs') or {}).keys()))
+                cached = [node for kind, details in row.get('status', {}).get('messages', [])
+                          if kind == 'execution_cached' for node in details.get('nodes', [])]
+                document['cached_node_ids'] = cached
+                document['sampler_cache_hit'] = '5' in cached
                 break
             time.sleep(0.5)
         else:

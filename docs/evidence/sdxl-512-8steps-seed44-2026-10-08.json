@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "kind": "real_gpu_baseline",
+  "collector_sha256": "87722f154694cb75b582a6a334f5fc34b4a9150d178ccc525aef3e4a2016d637",
+  "recorded_at": "2026-10-08T04:35:09.929593+00:00",
+  "samples": [
+    {
+      "monotonic_s": 40020.531,
+      "total_mb": 16380,
+      "used_mb": 8465,
+      "free_mb": 7643,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 40020.812,
+      "total_mb": 16380,
+      "used_mb": 8593,
+      "free_mb": 7515,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 40021.062,
+      "total_mb": 16380,
+      "used_mb": 8593,
+      "free_mb": 7515,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 40021.312,
+      "total_mb": 16380,
+      "used_mb": 8593,
+      "free_mb": 7515,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 40021.578,
+      "total_mb": 16380,
+      "used_mb": 8593,
+      "free_mb": 7515,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 40021.875,
+      "total_mb": 16380,
+      "used_mb": 9137,
+      "free_mb": 6971,
+      "utilization": 79
+    }
+  ],
+  "sampling_errors": [],
+  "comparative_result": false,
+  "limitations": [
+    "single run",
+    "sampled whole-device memory includes desktop/background activity",
+    "sampling can miss transient peaks",
+    "no cold-cache or OOM guarantee"
+  ],
+  "backend_environment": {
+    "system": {
+      "os": "linux",
+      "ram_total": 25202106368,
+      "ram_free": 14656798720,
+      "comfyui_version": "0.34.0",
+      "required_frontend_version": "1.49.6",
+      "installed_templates_version": "0.11.48",
+      "required_templates_version": "0.11.48",
+      "comfy_package_versions": [
+        {
+          "name": "comfyui-frontend-package",
+          "installed": "1.49.6",
+          "required": "1.49.6"
+        },
+        {
+          "name": "comfyui-workflow-templates",
+          "installed": "0.11.48",
+          "required": "0.11.48"
+        },
+        {
+          "name": "comfyui-embedded-docs",
+          "installed": "0.5.10",
+          "required": "0.5.10"
+        },
+        {
+          "name": "comfy-kitchen",
+          "installed": "0.2.31",
+          "required": "0.2.31"
+        },
+        {
+          "name": "comfy-aimdo",
+          "installed": "0.4.15",
+          "required": "0.4.15"
+        }
+      ],
+      "python_version": "3.10.12 (main, Sep 11 2024, 15:47:36) [GCC 11.4.0]",
+      "pytorch_version": "2.5.1+cu121",
+      "embedded_python": false,
+      "deploy_environment": "local-git"
+    },
+    "devices": [
+      {
+        "name": "cuda:0 NVIDIA GeForce RTX 4060 Ti : cudaMallocAsync",
+        "type": "cuda",
+        "index": 0,
+        "vram_total": 17175150592,
+        "vram_free": 8954229730,
+        "torch_vram_total": 6979321856,
+        "torch_vram_free": 31896546
+      }
+    ],
+    "launch_args_sha256": "30430975967b75301a12c240725e35d1c94578291297e745247302bc8f50fce8"
+  },
+  "model_artifact": {
+    "filename": "sd_xl_base_1.0.safetensors",
+    "sha256": "31e35c80fc4829d14f90153f4c74cd59c90b779f6afe05a74cd6120b893f7e5b"
+  },
+  "gpu_identity": {
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "driver": "591.86",
+    "uuid_sha256": "144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9"
+  },
+  "trial_condition": "resident_model_attempt",
+  "required_free_mb": 4096,
+  "baseline": {
+    "monotonic_s": 40020.468,
+    "total_mb": 16380,
+    "used_mb": 8465,
+    "free_mb": 7643,
+    "utilization": 0
+  },
+  "workflow": {
+    "1": {
+      "class_type": "CheckpointLoaderSimple",
+      "inputs": {
+        "ckpt_name": "sd_xl_base_1.0.safetensors"
+      }
+    },
+    "2": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "A small red ceramic teapot on a plain wooden table, studio lighting",
+        "clip": [
+          "1",
+          1
+        ]
+      }
+    },
+    "3": {
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "worst quality, low quality, blurry, distorted, ugly, watermark, text",
+        "clip": [
+          "1",
+          1
+        ]
+      }
+    },
+    "4": {
+      "class_type": "EmptyLatentImage",
+      "inputs": {
+        "width": 512,
+        "height": 512,
+        "batch_size": 1
+      }
+    },
+    "5": {
+      "class_type": "KSampler",
+      "inputs": {
+        "seed": 44,
+        "steps": 8,
+        "cfg": 6.0,
+        "sampler_name": "euler",
+        "scheduler": "normal",
+        "denoise": 1.0,
+        "model": [
+          "1",
+          0
+        ],
+        "positive": [
+          "2",
+          0
+        ],
+        "negative": [
+          "3",
+          0
+        ],
+        "latent_image": [
+          "4",
+          0
+        ]
+      }
+    },
+    "6": {
+      "class_type": "VAEDecode",
+      "inputs": {
+        "samples": [
+          "5",
+          0
+        ],
+        "vae": [
+          "1",
+          2
+        ]
+      }
+    },
+    "7": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "6",
+          0
+        ],
+        "filename_prefix": "sdxl_t2i"
+      }
+    }
+  },
+  "workflow_sha256": "62cd9cde8f64628e943580f522a76fa5b2124d7ddeca6d964b3087f3afc33850",
+  "parameters": {
+    "prompt": "A small red ceramic teapot on a plain wooden table, studio lighting",
+    "width": 512,
+    "height": 512,
+    "steps": 8,
+    "cfg": 6.0,
+    "seed": 44
+  },
+  "experimental_cold_planning_estimate_mb": 8192,
+  "reserve_mb": 2560,
+  "task_id": "4b44f81752ac40eda8f3fa3ff58e0ae2",
+  "prompt_id": "4e723416-539d-4f50-a452-c4a4d3ff7515",
+  "terminal_status": "success",
+  "duration_s": 1.5780000000013388,
+  "output_node_ids": [
+    "7"
+  ],
+  "cached_node_ids": [
+    "1",
+    "2",
+    "3",
+    "4"
+  ],
+  "sampler_cache_hit": false,
+  "observed_device_peak_mb": 9137
+}
