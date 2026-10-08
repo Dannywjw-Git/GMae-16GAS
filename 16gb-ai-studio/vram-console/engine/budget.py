@@ -213,10 +213,18 @@ def vram_advice() -> dict:
     }
 
 
+def _profile_peak_gb(value):
+    try:
+        value = float(value)
+        return value if math.isfinite(value) and value > 0 else 0
+    except (TypeError, ValueError):
+        return 0
+
+
 def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool = False) -> dict:
     """Step 4 显存预算引擎（蓝图 §6）：核算每个已知模型「能不能跑、要释放多少、差多少」。
     context_overrides: {model_id: context_size} — 用户在预演模式指定的 context 大小，
-                       优先从 model.context_vram 查找对应显存，找不到则用默认值+KV cache估算。
+                       只接受已校准 context，找不到则拒绝准入。
     公式（蓝图 6.1）：avail = total − 底噪 − 保留 − 其他进程占用(非受管)
          能跑 = 请求模型标称 + 不可释放占用 ≤ total − reserve
     决策四选一（6.2）：ok / free_L1 / free_L2 / reject（连释放都不够 → 差多少 GB）
@@ -224,8 +232,13 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
     from services.ollama import ollama_ps
     from services.comfy import comfy_loaded_models
     sys_cfg = REGISTRY.get("system", {})
-    noise_mb = int(float(sys_cfg.get("gpu_base_noise_gb", 1.0)) * 1024)
-    reserve_mb = int(float(sys_cfg.get("vram_reserve_gb", 2.5)) * 1024)
+    try:
+        noise_mb = int(float(sys_cfg.get("gpu_base_noise_gb", 1.0)) * 1024)
+        reserve_mb = int(float(sys_cfg.get("vram_reserve_gb", 2.5)) * 1024)
+        if noise_mb < 0 or reserve_mb < 0:
+            raise ValueError("negative memory allowance")
+    except (TypeError, ValueError, OverflowError):
+        return {"ok": False, "error": "显存噪声或安全余量配置无效", "models": [], "loaded_models": []}
     gpu = gpu_status(force_refresh=force_refresh)
     if not gpu.get("ok") or gpu.get("stale"):
         return {"ok": False, "error": "新鲜 GPU 遥测不可用，暂停新任务准入", "models": [], "loaded_models": []}
@@ -260,8 +273,9 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
     for src_key, loaded_set in (("ollama", ol_loaded), ("comfyui", cf_loaded)):
         for m in REGISTRY.get(src_key, {}).get("models", []):
             mid = m["id"]
-            default_vram = float(m.get("vram_gb", 0))
-            context_vram_map = m.get("context_vram", {}) or {}
+            default_vram = _profile_peak_gb(m.get("vram_gb", 0))
+            context_vram_map = {k: _profile_peak_gb(v) for k, v in (m.get("context_vram", {}) or {}).items()
+                                if _profile_peak_gb(v) > 0}
             specified_ctx = (context_overrides or {}).get(mid)
             ctx_note = ""
             if specified_ctx and str(specified_ctx) in context_vram_map:
@@ -277,6 +291,8 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
             uncalibrated_ctx = bool(specified_ctx and str(specified_ctx) not in context_vram_map
                                     and specified_ctx not in context_vram_map)
             invalid_estimate = not math.isfinite(vram) or vram <= 0
+            if invalid_estimate:
+                vram = 0  # Keep the rejected result JSON-safe; never convert NaN/inf to time.
             # vram_gb represents the task's peak estimate, not a zero-cost cache hit.
             # Until phase-aware profiles exist, loaded targets keep the conservative estimate.
             direct_peak_mb = used_mb + int(vram * 1024) if not invalid_estimate else 0
@@ -305,7 +321,9 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
                 note = "释放后仍差 %s GB" % gap
             gs = gen_stats.get(mid, {})
             avg_sec = gs.get("avg_seconds")
-            if avg_sec:
+            if invalid_estimate:
+                est_text = "峰值未校准，无法估算"
+            elif avg_sec:
                 est_text = "基于 %d 次历史生成，平均约 %s" % (
                     gs.get("count", 0),
                     ("%d分%d秒" % (avg_sec // 60, avg_sec % 60)) if avg_sec >= 60 else ("%d秒" % avg_sec))
@@ -327,13 +345,13 @@ def budget_engine(context_overrides: dict | None = None, *, force_refresh: bool 
         rm = next((x for x in REGISTRY.get("ollama", {}).get("models", []) if x["id"] == mid), None)
         loaded_models.append({"source": "ollama", "id": mid,
                               "name": rm.get("name", mid) if rm else mid,
-                              "vram_gb": rm.get("vram_gb", 0) if rm else 0,
+                              "vram_gb": _profile_peak_gb(rm.get("vram_gb", 0)) if rm else 0,
                               "exclusive": bool(rm.get("exclusive", False)) if rm else False})
     for mid in cf_loaded:
         rm = next((x for x in REGISTRY.get("comfyui", {}).get("models", []) if x["id"] == mid), None)
         loaded_models.append({"source": "comfyui", "id": mid,
                               "name": rm.get("name", mid) if rm else mid,
-                              "vram_gb": rm.get("vram_gb", 0) if rm else 0,
+                              "vram_gb": _profile_peak_gb(rm.get("vram_gb", 0)) if rm else 0,
                               "exclusive": bool(rm.get("exclusive", False)) if rm else False})
     loaded_models.sort(key=lambda x: x.get("vram_gb", 0), reverse=True)
 

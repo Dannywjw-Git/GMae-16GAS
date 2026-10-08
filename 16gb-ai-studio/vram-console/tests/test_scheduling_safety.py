@@ -6,12 +6,14 @@ from engine import budget, queue
 
 
 class BudgetSafetyTests(unittest.TestCase):
-    def evaluate(self, used=8192, known=6144, vram=8, gpu=None, exclusive=False, loaded=False, ctx=None):
+    def evaluate(self, used=8192, known=6144, vram=8, gpu=None, exclusive=False, loaded=False, ctx=None, system=None):
         model = {"id": "target", "vram_gb": vram, "exclusive": exclusive,
                  "ctx": 8192, "context_vram": {"8192": vram}}
         reg = {"system": {"gpu_vram_total_gb": 16, "gpu_base_noise_gb": 1,
                           "vram_reserve_gb": 2.5},
                "ollama": {"models": [model]}, "comfyui": {"models": []}}
+        if system:
+            reg["system"].update(system)
         with ExitStack() as stack:
             stack.enter_context(patch.object(budget, "REGISTRY", reg))
             stack.enter_context(patch.object(budget, "gpu_status", return_value= gpu if gpu is not None else
@@ -26,6 +28,19 @@ class BudgetSafetyTests(unittest.TestCase):
 
     def test_resident_models_require_release(self):
         self.assertEqual(self.evaluate()["models"][0]["decision"], "free_L1")
+
+    def test_invalid_peak_is_rejected_without_crashing(self):
+        import json
+        for value in (float("nan"), float("inf"), -1, 0, None, "invalid"):
+            with self.subTest(value=value):
+                result = self.evaluate(vram=value)
+                self.assertEqual(result["models"][0]["decision"], "reject")
+                json.dumps(result, allow_nan=False)
+
+    def test_invalid_allowance_blocks_budget(self):
+        for value in (-1, float("nan"), float("inf"), "invalid"):
+            with self.subTest(value=value):
+                self.assertFalse(self.evaluate(system={"vram_reserve_gb": value})["ok"])
 
     def test_impossible_peak_is_rejected_even_with_releasable_models(self):
         self.assertEqual(self.evaluate(vram=20)["models"][0]["decision"], "reject")
