@@ -1,0 +1,12 @@
+{
+  "controller_exit_code": 1,
+  "gpu_at_fault_mb": 6245,
+  "observed_whole_device_peak_mb": 8319,
+  "samples": 273,
+  "input_tokens": 6182,
+  "output_tokens": 24,
+  "delegated_command_count": 1,
+  "unknown_hold_verified": true,
+  "recovered_without_replay": true,
+  "limitation": "one controller crash; worker/host loss and immediate cancellation unverified"
+}
