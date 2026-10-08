@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--profile-dir',required=True)
     parser.add_argument('--ollama-raw',required=True)
     parser.add_argument('--output',required=True)
+    parser.add_argument('--first-seed',type=int,default=68)
     args=parser.parse_args();output=Path(args.output)
     if output.exists(): raise ValueError('refusing overwrite of evidence')
     os.environ['GMAE_PROFILE_DIR']=str(Path(args.profile_dir).resolve())
@@ -38,7 +39,7 @@ def main():
                     width=512,height=512,steps=8,cfg=6.0)
         from engine.profile_admission import select_profile
         model=next(m for m in queue.REGISTRY['comfyui']['models'] if m['id']=='SDXL')
-        for seed in (66,67):
+        for seed in (args.first_seed,args.first_seed+1):
             effective=queue._apply_params(queue._load_workflow(model['workflow']),{**params,'seed':seed})
             if select_profile(effective) is None: raise ValueError('exact SDXL Profile required')
         if select_profile(request) is None: raise ValueError('exact Ollama Profile required')
@@ -48,7 +49,7 @@ def main():
                 except Exception as error: document['sampling_errors'].append(type(error).__name__)
                 stop.wait(0.2)
         worker=threading.Thread(target=sample);worker.start();started=time.monotonic()
-        for source,payload in [('comfyui',{**params,'seed':66}),('ollama',request),('comfyui',{**params,'seed':67})]:
+        for source,payload in [('comfyui',{**params,'seed':args.first_seed}),('ollama',request),('comfyui',{**params,'seed':args.first_seed+1})]:
             result=(queue.queue_enqueue('SDXL',payload) if source=='comfyui' else queue.queue_enqueue_ollama(payload))
             if not result.get('ok'): raise RuntimeError('durable acceptance failed: '+str(result))
             document['task_ids'].append(result['task']['id'])
@@ -79,6 +80,10 @@ def main():
             if record['intent'].get('source')=='ollama' and isinstance(result,dict):
                 result.pop('response',None)
         document['coordination_after']=get_coordinator().snapshot()['active']
+        document['coordination_events']=get_coordinator().snapshot()['events']
+        with store._transaction() as connection:
+            document['durable_events']=[dict(row) for tid in document['task_ids'] for row in connection.execute(
+                'SELECT sequence,task_id,state,version,timestamp FROM task_events WHERE task_id=? ORDER BY sequence',(tid,))]
         document['pending_operations_after']=len(journal.pending())
         if document['samples']:
             document['observed_whole_device_peak_mb']=max(max(s['used_mb'],s['total_mb']-s['free_mb']) for s in document['samples'])

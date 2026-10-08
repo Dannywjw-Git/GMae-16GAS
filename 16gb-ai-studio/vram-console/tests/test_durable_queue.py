@@ -117,6 +117,46 @@ def test_saved_ollama_response_recovers_without_backend_replay(ollama_runtime,mo
     rpc.assert_not_called()
 
 
+def test_ollama_completion_storage_failure_retains_ownership(ollama_runtime,monkeypatch):
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);task=queue._tasks[first['task']['id']]
+    monkeypatch.setattr(queue,'_ollama_generate',lambda body:ollama_response(body))
+    original=queue._persist
+    def persist(task,status=None,**fields):
+        if status=='running': raise OSError('completion disk failure')
+        return original(task,status,**fields)
+    monkeypatch.setattr(queue,'_persist',persist)
+    queue._run_task(task)
+    assert TaskStore(path).get(task['id'])['status']=='uncertain'
+    assert coordinator.get_coordinator().snapshot()['active']['phase']=='uncertain'
+
+
+def test_ollama_unmeasured_prompt_and_unsafe_context_reject_before_acceptance(ollama_runtime):
+    from copy import deepcopy
+    path,request=ollama_runtime
+    changed=deepcopy(request);changed['prompt']='different request'
+    assert queue.queue_enqueue_ollama(changed)['code']=='PROFILE_REQUIRED'
+    changed=deepcopy(request);changed['options']['num_ctx']=16384
+    assert queue.queue_enqueue_ollama(changed)['code']=='INVALID_INTENT'
+    assert not TaskStore(path).snapshot()
+
+
+def test_corrupt_saved_ollama_response_is_not_terminal_proof(ollama_runtime):
+    import hashlib
+    path,request=ollama_runtime
+    first=queue.queue_enqueue_ollama(request);store=TaskStore(path)
+    record=store.get(first['task']['id'])
+    for status in ('precheck','submitting'):
+        record=store.checkpoint(record['id'],record['version'],status,{'submission_id':'local-only'})
+    response=ollama_response(request);metrics={k:v for k,v in response.items() if k not in ('model','response')}
+    record=store.checkpoint(record['id'],record['version'],'running',dict(
+        backend_completion=dict(model=request['model'],metrics=metrics),
+        result=dict(response='changed',response_sha256=hashlib.sha256(response['response'].encode()).hexdigest(),metrics=metrics)))
+    restart()
+    assert store.get(record['id'])['status']=='uncertain'
+    assert coordinator.get_coordinator().snapshot()['active']['service']=='ollama'
+
+
 @pytest.fixture
 def runtime(tmp_path, monkeypatch):
     path = tmp_path / 'tasks.sqlite3'
