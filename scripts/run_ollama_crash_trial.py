@@ -18,6 +18,58 @@ from engine.coordinator import restore_resource_operations,get_coordinator,recon
 from run_profiled_ollama_trial import redact
 
 
+def windows_identity(handle=None):
+    import ctypes
+    from ctypes import wintypes
+    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    kernel.GetCurrentProcess.restype=wintypes.HANDLE
+    kernel.GetProcessTimes.argtypes=[wintypes.HANDLE,*([ctypes.POINTER(wintypes.FILETIME)]*4)]
+    kernel.QueryFullProcessImageNameW.argtypes=[wintypes.HANDLE,wintypes.DWORD,wintypes.LPWSTR,ctypes.POINTER(wintypes.DWORD)]
+    handle=handle if handle is not None else kernel.GetCurrentProcess()
+    times=[wintypes.FILETIME() for _ in range(4)]
+    if not kernel.GetProcessTimes(handle,*[ctypes.byref(t) for t in times]): raise OSError('process time unavailable')
+    size=wintypes.DWORD(32768);buffer=ctypes.create_unicode_buffer(size.value)
+    if not kernel.QueryFullProcessImageNameW(handle,0,buffer,ctypes.byref(size)): raise OSError('process image unavailable')
+    return dict(creation_time=(times[0].dwHighDateTime<<32)|times[0].dwLowDateTime,
+                image=os.path.normcase(os.path.realpath(buffer.value)))
+
+
+class OwnedController:
+    """Keep a native handle, fencing PID reuse and Windows venv redirectors."""
+    def __init__(self,process,identity):
+        self.process=process;self.handle=None
+        if identity['pid']!=process.pid and identity.get('parent_pid')!=process.pid:
+            raise ValueError('controller is not the launched process or its child')
+        if os.name=='nt':
+            import ctypes
+            from ctypes import wintypes
+            self.kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+            self.kernel.OpenProcess.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD]
+            self.kernel.OpenProcess.restype=wintypes.HANDLE
+            self.kernel.CloseHandle.argtypes=[wintypes.HANDLE]
+            self.kernel.TerminateProcess.argtypes=[wintypes.HANDLE,wintypes.UINT]
+            self.kernel.WaitForSingleObject.argtypes=[wintypes.HANDLE,wintypes.DWORD]
+            self.handle=self.kernel.OpenProcess(0x1000|0x0001|0x00100000,False,identity['pid'])
+            if not self.handle: raise OSError('owned process handle unavailable')
+            observed=windows_identity(self.handle)
+            expected_image=os.path.normcase(os.path.realpath(sys._base_executable))
+            if observed['creation_time']!=identity['creation_time'] or observed['image']!=expected_image:
+                self.close();raise ValueError('native creation time or executable mismatch')
+        elif identity['pid']!=process.pid:
+            raise ValueError('unexpected controller indirection')
+
+    def terminate(self):
+        if self.handle is not None:
+            if not self.kernel.TerminateProcess(self.handle,1): raise OSError('owned termination failed')
+            if self.kernel.WaitForSingleObject(self.handle,10000)!=0: raise TimeoutError('owned process still live')
+        else: self.process.terminate()
+        return self.process.wait(timeout=10)
+
+    def close(self):
+        if self.handle is not None:
+            self.kernel.CloseHandle(self.handle);self.handle=None
+
+
 def parent(args):
     owner=ProcessOwnership(APP/'data/tasks.sqlite3').acquire()
     store=TaskStore(APP/'data/tasks.sqlite3');journal=OperationJournal(store.path)
@@ -28,7 +80,9 @@ def parent(args):
     if not accepted.get('ok'): raise ValueError('parent acceptance failed')
     task_id=accepted['task']['id']
     with Path(args.parent_status).open('x',encoding='utf-8') as file:
-        json.dump(dict(pid=os.getpid(),task_id=task_id),file)
+        identity=dict(pid=os.getpid(),parent_pid=os.getppid(),task_id=task_id)
+        if os.name=='nt': identity.update(windows_identity())
+        json.dump(identity,file)
     while queue._store().get(task_id)['status'] not in TaskStore.TERMINAL:
         time.sleep(0.1)
 
@@ -54,21 +108,24 @@ def main():
     else: options['start_new_session']=True
     process=subprocess.Popen([sys.executable,str(Path(__file__).resolve()),'--parent','--parent-status',str(marker),
         '--raw',args.raw,'--profile-dir',args.profile_dir,'--output',args.output],**options)
-    document['controller_pid']=process.pid
+    document['launcher_pid']=process.pid
     stop=threading.Event()
     def sample():
         while not stop.is_set():
             try: document['samples'].append(gpu_sample())
             except Exception as error: document['sampling_errors'].append(type(error).__name__)
             stop.wait(0.2)
-    worker=threading.Thread(target=sample);worker.start();owner=None
+    worker=threading.Thread(target=sample);worker.start();owner=None;controller=None
     try:
         deadline=time.monotonic()+240
         while True:
             if process.poll() is not None: raise RuntimeError('controller ended before fault injection')
             if marker.exists():
                 identity=json.loads(marker.read_text());task_id=identity['task_id']
-                if identity['pid']!=process.pid: raise ValueError('controller identity mismatch')
+                if controller is None:
+                    controller=OwnedController(process,identity)
+                    document['controller_pid']=identity['pid']
+                    document['controller_creation_time']=identity.get('creation_time')
                 records=[r for r in journal.pending() if r['intent']['owner']=='job:'+task_id]
                 if records:
                     operation=records[0];commands=journal.commands(operation['id'])
@@ -88,7 +145,7 @@ def main():
             time.sleep(0.1)
         # This handle belongs to the controller launched above. No service or
         # unrelated process is stopped. Independent supervisor remains alive.
-        process.terminate();document['controller_exit_code']=process.wait(timeout=10)
+        document['controller_exit_code']=controller.terminate()
         owner=ProcessOwnership(APP/'data/tasks.sqlite3').acquire()
         document['gpu_ownership_reacquired']=True
         restore_resource_operations();queue.queue_restore()
@@ -112,6 +169,7 @@ def main():
         document.update(status='failed',error=str(error));raise
     finally:
         stop.set();worker.join(15);document['sampler_stopped']=not worker.is_alive()
+        if controller is not None: controller.close()
         if document['samples']:
             document['observed_whole_device_peak_mb']=max(max(s['used_mb'],s['total_mb']-s['free_mb']) for s in document['samples'])
         with output.open('x',encoding='utf-8',newline='\n') as file: json.dump(redact(document),file,indent=2,allow_nan=False)
