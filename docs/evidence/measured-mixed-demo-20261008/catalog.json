@@ -1,0 +1,41 @@
+{
+  "kind": "installed_measured_preset_catalog",
+  "recorded_at": "2026-10-08T08:40:02.127449+00:00",
+  "source_commit": "515f543ac5749c500053c173f01881f234972930",
+  "gpu_experiment": false,
+  "catalog": {
+    "presets": [
+      {
+        "id": "332bc75a458b14306ee391a680fe3abbb769dc4cd14cb0bab0f84aca03b438c5",
+        "source": "comfyui",
+        "model": "SDXL",
+        "width": 512,
+        "height": 512,
+        "steps": 8,
+        "prompt_preview": "A small red ceramic teapot on a plain wooden table, studio lighting",
+        "prompt_characters": 67,
+        "measured_peak_mb": 8705,
+        "envelope_mb": 9217,
+        "evidence_sha256": "0b19fde07d3b2065a6f4467169a52df4faeb2d1a86295ab98dbf8430ee30d396",
+        "recorded_at": "2026-10-08T06:07:11.857624+00:00"
+      },
+      {
+        "id": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+        "source": "ollama",
+        "model": "qwen3.5:9b",
+        "context_length": 8192,
+        "prompt_tokens": 6182,
+        "max_output_tokens": 32,
+        "prompt_preview": "Read the following notes and summarize their common point in one sentence.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory bud",
+        "prompt_characters": 36493,
+        "measured_peak_mb": 8321,
+        "envelope_mb": 8833,
+        "evidence_sha256": "169728e2b4b790d23a6a800add4d70bfffbab4e6ead8fedea3a2707b59eb6a51",
+        "recorded_at": "2026-10-08T07:19:58.581244+00:00"
+      }
+    ],
+    "rejected_count": 0,
+    "live_admission_verified": false,
+    "limitation": "固定测量请求；执行时仍核验模型、运行环境、显存与资源所有权。不能外推任意提示词，也不保证不会 OOM。"
+  }
+}

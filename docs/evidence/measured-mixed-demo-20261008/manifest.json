@@ -1,0 +1,18 @@
+{
+  "kind": "installed_preset_and_layout_evidence",
+  "gpu_experiment": false,
+  "catalog_source_commit": "515f543ac5749c500053c173f01881f234972930",
+  "layout_source_commit": "b9c8f5b51cb37bfe1f2e0904d9a6fdd789640199",
+  "page_source_sha256": "4bb00b91754003455ee764b5aaf4ca7542a15dc8fbc9df0cd73592690b5a4744",
+  "files": {
+    "catalog.json": "e9449300ee2a476b9b37f0527f0fbc96cc58119511f94094ff6a21547e3b33a6",
+    "collector.py": "6da19bff78b1ad1f58e78641eaf728728e8d7c135d43d74399b85ac7304b04a4",
+    "layout-preview.png": "7065b5f47c54135d536dabe1bcdbbc3fba5c7535764450154bb4496db2808420",
+    "preview-harness.py": "ac67d13729209e602d94e6378f588895c06a5c1d47e35c13aa67611d890f233b"
+  },
+  "limitations": [
+    "preview tasks and output are UI fixtures, not GPU results",
+    "catalog is installed evidence validation, not live admission",
+    "temporary harness originally runs from workspace audit-evidence directory"
+  ]
+}
