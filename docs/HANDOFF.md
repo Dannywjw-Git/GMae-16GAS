@@ -2,7 +2,8 @@
 
 ## 2026-10-08：可复现身份、重复试验与证据导入
 
-- 分支 `feat/reproducible-profile-trials-20261008`，基于 PR #7 的 `aac6334`。
+- 分支 `feat/reproducible-profile-trials-20261008`，代码提交 `6d7a299`，基于 PR #7 的 `aac6334`。[Draft PR #8](https://github.com/Dannywjw-Git/GMae-16GAS/pull/8)，新阶段 CI 待核验。
+- 基础 CI：PR #7 `aac6334` 的 `37726852441`、`37726848521` 两项均 success。
 - 实现：采集模型 SHA-256、启动配置摘要和采样器缓存状态；显式驻留试验与独立 seed。原始证据导入校验成功/未缓存、样本与峰值一致、完整身份与证据摘要，形成保守整卡 Profile 原型。
 - 自动化：完整 461 项通过（15.03 秒），新增 9 项合成夹具；名称检查 65 既有警告、0 阻断，编译与 diff 检查通过。
 - 真实 GPU：seed 43/44 两次生成 success，1.594/1.578 秒，整卡采样峰值 9,147/9,137 MiB，各 6 样本、0 错误，采样器未命中缓存。模型摘要和完整原始证据见 [试验报告](reproducible-profile-trials-2026-10-08.md)。差异由加载/缓存条件影响，不能宣传调度加速。
