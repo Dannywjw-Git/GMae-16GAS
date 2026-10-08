@@ -1,6 +1,6 @@
 """Bind the ownership ledger to fresh telemetry and existing service adapters."""
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from functools import wraps
 import inspect
 import math
@@ -8,6 +8,8 @@ import time
 import uuid
 from typing import Callable, Iterator
 from core.config import REGISTRY
+from core.config import BASE_DIR
+import os
 from core.registry import registry
 from core.resource_coordinator import ResourceCoordinator, ResourceDenied, ResourceLease, ResourceRequest
 from core.logger import log_event
@@ -33,6 +35,62 @@ def get_coordinator() -> ResourceCoordinator:
             coordinator = ResourceCoordinator()
             registry.set("resource_coordinator", coordinator)
         return coordinator
+
+
+def restore_resource_operations():
+    """Enable write-ahead tracking and recover holds before any startup worker."""
+    from core.operation_journal import OperationJournal
+    with registry.lock('operation_journal_init'):
+        if registry.get('operation_journal') is not None:
+            return
+        journal = OperationJournal(os.environ.get('GMAE_TASK_DB', os.path.join(BASE_DIR, 'data', 'tasks.sqlite3')))
+        for record in journal.pending():
+            intent = record['intent']
+            if intent['operation'] == 'generate' and intent['owner'].startswith('job:'):
+                task = journal.store.get(intent['owner'][4:])
+                if task and task['status'] in ('submitting', 'running', 'uncertain'):
+                    # The task's durable correlation ID is the stronger recovery
+                    # record. queue_restore installs its hold; avoid duplication.
+                    continue
+                if task and task['status'] in journal.store.TERMINAL:
+                    journal.finish(record['id'], True, {'terminal_task': task['id']})
+                    continue
+            get_coordinator().restore_uncertain(
+                ResourceRequest(intent['operation'], intent['owner'], intent['service'], intent.get('model')),
+                {'journal_id': record['id'],
+                 **{key: record['evidence'][key] for key in ('prompt_id', 'job_id') if key in record['evidence']},
+                 'reason': '资源操作在进程退出前未确认结束，须独立核验'})
+        registry.set('operation_journal', journal)
+
+
+class _TrackedLease(ResourceLease):
+    """Persist immediately before the first adapter mutation phase."""
+    def __init__(self, lease, journal, request):
+        super().__init__(lease.coordinator, lease.token, lease.borrowed)
+        self.journal = journal
+        self.request = request
+        self.operation_id = None
+
+    def transition(self, phase, **details):
+        if (self.journal is not None and not self.borrowed and self.operation_id is None and
+                phase in ('running', 'releasing', 'stopping')):
+            self.operation_id = self.journal.begin(asdict(self.request))
+        if self.operation_id:
+            details['journal_id'] = self.operation_id
+        super().transition(phase, **details)
+
+    def checkpoint_end(self, exception=False):
+        if self.operation_id is None:
+            return
+        active = self.coordinator.snapshot()['active']
+        confirmed = not exception and active is not None and active['phase'] in ('completed', 'failed')
+        if not confirmed:
+            self.uncertain((active or {}).get('reason') or '资源操作未确认结束，保留预留')
+        try:
+            self.journal.finish(self.operation_id, confirmed, active or {})
+        except Exception:
+            self.uncertain('资源操作结束记录无法保存，保留预留')
+            raise
 
 
 def fresh_gpu() -> dict:
@@ -154,11 +212,28 @@ def coordinated_operation(spec: OperationSpec) -> Iterator[ResourceLease]:
     coordinator = get_coordinator()
     request = ResourceRequest(spec.operation, spec.owner or (spec.operation + ":" + uuid.uuid4().hex[:10]),
                               spec.service, spec.model)
+    journal = registry.get('operation_journal')
+    tracked = None
+
+    def assessed(lease):
+        nonlocal tracked
+        tracked = _TrackedLease(lease, journal, request)
+        try:
+            assess(spec, tracked)
+        except BaseException:
+            tracked.checkpoint_end(exception=True)
+            raise
+
     try:
-        with coordinator.operation(request, lambda lease: assess(spec, lease)) as lease:
-            log_event("resource_reserved", owner=request.owner, token=lease.token,
-                      operation=spec.operation, service=spec.service, model=spec.model)
-            yield lease
+        with coordinator.operation(request, assessed) as lease:
+            exception = True
+            try:
+                log_event("resource_reserved", owner=request.owner, token=lease.token,
+                          operation=spec.operation, service=spec.service, model=spec.model)
+                yield tracked
+                exception = False
+            finally:
+                tracked.checkpoint_end(exception=exception)
     except ResourceDenied as error:
         log_event("resource_rejected", owner=request.owner, code=error.code, reason=str(error))
         raise
@@ -236,19 +311,36 @@ def reconcile_uncertain() -> dict:
     from clients.comfyui_client import _get
     from urllib.parse import quote
     ok, history, error = _get("/history/" + quote(prompt_id, safe=""))
-    record = history.get(prompt_id, {}) if ok else {}
-    terminal = record.get("status", {}).get("status_str") in ("success", "error")
+    record = history.get(prompt_id, {}) if ok and isinstance(history, dict) else {}
+    if not isinstance(record, dict):
+        record = {}
+    status = record.get('status', {}).get('status_str')
+    terminal = status in ('success', 'error')
+    if not terminal and active.get('job_id'):
+        from engine.queue import cancellation_evidence
+        from clients.comfyui_client import canceled_job_absent
+        if (cancellation_evidence(active['job_id'], active['token'], prompt_id) and
+                canceled_job_absent(prompt_id)):
+            terminal, status = True, 'canceled'
     if not terminal:
         return {"ok": False, "code": "UNCONFIRMED_EXECUTION",
                 "error": error or "尚无对应任务的结束记录，资源预留继续保留"}
     try:
         fresh_gpu()
-        coordinator.resolve(active["token"], {"terminal": True, "prompt_id": prompt_id,
-                                             "status": record["status"]["status_str"]})
         from engine.queue import reconcile_task
-        reconcile_task(active.get("job_id"), active["token"], prompt_id,
-                       record["status"]["status_str"])
+        if active.get('job_id') and not reconcile_task(
+                active['job_id'], active['token'], prompt_id, status):
+            return {'ok': False, 'code': 'TASK_EVIDENCE_MISMATCH', 'error': '任务身份不匹配，保留预留'}
+        if active.get('journal_id'):
+            journal = registry.get('operation_journal')
+            if journal is None:
+                return {'ok': False, 'code': 'TASK_STORAGE_UNAVAILABLE', 'error': '资源操作账本不可用'}
+            journal.finish(active['journal_id'], True, {'terminal': True, 'prompt_id': prompt_id, 'status': status})
+        coordinator.resolve(active["token"], {"terminal": True, "prompt_id": prompt_id,
+                                             "status": status})
         log_event("resource_reconciled", owner=active["owner"], prompt_id=prompt_id)
         return {"ok": True, "resolved": True, "prompt_id": prompt_id}
     except ResourceDenied as error:
         return error.result()
+    except Exception as error:
+        return {'ok': False, 'code': 'TASK_STORAGE_UNAVAILABLE', 'error': str(error)}

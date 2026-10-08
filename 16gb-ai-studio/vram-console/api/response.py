@@ -47,8 +47,8 @@ class Response:
         """Preserve rejected operation semantics at the HTTP boundary."""
         if isinstance(result, dict) and result.get("ok") is False:
             code = result.get("code", "OPERATION_FAILED")
-            status = 409 if code in ("RESOURCE_BUSY", "SERVICE_BUSY", "UNCONFIRMED_EXECUTION") else 422
-            if code in ("TELEMETRY_UNAVAILABLE", "ACTIVITY_UNKNOWN", "BUDGET_UNAVAILABLE"):
+            status = 409 if code in ("RESOURCE_BUSY", "SERVICE_BUSY", "UNCONFIRMED_EXECUTION", "IDEMPOTENCY_CONFLICT") else 422
+            if code in ("TELEMETRY_UNAVAILABLE", "ACTIVITY_UNKNOWN", "BUDGET_UNAVAILABLE", "TASK_STORAGE_UNAVAILABLE"):
                 status = 503
             if code == "COMMAND_QUEUE_FULL":
                 status = 429

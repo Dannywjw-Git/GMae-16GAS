@@ -55,7 +55,8 @@ def post_queue(req: Request) -> Response:
             }
     except Exception as e:
         log_error("budget_precheck_failed", error=str(e))
-    result = queue_enqueue(model=task_model, params=task_params)
+    result = queue_enqueue(model=task_model, params=task_params,
+                           idempotency_key=req.body_get('idempotency_key', None))
     if budget_warning and isinstance(result, dict):
         result["budget_warning"] = budget_warning
     status_cache.invalidate()

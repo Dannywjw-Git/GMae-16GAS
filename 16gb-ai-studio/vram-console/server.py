@@ -52,7 +52,7 @@ from services.comfy_ws import ComfyWS, comfy_events, start_comfy_ws, _COMFY_EVEN
 from engine.budget import budget_engine, vram_advice
 from engine.eviction_guard import gpu_guard_check, gpu_guard_evict, GUARD_UNKNOWN_POLICY, GUARD_WARN_THRESHOLD
 from engine.scanner import model_scan, scan_register, start_auto_scanner
-from engine.queue import queue_enqueue, queue_snapshot, queue_cancel
+from engine.queue import queue_enqueue, queue_snapshot, queue_cancel, queue_restore
 from services.scene import (scene_switch, combo_switch, service_action, model_action,
     load_model_api, ollama_stop, _sync_ollama_models, _sync_comfyui_models)
 from services.status import current_status, comfy_loaded_models, invalidate_status_cache
@@ -91,6 +91,11 @@ if __name__ == "__main__":
             raise SystemExit(0)
 
         server = ThreadingHTTPServer((HOST, PORT), Handler)
+        # Fail closed on unavailable storage and restore unknown GPU ownership
+        # before any reaper/QoS mutations or HTTP requests can run.
+        from engine.coordinator import restore_resource_operations
+        restore_resource_operations()
+        queue_restore()
 
         # 启动后台线程
         start_idle_reaper()      # 后台空闲回收线程
