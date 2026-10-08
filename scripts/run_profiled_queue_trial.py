@@ -3,10 +3,12 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import threading
 import time
 from measure_comfy_workload import APP, get_json, gpu_sample
+from clients.comfyui_client import residency_snapshot
 from core.process_ownership import ProcessOwnership
 from engine.coordinator import restore_resource_operations, get_coordinator
 from engine import queue
@@ -17,7 +19,10 @@ def main():
     parser.add_argument('--output', required=True)
     parser.add_argument('--seed', type=int, required=True)
     parser.add_argument('--timeout', type=int, default=300)
+    parser.add_argument('--profile-dir')
     args = parser.parse_args()
+    if args.profile_dir:
+        os.environ['GMAE_PROFILE_DIR'] = str(Path(args.profile_dir).resolve())
     if args.seed < 0 or args.timeout <= 0:
         raise ValueError('invalid trial arguments')
     output = Path(args.output)
@@ -51,6 +56,15 @@ def main():
                 errors.append(str(error))
             stop.wait(0.2)
 
+    document['residency_before'] = residency_snapshot()
+    document['baseline'] = gpu_sample()
+    from services import comfy
+    original_free = comfy.comfy_free
+    document['managed_unload_calls'] = 0
+    def counted_free():
+        document['managed_unload_calls'] += 1
+        return original_free()
+    comfy.comfy_free = counted_free
     thread = threading.Thread(target=sampler)
     thread.start()
     started = time.monotonic()
@@ -84,10 +98,18 @@ def main():
         stop.set()
         thread.join(timeout=15)
         document['coordination'] = get_coordinator().snapshot()
+        document['residency_after'] = residency_snapshot()
+        comfy.comfy_free = original_free
         if samples:
             document['observed_device_peak_mb'] = max(sample['used_mb'] for sample in samples)
         output.parent.mkdir(parents=True, exist_ok=True)
-        payload = json.dumps(document, ensure_ascii=False, indent=2, allow_nan=False).encode()
+        def redact(value):
+            if isinstance(value, dict):
+                return {(key + '_sha256' if key in ('token','reservation_token') else key):
+                    (hashlib.sha256(str(item).encode()).hexdigest() if key in ('token','reservation_token') else redact(item)) for key,item in value.items()}
+            if isinstance(value,list): return [redact(item) for item in value]
+            return value
+        payload = json.dumps(redact(document), ensure_ascii=False, indent=2, allow_nan=False).encode()
         with output.open('xb') as file:
             file.write(payload)
         # OS ownership lives to process exit, including any daemon queue worker.
