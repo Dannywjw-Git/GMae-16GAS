@@ -1,0 +1,36 @@
+{
+  "collector_commit": "f6c2c64baa4715977c85f2f3017551208582de6a",
+  "files": {
+    "ollama-qwen9b-ctx2048-20261008.json": "e0ba4a07c3382f7e81674087ef7113a170010b848326c32ea1afd02f8ecd0004",
+    "ollama-qwen9b-ctx8192-20261008.json": "1d655a2502d272bd277d2a92c26346202c7df720cbaa93071144ef608ca47461",
+    "ollama-qwen9b-release2048-20261008.json": "b0f1bbbb2538ba11290fb9257337d36127d30a02a31d5cdb35d9371398efdcec",
+    "ollama-qwen9b-release8192-20261008.json": "e3d97cff264c6ce46f6957164de2c7d28ea6b62356a4f5f799fbc62fc7a44788",
+    "measure_ollama_workload.py": "bb95daba43bd96ff798b428607a318398068317b8c43b8799167322cdeef0d64",
+    "measure_ollama_release.py": "c138c7b81806022b4616fe8822696a93c609b067825eded9cb8da272ca56060e",
+    "analyze_ollama_calibration.py": "0bf237ae2d96f9d0b0b9644d04a291173e6f6099e508a995826004b42a6a0e85"
+  },
+  "results": [
+    {
+      "context_length": 2048,
+      "prompt_tokens": 24,
+      "output_tokens": 32,
+      "samples": 159,
+      "whole_device_peak_mb": 8030,
+      "resident_vram_bytes": 5420875774,
+      "duration_s": 40.64100000000326,
+      "production_profile": false,
+      "limitation": "short prompt only; not full-context or worst-case peak"
+    },
+    {
+      "context_length": 8192,
+      "prompt_tokens": 24,
+      "output_tokens": 32,
+      "samples": 173,
+      "whole_device_peak_mb": 8310,
+      "resident_vram_bytes": 5729167604,
+      "duration_s": 46.57800000000134,
+      "production_profile": false,
+      "limitation": "short prompt only; not full-context or worst-case peak"
+    }
+  ]
+}
