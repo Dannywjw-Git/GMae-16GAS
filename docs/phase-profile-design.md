@@ -1,6 +1,6 @@
 # 驻留复用与分阶段显存预算：下一阶段设计
 
-状态：分阶段预算尚未实现；只读来源观察已在 PR #11/#12 实现并完成当前 SDXL 实机验收，见 [启动与驻留验证](comfy-startup-residency-validation-2026-10-08.md)。依据：[测量准入](measured-profile-admission-2026-10-08.md)及本阶段真实加载条件试验。不能因该文档存在而宣称暖启动准入或性能提升已完成。
+状态：分阶段预算已按限定 SDXL 双证据实现，正式队列初步验证见 [驻留准入报告](resident-phase-admission-2026-10-08.md)；只读来源观察已在 PR #11/#12 实现并完成当前 SDXL 实机验收，见 [启动与驻留验证](comfy-startup-residency-validation-2026-10-08.md)。依据：[测量准入](measured-profile-admission-2026-10-08.md)及本阶段真实加载条件试验。不能因该文档存在而宣称暖启动准入或性能提升已完成。
 
 ## 必须解决的问题
 

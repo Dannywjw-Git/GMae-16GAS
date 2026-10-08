@@ -136,3 +136,53 @@ def test_formal_queue_uses_measured_override_and_persists_decision(installed, mo
         assert queue._store().get(task['id'])['checkpoint']['budget']['measured_profile']['evidence_sha256']
     finally:
         registry.delete('task_store')
+
+
+@pytest.fixture
+def resident_installed(installed, monkeypatch):
+    raw, cold, root = installed
+    payload = (Path(__file__).resolve().parents[3] / 'docs/evidence/sdxl-observer-resident-512-seed52-20261008.json').read_bytes()
+    resident = json.loads(payload)
+    (root / 'resident.json').write_bytes(payload)
+    target = root / (execution_configuration_fingerprint(raw['workflow']) + '.json')
+    manifest = json.loads(target.read_bytes())
+    manifest.update(resident_raw_file='resident.json',resident_raw_sha256=hashlib.sha256(payload).hexdigest())
+    target.write_text(json.dumps(manifest))
+    source = resident['residency_after']['components'][0]
+    monkeypatch.setattr(profile_admission, 'residency_snapshot',lambda: resident['residency_after'])
+    monkeypatch.setattr(profile_admission, '_live_artifact_identity',lambda env:dict(model_digest=env['model_digest'],file_identity=source['file_identity'],path_sha256=source['path_sha256']))
+    return raw, root, resident
+
+
+def test_opted_in_resident_profile_retains_physical_model_size(resident_installed):
+    raw, _, resident = resident_installed
+    result = profile_admission.measured_budget(raw['workflow'],profile_admission.select_profile(raw['workflow']))
+    assert result['peak_mb'] == 1184
+    assert result['resident_model_mb'] > 5120
+    assert result['memory_scope'] == 'measured_resident_increment'
+    assert result['calibration_workflow_sha256'] == resident['workflow_sha256']
+    assert result['cold_evidence_sha256'] != result['evidence_sha256']
+
+
+def test_missing_observer_falls_back_to_conservative_profile(resident_installed,monkeypatch):
+    raw, _, _ = resident_installed
+    monkeypatch.setattr(profile_admission,'residency_snapshot',lambda:dict(ok=False))
+    result = profile_admission.measured_budget(raw['workflow'],profile_admission.select_profile(raw['workflow']))
+    assert result['peak_mb'] == 9649
+    assert 'resident_fallback_reason' in result
+
+
+def test_warm_evidence_mutation_cannot_replace_accepted_reference(resident_installed):
+    raw, root, _ = resident_installed
+    reference=profile_admission.select_profile(raw['workflow'])
+    (root/'resident.json').write_bytes(b'changed')
+    with pytest.raises(ResourceDenied):
+        profile_admission.measured_budget(raw['workflow'],reference)
+
+
+def test_large_model_conflict_survives_small_increment(resident_installed,monkeypatch):
+    raw, _, _ = resident_installed
+    reference=profile_admission.select_profile(raw['workflow'])
+    monkeypatch.setattr('engine.budget.budget_engine',lambda *a,**k:dict(ok=True,models=[dict(source='comfyui',id='SDXL',vram_gb=1184/1024,decision='ok')],loaded_models=[dict(source='ollama',id='large',vram_gb=6)]))
+    _, item = coordinator._model_budget(coordinator.OperationSpec('generate','comfyui','SDXL',workflow=raw['workflow'],profile_reference=reference))
+    assert item['decision']=='free_L2'

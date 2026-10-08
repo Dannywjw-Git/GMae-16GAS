@@ -11,6 +11,8 @@ from core.workload_profile import (profile_from_evidence, match_profile, workloa
                                    execution_configuration_fingerprint)
 from core.utils import run_args
 from clients.docker_client import _get_docker_cmd
+from core.phase_profile import phase_profile_from_evidence, match_resident_phase
+from clients.comfyui_client import residency_snapshot
 
 _digest_cache = {}
 _digest_lock = threading.Lock()
@@ -38,10 +40,38 @@ def select_profile(workflow):
         profile = profile_from_evidence(payload, manifest['margin_mb'])
         if profile['execution_configuration_sha256'] != profile_key:
             raise ValueError('workflow evidence mismatch')
-        return dict(workflow_sha256=digest, profile_key=profile_key, raw_sha256=manifest['raw_sha256'],
-                    margin_mb=manifest['margin_mb'])
+        reference = dict(workflow_sha256=digest, profile_key=profile_key, raw_sha256=manifest['raw_sha256'],
+                         margin_mb=manifest['margin_mb'])
+        if 'resident_raw_file' in manifest:
+            resident_payload = _resident_payload(manifest)
+            resident = phase_profile_from_evidence(resident_payload, manifest['margin_mb'])
+            if (resident['execution_configuration_sha256'] != profile_key or
+                    resident['environment'] != profile['environment']):
+                raise ValueError('resident profile configuration/environment mismatch')
+            reference['resident_raw_sha256'] = manifest['resident_raw_sha256']
+        return reference
     except Exception as error:
         raise ResourceDenied('PROFILE_UNVERIFIED', '已安装 Profile 证据无效: ' + str(error)) from error
+
+
+
+def _resident_payload(manifest):
+    filename = manifest['resident_raw_file']
+    if not isinstance(filename, str) or Path(filename).name != filename or '/' in filename or '\\' in filename:
+        raise ValueError('resident evidence must be a direct local filename')
+    payload = (_root() / filename).read_bytes()
+    if hashlib.sha256(payload).hexdigest() != manifest['resident_raw_sha256']:
+        raise ValueError('resident evidence digest mismatch')
+    return payload
+
+
+def _live_artifact_identity(environment):
+    path = '/opt/ComfyUI/models/checkpoints/sd_xl_base_1.0.safetensors'
+    script = 'from pathlib import Path;import hashlib,json,sys;p=Path(sys.argv[1]);s=p.stat();print(json.dumps(dict(file_identity=[s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns],path_sha256=hashlib.sha256(str(p.resolve()).encode()).hexdigest())))'
+    rc, output = run_args([_get_docker_cmd(), 'exec', 'comfyui', 'python3', '-c', script, path], 10)
+    if rc:
+        raise ValueError('fresh artifact metadata unavailable')
+    return {**json.loads(output), 'model_digest': environment['model_digest']}
 
 
 def _live_environment(raw):
@@ -107,11 +137,26 @@ def measured_budget(workflow, reference):
         if hashlib.sha256(payload).hexdigest() != current['raw_sha256']:
             raise ValueError('evidence changed during read')
         profile = profile_from_evidence(payload, current['margin_mb'])
-        result = match_profile(profile, workflow, _live_environment(json.loads(payload)))
+        environment = _live_environment(json.loads(payload))
+        result = match_profile(profile, workflow, environment)
         if not result['ok']:
             raise ValueError(result['reason'])
+        if 'resident_raw_sha256' in current:
+            resident = phase_profile_from_evidence(_resident_payload(manifest), current['margin_mb'])
+            snapshot = residency_snapshot()
+            try:
+                if not snapshot.get('ok'):
+                    raise ValueError('fresh residency unavailable')
+                phase = match_resident_phase(resident, snapshot, _live_artifact_identity(environment))
+                result = {**result, **phase, 'cold_evidence_sha256': result['evidence_sha256'],
+                          'peak_mb': phase['increment_mb'],
+                          'memory_scope': 'measured_resident_increment',
+                          'residency_instance': snapshot['backend_instance_id'],
+                          'residency_epoch': snapshot['load_epoch']}
+            except (ValueError, KeyError, TypeError) as error:
+                result = {**result, 'resident_fallback_reason': str(error)}
         return {**result, 'profile_status': 'raw_evidence_and_live_identity_verified',
-                'memory_scope': profile['memory_scope'],
+                'memory_scope': result.get('memory_scope', profile['memory_scope']),
                 'limitations': profile['limitations']}
     except Exception as error:
         raise ResourceDenied('PROFILE_UNVERIFIED', '测量预算无法核验: ' + str(error)) from error

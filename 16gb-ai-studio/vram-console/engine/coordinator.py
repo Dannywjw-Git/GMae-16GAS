@@ -142,6 +142,12 @@ def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[di
         raise ResourceDenied("BUDGET_UNAVAILABLE", result.get("error") or "模型未登记或预算缺失")
     if measured is not None:
         item = {**item, 'measured_profile': measured, 'profile_status': measured['profile_status']}
+        if measured.get('memory_scope') == 'measured_resident_increment':
+            item['resident_model_mb'] = measured['resident_model_mb']
+            item['loaded'] = True
+            item['note'] = '已核验驻留来源；任务增量采用实测增长及余量，执行前重新核验'
+        elif measured.get('resident_fallback_reason'):
+            item['note'] = '驻留复用条件未确认，采用保守整卡测量包络；' + item.get('note', '')
     else:
         item = {**item, 'profile_status': 'registry_estimate_unverified'}
     context_size = spec.ctx if spec.ctx is not None else item.get("default_ctx", 0)
@@ -151,7 +157,10 @@ def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[di
     # Unknown resident profiles cannot prove that a second large model is safe.
     other_residents = [m for m in result.get("loaded_models", [])
                        if (m.get("source"), m.get("id")) != (spec.service, spec.model)]
-    target_large = item.get("vram_gb", 0) >= 5
+    if measured is not None and measured.get('memory_scope') == 'measured_resident_increment':
+        # Complete actual component evidence supersedes historical Comfy filenames.
+        other_residents = [m for m in other_residents if m.get('source') != 'comfyui']
+    target_large = (measured or {}).get('resident_model_mb', 0) >= 5 * 1024 or item.get("vram_gb", 0) >= 5
     conflict = any(m.get("exclusive") or item.get("exclusive") or
                    (target_large and (m.get("vram_gb", 0) >= 5 or m.get("vram_gb", 0) <= 0))
                    for m in other_residents)

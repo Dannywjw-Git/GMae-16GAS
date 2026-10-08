@@ -264,10 +264,12 @@ Object.assign(Pages, {
       if (allowed) {
         const peak = res.budget?.vram_gb;
         const measured = res.budget?.profile_status === 'raw_evidence_and_live_identity_verified';
+        const resident = res.budget?.measured_profile?.memory_scope === 'measured_resident_increment';
+        const scope = resident ? '任务额外显存（含余量）' : (measured ? '测量包络' : '未验证估计');
         const label = res.execution_ready ? (measured ? '测量预算允许执行' : '预算允许执行（尚未实测）') : '可排队，执行前重新准入';
         badge.innerHTML = `<span class="badge badge--${res.execution_ready ? 'success' : 'warning'}">${Utils.escapeHtml(label)}</span>
-          <div>${Utils.escapeHtml(reason)}${peak ? ` · ${measured ? '测量包络' : '未验证估计'} ${Utils.escapeHtml(String(peak))} GiB` : ''}</div>
-          <div class="text-muted">${measured ? '该配置匹配测量证据；执行前重新核验环境与显存。' : '该配置仍使用未验证估计；资源参数变化需要测量证据。'}</div>`;
+          <div>${Utils.escapeHtml(reason)}${peak ? ` · ${scope} ${Utils.escapeHtml(String(peak))} GiB` : ''}</div>
+          <div class="text-muted">${measured ? '该配置匹配测量证据；执行前重新核验环境、驻留状态与显存。' : '该配置仍使用未验证估计；资源参数变化需要测量证据。'}</div>`;
         submitBtn.disabled = false;
       } else {
         badge.innerHTML = `<span class="badge badge--danger">❌ ${Utils.escapeHtml(reason || '显存不足')}</span>`;
