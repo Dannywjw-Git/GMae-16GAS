@@ -2,7 +2,7 @@
 
 ## 2026-10-08：同进程均衡交错 GPU 对照
 
-完整实现及证据提交 `40b30be2d441eb1d8928c1e04554b8b697e4af4c`，见 [Draft PR #14](https://github.com/Dannywjw-Git/GMae-16GAS/pull/14)。其 CI `37740270484`、`37740264886` 运行中（写入时快照）；当前 HEAD 以 PR 检查为准。分支 `feat/interleaved-gpu-benchmark-20261008`，基于 PR #13 HEAD `23be541691c65fbaaf4979c83c78437e825b4282`，其两项 CI `37738752536`、`37738745505` success。实际采集源码 `debebe6031749c4e378c6ab3f94023fee4ff1fe0` 的 CI `37739227759` success；新分析/证据 HEAD 另行核验。
+完整实现及证据提交 `40b30be2d441eb1d8928c1e04554b8b697e4af4c`，见 [Draft PR #14](https://github.com/Dannywjw-Git/GMae-16GAS/pull/14)。该实现提交两项 CI `37740270484`、`37740264886` success；文档提交 `b28c6a326155458d01a334d4d902475b9c0a60cf` 的 CI `37740411954`、`37740407011` 亦 success。后续 HEAD 以 PR 检查为准，不沿用旧结果。分支 `feat/interleaved-gpu-benchmark-20261008`，基于 PR #13 HEAD `23be541691c65fbaaf4979c83c78437e825b4282`，其两项 CI `37738752536`、`37738745505` success。实际采集源码 `debebe6031749c4e378c6ab3f94023fee4ff1fe0` 的 CI `37739227759` success；新分析/证据 HEAD 另行核验。
 
 已实现：一次真实 GPU 0 所有权贯穿 1 次预热及预声明 `C R R C C R R C` 正式序列；每次核验实际策略和完整驻留起点，错误/未知即停止，逐次 raw 和索引摘要保留。独立分析器验证 raw 摘要、种子/实际工作流、配置、冷证据、来源状态、采样时间和计量后汇总，不用模型名猜测性能。
 
