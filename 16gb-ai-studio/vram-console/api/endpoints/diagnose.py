@@ -5,6 +5,7 @@
 - POST /api/diagnose — 执行根因诊断，返回 Top3 根因候选
 - GET  /api/diagnose/rules — 获取所有诊断规则元信息
 """
+from core.logger import log_error
 from api.router import router
 from api.request import Request
 from api.response import Response

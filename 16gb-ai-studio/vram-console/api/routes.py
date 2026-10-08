@@ -40,8 +40,6 @@ class Handler(BaseHTTPRequestHandler):
 
     def _check_auth(self) -> bool:
         """认证检查：Session Cookie 优先，其次 API Token。"""
-        if not auth_mod.has_admin():
-            return True
         cookies = auth_mod.parse_cookie(self.headers.get("Cookie", ""))
         session_id = cookies.get(auth_mod.SESSION_COOKIE_NAME, "")
         if session_id and auth_mod.get_session(session_id):

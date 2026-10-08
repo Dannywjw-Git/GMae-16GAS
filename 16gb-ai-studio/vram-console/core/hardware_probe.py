@@ -15,7 +15,7 @@ import os
 import time
 from dataclasses import dataclass, asdict
 from typing import Optional
-from core.logger import logger
+from core.logger import logger, log_error
 from clients.process_client import process_client
 
 

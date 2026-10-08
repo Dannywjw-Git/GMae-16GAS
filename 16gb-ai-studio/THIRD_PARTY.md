@@ -2,7 +2,7 @@
 
 > 本文件登记 GMae / 16G-AI-Studio 使用、依赖或参考的第三方开源项目。
 > 主许可证：MIT（见 [LICENSE](LICENSE)）。合规规则见 `docs/开源借鉴与许可证合规指南.md`。
-> 最后更新：2026-09-03
+> 最后更新：2026-10-08；具体部署版本、制品 hash 和模型授权清单仍待补齐。
 
 ---
 
@@ -11,25 +11,26 @@
 | 项目 | 版本 | 许可证 | 用途 | 使用方式 |
 |------|------|--------|------|---------|
 | psutil | 7.x | BSD-3-Clause | CPU/内存/磁盘/网络系统信息探测（`core/system_info.py`） | pip 依赖，API 调用 |
-| Python 标准库 | 3.13 | PSF-2.0 | 运行时基础 | 内置 |
+| Python 标准库 | 3.10+（CI: 3.10/3.12） | PSF-2.0 | 运行时基础 | 内置 |
 
 ## 二、开发/测试依赖
 
 | 项目 | 许可证 | 用途 | 使用方式 |
 |------|--------|------|---------|
 | pytest | MIT | 单元测试框架 | 开发依赖 |
+| pyflakes | MIT | 未定义名称检查 | 开发依赖，版本见 requirements-dev.txt |
 | setuptools | MIT | 打包 | 开发依赖 |
 
 ## 三、外部系统组件（独立进程/容器，非 GMae 代码衍生）
 
-> 以下组件以独立容器或外部进程方式被 GMae 调度编排，进程间通过 HTTP/Docker API 交互，**不构成 GMae 的衍生作品**，各自遵循其独立许可证。
+> 以下组件通常以独立容器或外部进程被调度，通过 HTTP/Docker API 交互。各组件须核验其具体版本许可；进程独立不是对所有集成/分发方式的合规结论，GMae 的 MIT 不授予第三方权利。
 
 | 组件 | 许可证 | 用途 |
 |------|--------|------|
-| Docker / Docker Compose | Apache-2.0 | 容器运行时 |
+| Docker Engine / Docker Compose | 按具体组件及版本核验（通常 Apache-2.0） | 容器运行时；Docker Desktop 的订阅许可另行核验 |
 | Ollama | MIT | 本地大模型推理服务 |
 | ComfyUI | GPL-3.0（独立进程，仅 API 调度） | 图像/视频生成工作流引擎 |
-| Open WebUI | MIT（独立容器） | 对话前端 |
+| Open WebUI | 当前为 Open WebUI License，含品牌要求；历史版本核验对应 LICENSE | 对话前端；[官方许可](https://github.com/open-webui/open-webui/blob/main/LICENSE) |
 | NVIDIA driver / nvidia-smi | NVIDIA EULA | GPU 硬件接口（命令行调用） |
 
 ## 四、设计参考项目（学习思路，未复制源码）
@@ -55,6 +56,8 @@
 ---
 
 ## 维护规则
+
+模型权重、GGUF 转换制品及插件必须另列来源、版本/hash、许可证和分发限制。例如 FLUX.1-dev 的权重遵循[模型许可](https://huggingface.co/black-forest-labs/FLUX.1-dev/blob/main/LICENSE.md)，不能由 GMae MIT 或“商业级画质”推断商用授权。当前表格不是完整 SBOM，也不是模型许可清单。
 
 1. 新增任何第三方依赖或参考项目时，必须在本文件登记一行。
 2. 从 MIT/Apache/BSD 项目**复制源码**时，在被复制文件顶部保留原版权头（模板见合规指南第三节）。

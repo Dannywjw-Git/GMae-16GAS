@@ -19,18 +19,27 @@ def query_gpu_memory() -> dict:
     """
     rc, out = run_args([
         "nvidia-smi",
+        "--id=0",
         "--query-gpu=memory.total,memory.used,memory.free,utilization.gpu",
         "--format=csv,noheader,nounits"
     ], 10)
     if rc != 0:
         return {"ok": False, "error": out[:200]}
-    parts = [x.strip() for x in out.strip().split(",")]
-    util = int(parts[3]) if len(parts) > 3 and parts[3].isdigit() else 0
+    # This controller manages GPU 0 only; multi-GPU scheduling is not implemented.
+    try:
+        parts = [x.strip() for x in out.strip().split(",")]
+        if len(parts) != 4:
+            raise ValueError("expected exactly one GPU memory record")
+        total, used, free, util = (int(p) for p in parts)
+        if total <= 0 or not (0 <= used <= total and 0 <= free <= total and 0 <= util <= 100):
+            raise ValueError("invalid GPU counters")
+    except (TypeError, ValueError):
+        return {"ok": False, "error": "invalid or unsupported nvidia-smi GPU memory record"}
     return {
         "ok": True,
-        "total_mb": int(parts[0]),
-        "used_mb": int(parts[1]),
-        "free_mb": int(parts[2]),
+        "total_mb": total,
+        "used_mb": used,
+        "free_mb": free,
         "utilization": util,
     }
 

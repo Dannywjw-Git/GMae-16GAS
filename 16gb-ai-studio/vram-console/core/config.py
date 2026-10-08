@@ -13,7 +13,7 @@ from .logger import log_event, log_error
 
 # === 服务配置 ===
 PORT = int(os.environ.get("VRAM_CONSOLE_PORT", "8787"))
-HOST = os.environ.get("VRAM_CONSOLE_HOST", "0.0.0.0")
+HOST = os.environ.get("VRAM_CONSOLE_HOST", "127.0.0.1")
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # === 前端版本控制 ===

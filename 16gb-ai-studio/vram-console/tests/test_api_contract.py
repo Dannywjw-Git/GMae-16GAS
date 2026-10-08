@@ -5,31 +5,48 @@ import os
 import sys
 import json
 import unittest
+from unittest.mock import patch, MagicMock
+from types import SimpleNamespace
+from api.route_helpers import health_check, registry_view
+
+
+class OfflineContractCase(unittest.TestCase):
+    def setUp(self):
+        patches = [
+            patch("api.route_helpers.urllib.request.urlopen", return_value=MagicMock()),
+            patch("api.route_helpers.gpu_status", return_value={"ok": True, "total_mb": 16384, "used_mb": 1024, "free_mb": 15360}),
+            patch("engine.budget.gpu_status", return_value={"ok": True, "total_mb": 16384, "used_mb": 1024, "free_mb": 15360}),
+            patch("engine.budget.gpu_processes", return_value={"ok": True, "known_total_mb": 0}),
+            patch("services.ollama.ollama_ps", return_value={"ok": True, "models": []}),
+            patch("services.comfy.comfy_loaded_models", return_value={"ok": True, "models": []}),
+            patch("services.scene.ollama_tags", return_value=set()),
+            patch("services.scene._comfy_installed_files", return_value=set()),
+        ]
+        for item in patches:
+            item.start()
+            self.addCleanup(item.stop)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
-class TestHealthContract(unittest.TestCase):
+class TestHealthContract(OfflineContractCase):
     """/api/health 返回结构契约"""
 
     @classmethod
     def setUpClass(cls):
         import server
-        cls.server = server
+        cls.server = SimpleNamespace(**vars(server), health_check=health_check, registry_view=registry_view)
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_health_returns_dict(self):
         result = self.server.health_check()
         self.assertIsInstance(result, dict, "health_check 应返回 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_health_has_required_fields(self):
         result = self.server.health_check()
         required = ["ok", "ts", "services"]
         for field in required:
             self.assertIn(field, result, f"health_check 缺少字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_health_services_structure(self):
         result = self.server.health_check()
         services = result.get("services", {})
@@ -40,26 +57,23 @@ class TestHealthContract(unittest.TestCase):
         self.assertIn("free_mb", gpu, "gpu 状态应包含 free_mb")
         self.assertIn("total_mb", gpu, "gpu 状态应包含 total_mb")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_health_ok_is_bool(self):
         result = self.server.health_check()
         self.assertIsInstance(result["ok"], bool, "health ok 应为布尔值")
 
 
-class TestRegistryViewContract(unittest.TestCase):
+class TestRegistryViewContract(OfflineContractCase):
     """/api/registry 返回结构契约"""
 
     @classmethod
     def setUpClass(cls):
         import server
-        cls.server = server
+        cls.server = SimpleNamespace(**vars(server), health_check=health_check, registry_view=registry_view)
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_returns_dict(self):
         result = self.server.registry_view()
         self.assertIsInstance(result, dict, "registry_view 应返回 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_has_required_fields(self):
         result = self.server.registry_view()
         required = ["ok", "ollama_models", "ollama_combos", "comfyui_models",
@@ -67,7 +81,6 @@ class TestRegistryViewContract(unittest.TestCase):
         for field in required:
             self.assertIn(field, result, f"registry_view 缺少字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_ollama_models_structure(self):
         result = self.server.registry_view()
         models = result.get("ollama_models", [])
@@ -79,7 +92,6 @@ class TestRegistryViewContract(unittest.TestCase):
             for field in core_fields:
                 self.assertIn(field, m, f"ollama 模型缺少核心字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_comfyui_models_structure(self):
         result = self.server.registry_view()
         models = result.get("comfyui_models", [])
@@ -90,12 +102,10 @@ class TestRegistryViewContract(unittest.TestCase):
             for field in core_fields:
                 self.assertIn(field, m, f"comfyui 模型缺少核心字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_scenes_is_dict(self):
         result = self.server.registry_view()
         self.assertIsInstance(result.get("scenes"), dict, "scenes 应为 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_registry_view_gpu_guard_structure(self):
         result = self.server.registry_view()
         guard = result.get("gpu_guard", {})
@@ -103,27 +113,24 @@ class TestRegistryViewContract(unittest.TestCase):
         self.assertIn("protect", guard, "gpu_guard 应包含 protect")
 
 
-class TestBudgetEngineContract(unittest.TestCase):
+class TestBudgetEngineContract(OfflineContractCase):
     """/api/budget 返回结构契约"""
 
     @classmethod
     def setUpClass(cls):
         import server
-        cls.server = server
+        cls.server = SimpleNamespace(**vars(server), health_check=health_check, registry_view=registry_view)
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_budget_engine_returns_dict(self):
         result = self.server.budget_engine()
         self.assertIsInstance(result, dict, "budget_engine 应返回 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_budget_engine_has_required_fields(self):
         result = self.server.budget_engine()
         required = ["ok", "total_gb", "used_gb", "avail_gb", "models"]
         for field in required:
             self.assertIn(field, result, f"budget_engine 缺少字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_budget_engine_gpu_structure(self):
         result = self.server.budget_engine()
         # budget_engine 顶层直接返回显存字段（GB），而非嵌套 gpu 对象
@@ -133,7 +140,6 @@ class TestBudgetEngineContract(unittest.TestCase):
         self.assertIsInstance(result["total_gb"], (int, float), "total_gb 应为数字")
         self.assertGreater(result["total_gb"], 0, "total_gb 应大于 0")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_budget_engine_models_decision(self):
         result = self.server.budget_engine()
         models = result.get("models", [])
@@ -149,27 +155,24 @@ class TestBudgetEngineContract(unittest.TestCase):
             self.assertIn("note", m, "预算模型应包含 note")
 
 
-class TestQueueSnapshotContract(unittest.TestCase):
+class TestQueueSnapshotContract(OfflineContractCase):
     """/api/queue 返回结构契约"""
 
     @classmethod
     def setUpClass(cls):
         import server
-        cls.server = server
+        cls.server = SimpleNamespace(**vars(server), health_check=health_check, registry_view=registry_view)
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_queue_snapshot_returns_dict(self):
         result = self.server.queue_snapshot()
         self.assertIsInstance(result, dict, "queue_snapshot 应返回 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_queue_snapshot_has_required_fields(self):
         result = self.server.queue_snapshot()
         required = ["ok", "queue", "tasks", "worker_alive", "client_id"]
         for field in required:
             self.assertIn(field, result, f"queue_snapshot 缺少字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_queue_snapshot_tasks_structure(self):
         result = self.server.queue_snapshot()
         tasks = result.get("tasks", [])
@@ -184,69 +187,60 @@ class TestQueueSnapshotContract(unittest.TestCase):
             self.assertIn("created", t, "任务应包含 created")
 
 
-class TestAuthStatusContract(unittest.TestCase):
+class TestAuthStatusContract(OfflineContractCase):
     """/api/auth/status 返回结构契约"""
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_auth_status_returns_dict(self):
-        import auth
+        from api import auth
         result = auth.auth_status()
         self.assertIsInstance(result, dict, "auth_status 应返回 dict")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_auth_status_has_required_fields(self):
-        import auth
+        from api import auth
         result = auth.auth_status()
         required = ["has_admin", "admin_email", "smtp_configured", "smtp_user", "active_sessions"]
         for field in required:
             self.assertIn(field, result, f"auth_status 缺少字段: {field}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_auth_status_has_admin_is_bool(self):
-        import auth
+        from api import auth
         result = auth.auth_status()
         self.assertIsInstance(result["has_admin"], bool, "has_admin 应为布尔值")
         self.assertIsInstance(result["smtp_configured"], bool, "smtp_configured 应为布尔值")
         self.assertIsInstance(result["active_sessions"], int, "active_sessions 应为整数")
 
 
-class TestSafeModelName(unittest.TestCase):
+class TestSafeModelName(OfflineContractCase):
     """模型名安全校验测试（防注入）"""
 
     @classmethod
     def setUpClass(cls):
         import server
-        cls.server = server
+        cls.server = SimpleNamespace(**vars(server), health_check=health_check, registry_view=registry_view)
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_normal(self):
         """正常模型名应通过校验"""
         ok, name = self.server._safe_model_name("qwen3.5:9b")
         self.assertTrue(ok, f"正常模型名应通过: {name}")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_with_path(self):
         """包含路径穿越的模型名应被拒绝"""
         ok, name = self.server._safe_model_name("../../../etc/passwd")
         self.assertFalse(ok, "路径穿越应被拒绝")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_with_shell(self):
         """包含 shell 元字符的模型名应被拒绝"""
         ok, name = self.server._safe_model_name("test; rm -rf /")
         self.assertFalse(ok, "shell 元字符应被拒绝")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_with_pipe(self):
         ok, name = self.server._safe_model_name("test | cat /etc/passwd")
         self.assertFalse(ok, "管道符应被拒绝")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_with_backtick(self):
         ok, name = self.server._safe_model_name("test`whoami`")
         self.assertFalse(ok, "反引号应被拒绝")
 
-    @unittest.skip("重构后 server.py 函数已移至 api/endpoints/，待重写")
     def test_safe_model_name_empty(self):
         ok, name = self.server._safe_model_name("")
         self.assertFalse(ok, "空模型名应被拒绝")

@@ -154,23 +154,28 @@ def _queue_wait(prompt_id, task, timeout=3600):
 def _run_task(task):
     """执行单个任务：预检 → 释放 → 提交 → 等待完成。"""
     try:
+        if task.get("cancel_requested"):
+            task["status"] = "canceled"
+            return
         task["status"] = "precheck"
         m = next((x for x in REGISTRY.get("comfyui", {}).get("models", []) if x["id"] == task["model"]), None)
-        if m:
-            dec = None
-            for bm in budget_engine().get("models", []):
-                if bm["id"] == task["model"]:
-                    dec = bm
-                    break
-            if dec and dec["decision"] == "reject":
-                task["status"] = "failed"
-                task["error"] = "预检拒绝：%s" % dec["note"]
-                return
-            if dec and dec["decision"].startswith("free"):
-                task["status"] = "freeing"
-                task["progress"] = "释放 L1/L2 显存…"
-                gpu_guard_evict()
-                time.sleep(2)
+        if not m:
+            raise ConfigError("模型未登记，拒绝执行")
+        budget = budget_engine(force_refresh=True)
+        dec = next((bm for bm in budget.get("models", []) if bm["id"] == task["model"]), None)
+        if not budget.get("ok") or not dec or dec["decision"] == "reject":
+            raise ConfigError("预检拒绝：%s" % (budget.get("error") or (dec or {}).get("note", "模型预算缺失")))
+        if dec["decision"].startswith("free"):
+            from engine.reaper import service_activity
+            activity = service_activity().get("services", {})
+            if any(s.get("busy") for s in activity.values()):
+                raise ConfigError("受管服务正在执行任务，拒绝自动释放")
+            task["status"] = "freeing"
+            task["progress"] = "释放 L1/L2 显存并重新核验…"
+            release = gpu_guard_evict()
+            if not release.get("ok"):
+                raise ConfigError("显存释放失败，拒绝提交")
+            time.sleep(2)
         try:
             wf = _load_workflow(task["workflow"])
         except ConfigError as e:
@@ -182,6 +187,14 @@ def _run_task(task):
             task["error"] = "模板读取失败"
             return
         wf = _apply_params(wf, task["params"])
+        if task.get("cancel_requested"):
+            task["status"] = "canceled"
+            return
+        # Do not treat release success or cached telemetry as proof of admission.
+        budget = budget_engine(force_refresh=True)
+        dec = next((bm for bm in budget.get("models", []) if bm["id"] == task["model"]), None)
+        if not budget.get("ok") or not dec or dec["decision"] != "ok":
+            raise ConfigError("提交前核验失败：显存未释放到预算要求或遥测不可用")
         task["status"] = "running"
         task["started"] = int(time.time())
         pid, err = _queue_submit_comfy(wf)

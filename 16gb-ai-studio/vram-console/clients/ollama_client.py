@@ -41,8 +41,12 @@ def list_loaded_models() -> dict:
     if not ok:
         return {"ok": False, "models": [], "error": "offline/timeout"}
     models = [{
-        "name": m.get("name", ""),
-        "size_gb": round(m.get("size", 0) / 1e9, 1),
+        "name": m.get("name") or m.get("model", ""),
+        "model": m.get("model") or m.get("name", ""),
+        # Keep the legacy field name, but use GPU-resident GiB, not CPU+GPU size.
+        "size_gb": m.get("size_vram", 0) / (1024 ** 3),
+        "total_size_gb": m.get("size", 0) / (1024 ** 3),
+        "vram_known": "size_vram" in m,
         "until": (m.get("expires_at") or "")[11:19],
     } for m in d.get("models", [])]
     return {"ok": True, "models": models}

@@ -4,6 +4,7 @@
 GPU Maestro 看门狗 - 监控 server.py 进程，崩溃后自动重启
 用法：pythonw watchdog.py （无窗口后台运行）
 """
+import logging
 import subprocess
 import time
 import os
@@ -27,12 +28,12 @@ def log(msg: str) -> None:
     try:
         print(line, flush=True)
     except Exception as e:
-        log_error("exception_suppressed", error=e, context="watchdog.py:29")
+        logging.getLogger(__name__).exception("Exception in watchdog.py:29")
     try:
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(line + "\n")
     except Exception as e:
-        log_error("exception_suppressed", error=e, context="watchdog.py:34")
+        logging.getLogger(__name__).exception("Exception in watchdog.py:34")
 
 def _port_open() -> bool:
     """探测1：端口连通性（TCP 连接，检测端口是否在监听）"""

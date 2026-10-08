@@ -6,6 +6,7 @@ logs/
 
 # === 临时文件 ===
 _*
+!__init__.py
 _tmp/
 _temp/
 *.tmp
