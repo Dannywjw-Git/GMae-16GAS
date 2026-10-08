@@ -85,7 +85,7 @@ def _record_qos_transition(old_level: str, new_level: str, free_mb: int, reason:
         pass  # 事件记录失败不影响 QoS 功能
 
 
-def qos_check():
+def qos_check(allow_actions: bool = True):
     """QoS 检查：按显存水位分级，危急时触发自动防死机。"""
     from services.helper import _auto_protect_cfg
     if not QOS_CFG["enabled"]:
@@ -103,7 +103,7 @@ def qos_check():
     now = time.time()
     old_level = _qos_state.get("level", "ok")
     if free_mb < QOS_CFG["emergency_threshold_mb"]:
-        auto_result = _auto_protect_run(free_mb)
+        auto_result = _auto_protect_run(free_mb) if allow_actions else None
         if auto_result and auto_result.get("ok", True):
             result = {"level": "emergency", "free_mb": free_mb, "free_gb": round(free_mb / 1024, 1),
                       "actions": auto_result.get("actions", []),

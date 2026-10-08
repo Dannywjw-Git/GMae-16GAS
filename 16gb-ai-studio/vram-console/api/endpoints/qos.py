@@ -29,7 +29,7 @@ def get_qos_status(req: Request) -> Response:
 @router.get("/api/qos/check")
 def get_qos_check(req: Request) -> Response:
     """执行一次 QoS 检查，返回建议动作。"""
-    return Response.success(qos_check())
+    return Response.success(qos_check(allow_actions=False))
 
 
 @router.post("/api/qos/execute")
