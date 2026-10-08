@@ -119,3 +119,10 @@ def test_comfy_catalog_rejects_graph_outside_registered_template(installed):
     sampler['inputs']['sampler_name'] = 'unregistered-sampler'
     with pytest.raises(ValueError, match='registered template'):
         measured_presets._comfy_intent(workflow)
+
+
+def test_catalog_requires_registered_ollama_model(installed, monkeypatch):
+    from engine import queue
+    monkeypatch.setattr(queue, 'REGISTRY', {'ollama': {'models': []}})
+    catalog = measured_presets.public_catalog()
+    assert catalog['presets'] == [] and catalog['rejected_count'] == 1

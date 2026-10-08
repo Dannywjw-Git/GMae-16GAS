@@ -5,6 +5,7 @@ No GPU access, backend calls, or model loading occurs during discovery.
 """
 import json
 import re
+from pathlib import Path
 from engine.profile_admission import _root, select_profile
 from core.workload_profile import profile_from_evidence, execution_configuration_fingerprint
 
@@ -57,12 +58,14 @@ def installed_presets():
             manifest = json.loads(path.read_bytes())
             filename = manifest['raw_file']
             if (not isinstance(filename, str) or '/' in filename or '\\' in filename
+                    or ':' in filename or Path(filename).name != filename
                     or filename in ('', '.', '..')):
                 raise ValueError('invalid evidence filename')
             payload = (root / filename).read_bytes()
             raw = json.loads(payload)
             if raw.get('kind') == 'real_ollama_calibration':
-                request = raw['request']
+                from engine.queue import _validate_ollama_request
+                request = _validate_ollama_request(raw['request'])
                 intent = dict(source='ollama', model=request['model'], request=request,
                     context_length=request['options']['num_ctx'],
                     prompt_tokens=raw['response_metrics']['prompt_eval_count'],
