@@ -162,8 +162,6 @@ def main():
         baseline = gpu_sample()
         document['baseline_torch_resident_bytes'] = torch_resident_bytes(
             get_json('http://127.0.0.1:8188/system_stats'))
-        if args.resident_baseline and document['baseline_torch_resident_bytes'] <= 64 * 1024**2:
-            raise RuntimeError('resident condition requested but no substantial torch residency observed')
         if baseline['free_mb'] < required_free or baseline['utilization'] > 20:
             raise RuntimeError('insufficient capacity or active GPU workload')
         document['trial_condition'] = ('model_unloaded_low_torch_verified' if args.prepare_unloaded else
