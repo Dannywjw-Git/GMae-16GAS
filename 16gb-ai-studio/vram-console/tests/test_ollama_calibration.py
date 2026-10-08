@@ -139,3 +139,35 @@ def test_ollama_profile_cannot_authorize_different_coordinator_context():
     with pytest.raises(ResourceDenied,match='请求'):
         _model_budget(OperationSpec('generate','ollama',calibration.MODEL,8192,
             workflow=calibration.request_for(2048),profile_reference=dict(fake=True)))
+
+
+def test_ollama_profile_cannot_authorize_comfyui_operation():
+    from engine.coordinator import OperationSpec,_model_budget
+    from core.resource_coordinator import ResourceDenied
+    with pytest.raises(ResourceDenied,match='跨服务'):
+        _model_budget(OperationSpec('generate','comfyui','SDXL',
+            workflow=calibration.request_for(2048),profile_reference=dict(fake=True)))
+
+
+def test_completed_generation_may_stop_before_maximum_output():
+    from core.ollama_profile import analyze
+    raw=example_raw();raw['response_metrics']['eval_count']=24
+    assert analyze(raw)['output_tokens']==24
+    raw['response_metrics']['eval_count']=33
+    with pytest.raises(ValueError): analyze(raw)
+
+
+@pytest.mark.parametrize('change',[
+    lambda raw: raw['admission']['budget']['measured_profile'].update(profile_status='estimate'),
+    lambda raw: raw['request'].update(prompt='a different request'),
+    lambda raw: raw['profile_reference'].update(raw_sha256='0'*64),
+])
+def test_archived_profiled_trial_rejects_changed_admission_or_reference(change):
+    import json
+    from core.ollama_profile import analyze_profiled
+    directory=ROOT/'docs/evidence/ollama-long-profile-20261008'
+    payload=(directory/'ollama-qwen9b-long8192-20261008.json').read_bytes()
+    raw=json.loads((directory/'ollama-qwen9b-profiled8192-20261008.json').read_bytes())
+    assert analyze_profiled(raw,payload)['admission_peak_mb']==8833
+    change(raw)
+    with pytest.raises(ValueError): analyze_profiled(raw,payload)

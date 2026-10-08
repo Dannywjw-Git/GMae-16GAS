@@ -1,0 +1,38 @@
+{
+  "calibrations": [
+    {
+      "context_length": 2048,
+      "prompt_tokens": 1574,
+      "output_tokens": 22,
+      "samples": 147,
+      "whole_device_peak_mb": 8018,
+      "resident_vram_bytes": 5420875774,
+      "duration_s": 37.92199999999866,
+      "production_profile": false,
+      "limitation": "long synthetic prompt; not full-context or worst-case peak"
+    },
+    {
+      "context_length": 8192,
+      "prompt_tokens": 6182,
+      "output_tokens": 24,
+      "samples": 152,
+      "whole_device_peak_mb": 8321,
+      "resident_vram_bytes": 5729167604,
+      "duration_s": 39.25,
+      "production_profile": false,
+      "limitation": "long synthetic prompt; not full-context or worst-case peak"
+    }
+  ],
+  "profiled": {
+    "context_length": 8192,
+    "prompt_tokens": 6182,
+    "output_tokens": 24,
+    "samples": 343,
+    "whole_device_peak_mb": 8319,
+    "resident_vram_bytes": 5729167604,
+    "duration_s": 88.73399999999674,
+    "production_profile": true,
+    "limitation": "exact request admission only; not arbitrary conversation or full-context safety",
+    "admission_peak_mb": 8833
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "source_commits": {
+    "1605095": "16050959547ca244700b8ec286e42049dd694ab5",
+    "5d40103": "5d40103739602848403960386247a547877f09a1",
+    "39c6672": "39c66721884de774f8895975e905fed53efd94fc"
+  },
+  "files": {
+    "collector-long2048.py": "29fdcaf249c636cf919e1aeacf84b72b0a7793cc5fdf71a6d6fe11651c3ba6ec",
+    "collector-long8192.py": "e7d97b7c7a15c8b6db2f49a389853faba33f42fac38b85f2336dda71a10b57b2",
+    "ollama-qwen9b-long2048-20261008.json": "77b8149313c06694d061cddbccc6a88e490e5c70fe6ea10fcb28eba37d6cd96c",
+    "ollama-qwen9b-long8192-20261008.json": "169728e2b4b790d23a6a800add4d70bfffbab4e6ead8fedea3a2707b59eb6a51",
+    "ollama-qwen9b-profiled8192-20261008.json": "8f618a80beffddf7abf4a3e2555d3ab62b63d4d61eb87a4094fe2783f9711c5e",
+    "ollama-qwen9b-release-long2048-20261008.json": "f7e00bd1dc9977d2c19cf70c7ce3b9e13735846181651ac5ee039df40f534371",
+    "ollama-qwen9b-release-long8192-20261008.json": "1aa7fd3ca6b22d48414e8a0bb59ea9b81caed6ead7f387957bb40599f4465e39",
+    "ollama-qwen9b-release-profiled8192-20261008.json": "8a1126dcf83d65969bddffc4d8410b5cac477b05ecebef19ea3a1a753079d46b",
+    "profiled-trial.py": "a63800c0a15bb4aed8fc65b34d1e4e5370b7d10500f462726bc95b9e4e82474b",
+    "summary.json": "c6a10768354f1412d6b5e04eb0853ddf088e65112360f6ae3841f440d6c69170",
+    "verifier.py": "4b328fa5f2a7568a597555fdc398597ab2fa6502468394f6237964241dad3c2f"
+  },
+  "profile_key": "3f71ce273ef8f6b1b0523ecb886a914bb4d7bb6dc790c13e988cbc9db2eb650a",
+  "public_calibration_sha256": "169728e2b4b790d23a6a800add4d70bfffbab4e6ead8fedea3a2707b59eb6a51",
+  "limitations": [
+    "single trial per condition",
+    "full-context not tested",
+    "exact request only",
+    "not a mixed workload throughput comparison"
+  ]
+}

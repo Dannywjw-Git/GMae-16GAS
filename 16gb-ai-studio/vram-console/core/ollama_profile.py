@@ -38,6 +38,8 @@ def analyze(raw):
         peaks.append(max(sample['used_mb'], sample['total_mb'] - sample['free_mb']))
     if not peaks or max(peaks) != raw['observed_whole_device_peak_mb']:
         raise ValueError('peak mismatch')
+    if type(raw.get('duration_s')) not in (int,float) or not math.isfinite(raw['duration_s']) or raw['duration_s']<=0:
+        raise ValueError('invalid duration')
     return dict(context_length=ctx, prompt_tokens=metrics['prompt_eval_count'],
                 output_tokens=metrics['eval_count'], samples=len(samples),
                 whole_device_peak_mb=max(peaks), resident_vram_bytes=residents[0]['size_vram'],
@@ -87,5 +89,31 @@ def profile_from_evidence(raw_bytes,margin_mb):
     if not match_profile(profile,raw['request'],environment)['ok']:
         raise ValueError('invalid envelope')
     return profile
+
+
+def analyze_profiled(raw,calibration_bytes):
+    """Verify ordinary measured admission against the referenced public raw."""
+    if raw.get('kind')!='real_ollama_profiled_trial':
+        raise ValueError('wrong trial kind')
+    reference=raw['profile_reference'];profile=profile_from_evidence(calibration_bytes,reference['margin_mb'])
+    request=raw['request'];digest=workload_fingerprint(request)
+    if (reference['raw_sha256']!=profile['evidence']['raw_data_sha256']
+            or reference['workflow_sha256']!=digest or reference['profile_key']!=digest):
+        raise ValueError('trial reference mismatch')
+    expected=match_profile(profile,request,profile['environment'])
+    admission=raw['admission'];measured=admission['budget']['measured_profile']
+    if (not expected['ok'] or admission['service']!='ollama' or admission['operation']!='generate'
+            or admission['model']!=request['model'] or admission['peak_mb']!=expected['peak_mb']
+            or measured['peak_mb']!=expected['peak_mb']
+            or measured['evidence_sha256']!=reference['raw_sha256']
+            or measured['profile_status']!='raw_evidence_and_live_identity_verified'
+            or measured['match_policy']!='exact'):
+        raise ValueError('ordinary measured admission not verified')
+    calibration=json.loads(calibration_bytes)
+    combined={**calibration,**{key:raw[key] for key in ('request','baseline','samples','sampling_errors',
+        'sampler_stopped','status','resident_after','response_metrics','duration_s','observed_whole_device_peak_mb')}}
+    summary=analyze(combined)
+    return {**summary,'admission_peak_mb':expected['peak_mb'],'production_profile':True,
+            'limitation':'exact request admission only; not arbitrary conversation or full-context safety'}
 
 

@@ -1,0 +1,1190 @@
+{
+  "kind": "real_ollama_calibration",
+  "recorded_at": "2026-10-08T07:19:58.581244+00:00",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "Read the following notes and summarize their common point in one sentence.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\n\nIn one short sentence, explain why GPU memory scheduling matters.",
+    "think": false,
+    "stream": false,
+    "keep_alive": "30m",
+    "options": {
+      "num_ctx": 8192,
+      "num_predict": 32,
+      "temperature": 0,
+      "seed": 20261008
+    }
+  },
+  "reserve_mb": 2560,
+  "production_profile_installed": false,
+  "samples": [
+    {
+      "monotonic_s": 49903.406,
+      "total_mb": 16380,
+      "used_mb": 1411,
+      "free_mb": 14697,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49903.656,
+      "total_mb": 16380,
+      "used_mb": 1411,
+      "free_mb": 14697,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49903.921,
+      "total_mb": 16380,
+      "used_mb": 1411,
+      "free_mb": 14697,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49904.171,
+      "total_mb": 16380,
+      "used_mb": 1411,
+      "free_mb": 14697,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49904.421,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49904.687,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49904.937,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49905.187,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49905.453,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49905.718,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49905.984,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49906.218,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49906.484,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49906.75,
+      "total_mb": 16380,
+      "used_mb": 1418,
+      "free_mb": 14690,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49907.0,
+      "total_mb": 16380,
+      "used_mb": 1418,
+      "free_mb": 14690,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49907.265,
+      "total_mb": 16380,
+      "used_mb": 1410,
+      "free_mb": 14698,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49907.515,
+      "total_mb": 16380,
+      "used_mb": 1418,
+      "free_mb": 14690,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49907.765,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49908.031,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 25
+    },
+    {
+      "monotonic_s": 49908.265,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 25
+    },
+    {
+      "monotonic_s": 49908.515,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49908.765,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49909.031,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49909.265,
+      "total_mb": 16380,
+      "used_mb": 1529,
+      "free_mb": 14579,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49909.515,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 91
+    },
+    {
+      "monotonic_s": 49909.765,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 91
+    },
+    {
+      "monotonic_s": 49910.031,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49910.281,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49910.531,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49910.781,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49911.046,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49911.296,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49911.546,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49911.796,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49912.046,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49912.296,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49912.546,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49912.796,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49913.062,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49913.328,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49913.593,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49913.859,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49914.109,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49914.359,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49914.609,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49914.859,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49915.109,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 49915.39,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 6
+    },
+    {
+      "monotonic_s": 49915.656,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49915.906,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49916.171,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49916.421,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49916.687,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49916.953,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49917.203,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49917.468,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49917.734,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49918.0,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49918.265,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49918.531,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49918.812,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49919.078,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49919.328,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49919.562,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49919.812,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49920.078,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 49920.328,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 49920.578,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49920.843,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49921.109,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49921.375,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49921.64,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49921.89,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49922.156,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49922.421,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49922.687,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49922.953,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49923.218,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49923.484,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49923.734,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49924.0,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49924.265,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49924.531,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49924.796,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49925.062,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49925.328,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49925.593,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49925.859,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49926.125,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49926.375,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49926.64,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49926.89,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49927.156,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49927.406,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49927.671,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49927.937,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49928.203,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49928.453,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49928.718,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49928.984,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49929.234,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49929.484,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49929.75,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49930.015,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49930.265,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49930.531,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49930.796,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49931.062,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49931.328,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49931.578,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49931.843,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49932.109,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49932.406,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49932.656,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49932.906,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49933.171,
+      "total_mb": 16380,
+      "used_mb": 6247,
+      "free_mb": 9861,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49933.437,
+      "total_mb": 16380,
+      "used_mb": 6555,
+      "free_mb": 9553,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49933.718,
+      "total_mb": 16380,
+      "used_mb": 6765,
+      "free_mb": 9343,
+      "utilization": 75
+    },
+    {
+      "monotonic_s": 49933.968,
+      "total_mb": 16380,
+      "used_mb": 6765,
+      "free_mb": 9343,
+      "utilization": 75
+    },
+    {
+      "monotonic_s": 49934.218,
+      "total_mb": 16380,
+      "used_mb": 6765,
+      "free_mb": 9343,
+      "utilization": 48
+    },
+    {
+      "monotonic_s": 49934.484,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 48
+    },
+    {
+      "monotonic_s": 49934.75,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 21
+    },
+    {
+      "monotonic_s": 49934.984,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 21
+    },
+    {
+      "monotonic_s": 49935.25,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49935.515,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49935.765,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49936.015,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49936.281,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49936.531,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49936.781,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49937.031,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49937.281,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49937.531,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49937.781,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49938.046,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49938.296,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49938.562,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49938.828,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49939.093,
+      "total_mb": 16380,
+      "used_mb": 7779,
+      "free_mb": 8329,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49939.343,
+      "total_mb": 16380,
+      "used_mb": 8037,
+      "free_mb": 8071,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49939.593,
+      "total_mb": 16380,
+      "used_mb": 8037,
+      "free_mb": 8071,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49939.89,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49940.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49940.406,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49940.656,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 99
+    },
+    {
+      "monotonic_s": 49940.906,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 99
+    },
+    {
+      "monotonic_s": 49941.156,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49941.39,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49941.687,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49941.953,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 100
+    },
+    {
+      "monotonic_s": 49942.218,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 85
+    },
+    {
+      "monotonic_s": 49942.468,
+      "total_mb": 16380,
+      "used_mb": 8049,
+      "free_mb": 8059,
+      "utilization": 85
+    }
+  ],
+  "sampling_errors": [],
+  "prompt_kind": "long",
+  "model_artifact": {
+    "name": "qwen3.5:9b",
+    "size": 6594463106,
+    "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7"
+  },
+  "backend_version": "0.33.0",
+  "artifact_identity": {
+    "container_id": "fb84bdf762a0532ef3006111961474067ea1635e201a36787a55c4ff8b7965da",
+    "blob_sha256": "dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c",
+    "blob_stat": "72:562949953472668:6594462816:1787961034:1787961034",
+    "blob_path_sha256": "69cfc3ff867585db3c24ea0cc2d9bedd2f357bcb2e83084185bfc4be11b0a81a",
+    "model_details": {
+      "parent_model": "sha256-dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "9.7B",
+      "quantization_level": "Q4_K_M"
+    },
+    "model_configuration_sha256": "caee75c2a3ef2a2bd2d352bad31a2a74bdeef7c3ed9e8fc92ae378e26112c5fe"
+  },
+  "gpu_identity": {
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "driver": "591.86",
+    "uuid_sha256": "144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9"
+  },
+  "container_backend_version": "ollama version is 0.33.0",
+  "planning_peak_mb": 10107,
+  "planning_basis": "file_size_times_1.2_plus_2560MiB_unverified",
+  "preparation": {
+    "condition": "model_unloaded_low_torch_verified",
+    "duration_s": 1.889999999999418,
+    "managed_release": {
+      "ok": true,
+      "http": 200,
+      "free_mb_before": 14704,
+      "free_mb_after": 14697,
+      "freed_mb": 0
+    },
+    "readings": [
+      {
+        "gpu": {
+          "monotonic_s": 49903.125,
+          "total_mb": 16380,
+          "used_mb": 1411,
+          "free_mb": 14697,
+          "utilization": 0
+        },
+        "torch_resident_bytes": 8519680
+      }
+    ],
+    "limitation": "low torch occupancy does not prove CPU/disk caches cold"
+  },
+  "baseline": {
+    "monotonic_s": 49903.359,
+    "total_mb": 16380,
+    "used_mb": 1411,
+    "free_mb": 14697,
+    "utilization": 0
+  },
+  "response_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 36059706265,
+    "load_duration": 33212270729,
+    "prompt_eval_count": 6182,
+    "prompt_eval_duration": 2271976000,
+    "eval_count": 24,
+    "eval_duration": 540872000
+  },
+  "output_sha256": "bb3b922ec067a4b3b58d5ea9826f2109df9b52c95a88211e3f0b66ae7b588317",
+  "resident_after": [
+    {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "size": 5729167604,
+      "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-10-08T07:51:24.634766369Z",
+      "size_vram": 5729167604,
+      "context_length": 8192
+    }
+  ],
+  "gpu_identity_after": {
+    "name": "NVIDIA GeForce RTX 4060 Ti",
+    "driver": "591.86",
+    "uuid_sha256": "144cc50fec73429cf66c936eb30f20e2bf7ff427cfdfb6cbe8ce6f1d015cdcc9"
+  },
+  "duration_s": 39.25,
+  "status": "success",
+  "sampler_stopped": true,
+  "observed_whole_device_peak_mb": 8321
+}

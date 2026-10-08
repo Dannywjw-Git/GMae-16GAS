@@ -1,0 +1,1144 @@
+{
+  "kind": "real_ollama_calibration",
+  "recorded_at": "2026-10-08T07:18:13.790441+00:00",
+  "request": {
+    "model": "qwen3.5:9b",
+    "prompt": "Read the following notes and summarize their common point in one sentence.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\nGPU memory budgets coordinate model loading and task execution safely.\n\nIn one short sentence, explain why GPU memory scheduling matters.",
+    "think": false,
+    "stream": false,
+    "keep_alive": "30m",
+    "options": {
+      "num_ctx": 2048,
+      "num_predict": 32,
+      "temperature": 0,
+      "seed": 20261008
+    }
+  },
+  "reserve_mb": 2560,
+  "production_profile_installed": false,
+  "samples": [
+    {
+      "monotonic_s": 49795.14,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49795.406,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49795.671,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49795.937,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49796.203,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49796.453,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49796.718,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49796.968,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49797.218,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49797.468,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49797.75,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49798.015,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49798.265,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49798.531,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49798.765,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49799.015,
+      "total_mb": 16380,
+      "used_mb": 1408,
+      "free_mb": 14700,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49799.265,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49799.515,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49799.765,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49800.015,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49800.265,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49800.515,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49800.765,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49801.015,
+      "total_mb": 16380,
+      "used_mb": 1526,
+      "free_mb": 14582,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49801.265,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49801.515,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49801.765,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49802.015,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49802.281,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49802.531,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49802.781,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 3
+    },
+    {
+      "monotonic_s": 49803.046,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49803.312,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49803.562,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49803.812,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49804.062,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49804.328,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49804.593,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49804.843,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49805.109,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49805.359,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49805.609,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49805.859,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49806.125,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49806.39,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49806.656,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49806.921,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 7
+    },
+    {
+      "monotonic_s": 49807.187,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49807.453,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49807.703,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49807.968,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49808.234,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49808.5,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49808.75,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49809.0,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49809.25,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49809.5,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49809.765,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49810.031,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49810.296,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49810.562,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49810.828,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49811.078,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49811.343,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49811.609,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49811.875,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49812.14,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49812.406,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49812.671,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49812.937,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49813.203,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49813.453,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49813.703,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49813.953,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49814.218,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49814.484,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49814.734,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49815.0,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49815.265,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49815.515,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49815.765,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49816.031,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49816.296,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 15
+    },
+    {
+      "monotonic_s": 49816.546,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49816.812,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49817.078,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49817.343,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49817.609,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49817.875,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 13
+    },
+    {
+      "monotonic_s": 49818.14,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49818.406,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 16
+    },
+    {
+      "monotonic_s": 49818.671,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49818.921,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 14
+    },
+    {
+      "monotonic_s": 49819.187,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49819.453,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49819.718,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49819.984,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 10
+    },
+    {
+      "monotonic_s": 49820.25,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 11
+    },
+    {
+      "monotonic_s": 49820.515,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49820.781,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 12
+    },
+    {
+      "monotonic_s": 49821.046,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49821.312,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49821.578,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49821.843,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 17
+    },
+    {
+      "monotonic_s": 49822.109,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 18
+    },
+    {
+      "monotonic_s": 49822.359,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 18
+    },
+    {
+      "monotonic_s": 49822.625,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 49822.89,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 8
+    },
+    {
+      "monotonic_s": 49823.156,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49823.421,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49823.687,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49823.953,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49824.218,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49824.484,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49824.75,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49825.015,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49825.265,
+      "total_mb": 16380,
+      "used_mb": 6244,
+      "free_mb": 9864,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49825.531,
+      "total_mb": 16380,
+      "used_mb": 6468,
+      "free_mb": 9640,
+      "utilization": 23
+    },
+    {
+      "monotonic_s": 49825.781,
+      "total_mb": 16380,
+      "used_mb": 6468,
+      "free_mb": 9640,
+      "utilization": 23
+    },
+    {
+      "monotonic_s": 49826.031,
+      "total_mb": 16380,
+      "used_mb": 6468,
+      "free_mb": 9640,
+      "utilization": 46
+    },
+    {
+      "monotonic_s": 49826.296,
+      "total_mb": 16380,
+      "used_mb": 6468,
+      "free_mb": 9640,
+      "utilization": 46
+    },
+    {
+      "monotonic_s": 49826.546,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49826.796,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49827.046,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49827.296,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 1
+    },
+    {
+      "monotonic_s": 49827.562,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49827.812,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49828.062,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49828.328,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49828.578,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49828.843,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49829.093,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49829.343,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49829.593,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49829.843,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 2
+    },
+    {
+      "monotonic_s": 49830.078,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 49830.328,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 5
+    },
+    {
+      "monotonic_s": 49830.609,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49830.859,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 9
+    },
+    {
+      "monotonic_s": 49831.109,
+      "total_mb": 16380,
+      "used_mb": 7482,
+      "free_mb": 8626,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49831.375,
+      "total_mb": 16380,
+      "used_mb": 7740,
+      "free_mb": 8368,
+      "utilization": 0
+    },
+    {
+      "monotonic_s": 49831.64,
+      "total_mb": 16380,
+      "used_mb": 7740,
+      "free_mb": 8368,
+      "utilization": 95
+    },
+    {
+      "monotonic_s": 49831.89,
+      "total_mb": 16380,
+      "used_mb": 7746,
+      "free_mb": 8362,
+      "utilization": 95
+    },
+    {
+      "monotonic_s": 49832.171,
+      "total_mb": 16380,
+      "used_mb": 7746,
+      "free_mb": 8362,
+      "utilization": 90
+    },
+    {
+      "monotonic_s": 49832.437,
+      "total_mb": 16380,
+      "used_mb": 7746,
+      "free_mb": 8362,
+      "utilization": 90
+    },
+    {
+      "monotonic_s": 49832.687,
+      "total_mb": 16380,
+      "used_mb": 7746,
+      "free_mb": 8362,
+      "utilization": 98
+    },
+    {
+      "monotonic_s": 49832.953,
+      "total_mb": 16380,
+      "used_mb": 7746,
+      "free_mb": 8362,
+      "utilization": 98
+    }
+  ],
+  "sampling_errors": [],
+  "prompt_kind": "long",
+  "model_artifact": {
+    "name": "qwen3.5:9b",
+    "size": 6594463106,
+    "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7"
+  },
+  "backend_version": "0.33.0",
+  "artifact_identity": {
+    "container_id": "fb84bdf762a0532ef3006111961474067ea1635e201a36787a55c4ff8b7965da",
+    "blob_sha256": "dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c",
+    "blob_stat": "72:562949953472668:6594462816:1787961034:1787961034",
+    "blob_path_sha256": "69cfc3ff867585db3c24ea0cc2d9bedd2f357bcb2e83084185bfc4be11b0a81a",
+    "model_details": {
+      "parent_model": "sha256-dec52a44569a2a25341c4e4d3fee25846eed4f6f0b936278e3a3c900bb99d37c",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "9.7B",
+      "quantization_level": "Q4_K_M"
+    }
+  },
+  "container_backend_version": "ollama version is 0.33.0",
+  "planning_peak_mb": 10107,
+  "planning_basis": "file_size_times_1.2_plus_2560MiB_unverified",
+  "preparation": {
+    "condition": "model_unloaded_low_torch_verified",
+    "duration_s": 1.9219999999986612,
+    "managed_release": {
+      "ok": true,
+      "http": 200,
+      "free_mb_before": 14700,
+      "free_mb_after": 14700,
+      "freed_mb": 0
+    },
+    "readings": [
+      {
+        "gpu": {
+          "monotonic_s": 49794.843,
+          "total_mb": 16380,
+          "used_mb": 1408,
+          "free_mb": 14700,
+          "utilization": 2
+        },
+        "torch_resident_bytes": 8519680
+      }
+    ],
+    "limitation": "low torch occupancy does not prove CPU/disk caches cold"
+  },
+  "baseline": {
+    "monotonic_s": 49795.093,
+    "total_mb": 16380,
+    "used_mb": 1408,
+    "free_mb": 14700,
+    "utilization": 0
+  },
+  "response_metrics": {
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 34742307432,
+    "load_duration": 33587456007,
+    "prompt_eval_count": 1574,
+    "prompt_eval_duration": 653755000,
+    "eval_count": 22,
+    "eval_duration": 485696000
+  },
+  "output_sha256": "5dac03f2a5bae59df3c4fa7f7269ea28f58fe131372b66d867dbb70d237f38a4",
+  "resident_after": [
+    {
+      "name": "qwen3.5:9b",
+      "model": "qwen3.5:9b",
+      "size": 5420875774,
+      "digest": "9eda36c3f67d67f9c251f8672458315af91909fd38e53b7723a48cbbe2607cf7",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "9.7B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-10-08T07:49:35.134271788Z",
+      "size_vram": 5420875774,
+      "context_length": 2048
+    }
+  ],
+  "duration_s": 37.92199999999866,
+  "status": "success",
+  "sampler_stopped": true,
+  "observed_whole_device_peak_mb": 8018
+}
