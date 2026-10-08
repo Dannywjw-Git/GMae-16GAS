@@ -1,7 +1,7 @@
 """Synthetic fixtures exercise matching logic, never performance evidence."""
 import copy
 import pytest
-from core.workload_profile import workload_fingerprint, match_profile
+from core.workload_profile import workload_fingerprint, match_profile, resource_configuration_fingerprint
 
 
 @pytest.fixture
@@ -56,3 +56,11 @@ def test_canonical_hash_and_nonfinite():
     assert workload_fingerprint({'b': 2, 'a': 1}) == workload_fingerprint({'a': 1, 'b': 2})
     with pytest.raises(ValueError):
         workload_fingerprint({'x': float('nan')})
+
+
+def test_resource_identity_binds_controls_but_not_prompt_seed():
+    original = {'1': {'inputs': {'width': 512, 'text': 'old', 'seed': 1}}}
+    varied = {'1': {'inputs': {'width': 512, 'text': 'new', 'seed': 2}}}
+    assert resource_configuration_fingerprint(original) == resource_configuration_fingerprint(varied)
+    varied['1']['inputs']['width'] = 1024
+    assert resource_configuration_fingerprint(original) != resource_configuration_fingerprint(varied)
