@@ -7,6 +7,7 @@ GMae Docker 客户端
 - 所有调用统一超时和错误处理
 """
 import os
+import json
 import shutil
 from core.logger import log_error, log_event
 from core.utils import run_args
@@ -42,6 +43,28 @@ def running_containers_status() -> dict:
     if rc != 0:
         return {"ok": False, "containers": [], "error": out[:200]}
     return {"ok": True, "containers": sorted({line.strip() for line in out.splitlines() if line.strip()})}
+
+
+def container_target_state(container_name):
+    """Fresh exact-name inspect; malformed/absent state never proves a target."""
+    rc, out = run_args([_get_docker_cmd(), 'inspect', '--type', 'container', container_name], 10)
+    if rc != 0:
+        return {'ok': False, 'error': 'container inspect unavailable'}
+    try:
+        rows = json.loads(out)
+        if not isinstance(rows, list) or len(rows) != 1 or rows[0]['Name'] != '/' + container_name:
+            raise ValueError('container identity mismatch')
+        state = rows[0]['State']
+        identity = rows[0]['Id']
+        if not isinstance(identity, str) or len(identity) != 64 or any(c not in '0123456789abcdef' for c in identity):
+            raise ValueError('invalid container identity')
+        if any(type(state.get(key)) is not bool for key in ('Running', 'Paused', 'Restarting', 'Dead')):
+            raise ValueError('invalid state flags')
+        return {'ok': True, 'running': state['Running'], 'paused': state['Paused'],
+                'restarting': state['Restarting'], 'dead': state['Dead'],
+                'container_id': rows[0]['Id']}
+    except (ValueError, TypeError, KeyError):
+        return {'ok': False, 'error': 'invalid container inspect evidence'}
 
 
 def list_running_containers() -> set:

@@ -77,7 +77,10 @@ except ImportError as _e:
 
 
 if __name__ == "__main__":
+    from core.process_ownership import ProcessOwnership
+    process_owner = None
     try:
+        process_owner = ProcessOwnership(os.environ.get('GMAE_TASK_DB', os.path.join(BASE_DIR, 'data', 'tasks.sqlite3'))).acquire()
         # 防多实例：启动前探测端口，已被占用则直接退出
         try:
             _probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -202,6 +205,8 @@ if __name__ == "__main__":
         log_error("server_crash", error=e)
         raise
     finally:
+        # Do not release early while daemon mutation workers may still run.
+        # Process exit closes the descriptor and releases OS ownership.
         # 优雅停止 Docker Events 监听
         try:
             docker_events.stop()

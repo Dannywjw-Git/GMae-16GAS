@@ -15,6 +15,8 @@ def recovery(tmp_path, monkeypatch):
     journal = OperationJournal(tmp_path / 'operations.sqlite3')
     registry.set('operation_journal', journal)
     monkeypatch.setattr(coordinator, 'fresh_gpu', lambda: {'ok': True})
+    monkeypatch.setattr('clients.docker_client.container_target_state', lambda name: {
+        'ok': True, 'running': False, 'paused': False, 'restarting': False, 'dead': False})
     yield journal
     if previous is None:
         registry.delete('operation_journal')
@@ -40,6 +42,18 @@ def test_completed_owned_control_receipt_resolves_without_replaying(recovery):
     assert recovery.get(operation_id)['state'] == 'confirmed'
     assert coordinator.get_coordinator().snapshot()['active'] is None
     assert len(recovery.commands(operation_id)) == 1
+
+
+@pytest.mark.parametrize('state', [
+    {'ok': False},
+    {'ok': True, 'running': True, 'paused': False, 'dead': False, 'restarting': False},
+    {'ok': True, 'running': False, 'paused': False, 'dead': False, 'restarting': True},
+])
+def test_successful_command_requires_matching_container_target(recovery, monkeypatch, state):
+    held(recovery)
+    monkeypatch.setattr('clients.docker_client.container_target_state', lambda name: state)
+    assert coordinator.reconcile_uncertain()['code'] == 'CONTAINER_STATE_UNVERIFIED'
+    assert coordinator.get_coordinator().snapshot()['active'] is not None
 
 
 def test_startup_reconciliation_stops_on_unknown_receipt(recovery):
