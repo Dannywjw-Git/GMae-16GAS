@@ -365,6 +365,19 @@ def reconcile_uncertain() -> dict:
     if not active or active["phase"] != "uncertain":
         return {"ok": True, "resolved": False, "message": "没有待核验的执行"}
     prompt_id = active.get("prompt_id")
+    if active.get('service')=='ollama' and active.get('job_id') and active.get('journal_id'):
+        try:
+            from engine.queue import reconcile_ollama_task
+            journal=registry.get('operation_journal')
+            if journal is None: raise ValueError('resource journal unavailable')
+            fresh_gpu()
+            command_id=reconcile_ollama_task(active,journal)
+            journal.finish(active['journal_id'],True,{'terminal':True,'job_id':active['job_id'],
+                           'command_id':command_id,'basis':'exact_delegated_ollama_receipt'})
+            coordinator.resolve(active['token'],{'terminal':True,'job_id':active['job_id']})
+            return {'ok':True,'resolved':True,'job_id':active['job_id'],'command_id':command_id}
+        except Exception as error:
+            return {'ok':False,'code':'UNCONFIRMED_EXECUTION','error':str(error)}
     if active.get("service") != "comfyui" or not prompt_id:
         if active.get('journal_id'):
             return _reconcile_command_operation(coordinator, active)
