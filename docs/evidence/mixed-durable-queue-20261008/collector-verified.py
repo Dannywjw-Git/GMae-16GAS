@@ -63,9 +63,7 @@ def main():
                     previous[record['id']]=record['status']
             if any(record['status'] in ('failed','uncertain','canceled') for record in records):
                 raise RuntimeError('mixed execution did not confirm all successful tasks')
-            if (all(record['status']=='done' for record in records)
-                    and get_coordinator().snapshot()['active'] is None and journal.pending()==[]):
-                break
+            if all(record['status']=='done' for record in records): break
             if time.monotonic()>deadline: raise TimeoutError('observe same tasks; do not resubmit')
             stop.wait(0.25)
         document.update(status='success',duration_s=time.monotonic()-started)

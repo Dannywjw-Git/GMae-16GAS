@@ -1,0 +1,62 @@
+{
+  "pilot": {
+    "tasks": [
+      {
+        "source": "comfyui",
+        "model": "SDXL",
+        "post_admission_task_s": 52,
+        "measured_budget_mb": 9217
+      },
+      {
+        "source": "ollama",
+        "model": "qwen3.5:9b",
+        "post_admission_task_s": 29,
+        "measured_budget_mb": 8833
+      },
+      {
+        "source": "comfyui",
+        "model": "SDXL",
+        "post_admission_task_s": 48,
+        "measured_budget_mb": 9217
+      }
+    ],
+    "observed_whole_device_peak_mb": 8912,
+    "minimum_observed_free_mb": 7468,
+    "samples": 1084,
+    "duration_s": 279.2810000000027,
+    "verified_switch_releases": 0,
+    "trace_verified": false,
+    "comparative_result": false,
+    "limitation": "single sequential workload; no throughput baseline or OOM guarantee"
+  },
+  "verified": {
+    "tasks": [
+      {
+        "source": "comfyui",
+        "model": "SDXL",
+        "post_admission_task_s": 39,
+        "measured_budget_mb": 9217
+      },
+      {
+        "source": "ollama",
+        "model": "qwen3.5:9b",
+        "post_admission_task_s": 28,
+        "measured_budget_mb": 8833
+      },
+      {
+        "source": "comfyui",
+        "model": "SDXL",
+        "post_admission_task_s": 45,
+        "measured_budget_mb": 9217
+      }
+    ],
+    "observed_whole_device_peak_mb": 8914,
+    "minimum_observed_free_mb": 7466,
+    "samples": 981,
+    "duration_s": 250.13999999999942,
+    "verified_switch_releases": 2,
+    "trace_verified": true,
+    "comparative_result": false,
+    "limitation": "single sequential workload; no throughput baseline or OOM guarantee"
+  }
+}
