@@ -1,5 +1,17 @@
 # GMae 阶段交接
 
+## 2026-10-08：Qwen 有限上下文真实校准
+
+完整实现及证据 `f0874e9e83427c1aa85c95f166a563cc2a830627`，生成采集版本 `f6c2c64baa4715977c85f2f3017551208582de6a`，见 [Draft PR #15](https://github.com/Dannywjw-Git/GMae-16GAS/pull/15)。分支 `feat/ollama-real-profile-20261008`，基于 PR #14 最终 HEAD `849d5162ce78d5369b4ddb7dd1a3230bdcd9307b`；该精确基线两项 CI `37740730904` / `37740725158` success。新实现提交 CI `37742021025` / `37741982610` 当前运行中，文档后续 HEAD 另行核验，不能沿用基线成功。
+
+已实现：原账本/单机 GPU 所有权下显式未验证 bootstrap、受管 SDXL 释放及物理低水位、固定有限 Qwen 请求、实际上下文/摘要核验、未知不重放；独立记录 Qwen 释放命令、模型列表和实际 GPU 回收。生产注册表未自动修改。
+
+自动化测试：完整 578 项通过（16.15 秒），包括错误上下文、残缺/身份/计数/时间不一致证据拒绝。真实 GPU：现有 Qwen3.5:9b Q4_K_M / Ollama 0.33.0，2K/8K 各一次，24-token 提示/32-token 输出，159/173 样本、零采样错误，整卡保守峰值 8,030/8,310 MiB；两次后均确认空模型列表、物理空闲显存达标、资源账本无待确认工作。[报告、raw、源码摘要](ollama-context-calibration-2026-10-08.md)。
+
+尚未验证：满上下文/长期生成/重复波动、独立模型 blob 内容认证、正式 Ollama Profile 和统一 LLM 持久任务队列、完整 SDXL↔Qwen 混合吞吐对照。不能将一次短提示测量标为通用生产峰值。Release、安装和演示交付仍待完成。
+
+需要 Chat Agent 独立评审：bootstrap 的生产隔离、短提示限制、API 清单摘要与独立内容摘要区别、释放三层证据、raw 摘要/保守计量及真实性。下一步补长提示实测和内容/环境身份绑定，进入正式参数化 Ollama Profile及混合任务安全切换，优先收敛参赛交付。
+
 ## 2026-10-08：同进程均衡交错 GPU 对照
 
 完整实现及证据提交 `40b30be2d441eb1d8928c1e04554b8b697e4af4c`，见 [Draft PR #14](https://github.com/Dannywjw-Git/GMae-16GAS/pull/14)。该实现提交两项 CI `37740270484`、`37740264886` success；文档提交 `b28c6a326155458d01a334d4d902475b9c0a60cf` 的 CI `37740411954`、`37740407011` 亦 success。后续 HEAD 以 PR 检查为准，不沿用旧结果。分支 `feat/interleaved-gpu-benchmark-20261008`，基于 PR #13 HEAD `23be541691c65fbaaf4979c83c78437e825b4282`，其两项 CI `37738752536`、`37738745505` success。实际采集源码 `debebe6031749c4e378c6ab3f94023fee4ff1fe0` 的 CI `37739227759` success；新分析/证据 HEAD 另行核验。

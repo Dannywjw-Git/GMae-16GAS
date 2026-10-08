@@ -11,7 +11,9 @@ def analyze(raw):
         raise ValueError('incomplete calibration')
     request = raw['request']
     ctx = request['options']['num_ctx']
-    if type(ctx) is not int or ctx not in (2048, 8192) or request.get('think') is not False:
+    if (type(ctx) is not int or ctx not in (2048, 8192) or request.get('think') is not False
+            or request.get('model') != 'qwen3.5:9b' or request.get('stream') is not False
+            or request['options'].get('num_predict') != 32):
         raise ValueError('unsupported request')
     residents = raw['resident_after']
     if (len(residents) != 1 or residents[0]['context_length'] != ctx
