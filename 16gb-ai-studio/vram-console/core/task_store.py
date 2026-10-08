@@ -111,9 +111,9 @@ class TaskStore:
             if current['state'] in self.TERMINAL or (state != current['state'] and
                                                      state not in self.EDGES.get(current['state'], set())):
                 raise TaskConflict('invalid task lifecycle transition')
-            if state == 'submitting' and not (fields or {}).get('submission_id'):
-                raise ValueError('submission intent requires a durable backend correlation ID')
             previous = json.loads(current['checkpoint'])
+            if state == 'submitting' and not (fields or {}).get('submission_id', previous.get('submission_id')):
+                raise ValueError('submission intent requires a durable backend correlation ID')
             for key in ('submission_id', 'prompt_id'):
                 if key in previous and key in (fields or {}) and previous[key] != fields[key]:
                     raise TaskConflict('backend correlation identity cannot be replaced')
@@ -128,6 +128,10 @@ class TaskStore:
     def snapshot(self) -> list[dict]:
         with self._transaction() as connection:
             return [self._decode(row) for row in connection.execute('SELECT * FROM tasks ORDER BY created,id')]
+
+    def get(self, task_id: str) -> dict | None:
+        with self._transaction() as connection:
+            return self._decode(connection.execute('SELECT * FROM tasks WHERE id=?', (task_id,)).fetchone())
 
     def recovery_plan(self) -> dict:
         """Classify durable facts; never infer backend termination from a restart."""

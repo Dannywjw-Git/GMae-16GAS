@@ -114,8 +114,14 @@ Object.assign(Pages, {
       const btn = Utils.$('#btn-submit-task');
       btn.disabled = true;
       btn.textContent = '提交中...';
-      const res = await API.submitTask({ model, params });
+      const signature = JSON.stringify({model, params});
+      if (!this._pendingSubmission || this._pendingSubmission.signature !== signature) {
+        const key = Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('');
+        this._pendingSubmission = {signature, key};
+      }
+      const res = await API.submitTask({ model, params, idempotency_key: this._pendingSubmission.key });
       if (res.ok) {
+        this._pendingSubmission = null;
         Toast.success('任务已提交');
         // 预算预警：显存可能不足时提示用户
         const bw = res.budget_warning;
@@ -290,11 +296,11 @@ Object.assign(Pages, {
     const all = res.tasks || res.queue || [];
     this._lastQueueTasks = all;
     const visible = all.filter(t => !this._hiddenTaskIds.has(t.id || t.task_id));
-    const STATUS_ACTIVE = ['queued', 'waiting_resource', 'precheck', 'freeing', 'running'];
+    const STATUS_ACTIVE = ['queued', 'waiting_resource', 'precheck', 'freeing', 'submitting', 'running', 'uncertain'];
     const STATUS_DONE = ['done', 'completed', 'failed', 'canceled'];
     this._renderCoordination(res.coordination || {});
     const st = t => t.status || t.state || '';
-    const running = visible.filter(t => ['precheck', 'freeing', 'running'].includes(st(t))).length;
+    const running = visible.filter(t => ['precheck', 'freeing', 'submitting', 'running'].includes(st(t))).length;
     const waiting = visible.filter(t => ['queued', 'waiting_resource'].includes(st(t))).length;
     const doneCnt = visible.filter(t => STATUS_DONE.includes(st(t))).length;
     const setText = (id, v) => { const el = Utils.$('#' + id); if (el) el.textContent = v; };
@@ -303,7 +309,7 @@ Object.assign(Pages, {
     setText('q-done', doneCnt);
 
     // 当前运行任务
-    const current = visible.filter(t => ['precheck', 'freeing', 'running'].includes(st(t)));
+    const current = visible.filter(t => ['precheck', 'freeing', 'submitting', 'running', 'uncertain'].includes(st(t)));
     const curEl = Utils.$('#q-current');
     if (curEl) {
       curEl.innerHTML = current.length ? current.map(t => `

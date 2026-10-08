@@ -43,15 +43,13 @@ class TaskDispatcher:
             return self._uncertain(submitting, 'backend submission raised: ' + str(exc))
         if isinstance(prompt_id, str) and prompt_id.strip():
             try:
-                return self.store.checkpoint(
-                    task['id'], submitting['version'], 'running', {'prompt_id': prompt_id})
+                return self._response_checkpoint(submitting, 'running', {'prompt_id': prompt_id})
             except Exception as exc:
                 # Never return a success that the durable record cannot prove.
                 raise DispatchUncertain(submission_id, 'accepted response could not be saved') from exc
         if isinstance(error, dict) and error.get('uncertain') is False and not prompt_id:
             try:
-                return self.store.checkpoint(
-                    task['id'], submitting['version'], 'failed',
+                return self._response_checkpoint(submitting, 'failed',
                     {'error': str(error.get('message', 'backend rejected submission'))})
             except Exception as exc:
                 raise DispatchUncertain(submission_id, 'rejection could not be saved') from exc
@@ -60,7 +58,21 @@ class TaskDispatcher:
     def _uncertain(self, task, message):
         submission_id = task['checkpoint']['submission_id']
         try:
-            self.store.checkpoint(task['id'], task['version'], 'uncertain', {'error': message})
+            self._response_checkpoint(task, 'uncertain', {'error': message})
         except Exception as exc:
             raise DispatchUncertain(submission_id, message + '; checkpoint unavailable') from exc
         raise DispatchUncertain(submission_id, message)
+
+    def _response_checkpoint(self, task, state, fields):
+        # A concurrently persisted cancel request may increment the version.
+        # Preserve it without overwriting identity or accepting a new lifecycle.
+        for _ in range(3):
+            try:
+                return self.store.checkpoint(task['id'], task['version'], state, fields)
+            except TaskConflict:
+                latest = self.store.get(task['id'])
+                if (latest is None or latest['status'] != 'submitting' or
+                        latest['checkpoint'].get('submission_id') != task['checkpoint']['submission_id']):
+                    raise
+                task = latest
+        raise TaskConflict('submission response raced with repeated state updates')

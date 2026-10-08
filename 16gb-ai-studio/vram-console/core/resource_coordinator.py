@@ -70,6 +70,26 @@ class ResourceCoordinator:
         self._active: dict | None = None
         self._events: list[dict] = []
         self._sequence = 0
+        self._recovered = []
+
+    def restore_uncertain(self, request: ResourceRequest, details: dict) -> ResourceLease:
+        """Install a trusted startup hold without executing or assessing a job.
+
+        Multiple crash records remain blocked until each has terminal evidence;
+        resolve moves to the next hold under the same lock, without a free gap.
+        """
+        with self._lock:
+            token = uuid.uuid4().hex
+            record = {**deepcopy(details), **asdict(request), 'token': token,
+                      'phase': 'uncertain', 'started_monotonic_s': self._clock()}
+            if self._active is None:
+                self._active = record
+            elif self._active['phase'] == 'uncertain':
+                self._recovered.append(record)
+            else:
+                raise ResourceDenied('RESOURCE_BUSY', '恢复前已有正在执行的资源预留')
+            self._record('restored', token=token, owner=request.owner)
+            return ResourceLease(self, token, False)
 
     def _record(self, event: str, **details) -> None:
         self._sequence += 1
@@ -82,7 +102,8 @@ class ResourceCoordinator:
         with self._lock:
             return deepcopy({"gpu_id": 0, "policy": "serial", "active": self._active,
                              "reserved_mb": (self._active or {}).get("peak_mb", 0),
-                             "sequence": self._sequence, "events": self._events})
+                             "sequence": self._sequence, "events": self._events,
+                             "recovery_pending": self._recovered})
 
     def current_token(self) -> str | None:
         """Return only this thread's live capability, if any."""
@@ -144,7 +165,7 @@ class ResourceCoordinator:
             if self._active.get("prompt_id") and evidence.get("prompt_id") != self._active["prompt_id"]:
                 raise ResourceDenied("UNCONFIRMED_EXECUTION", "结束证据不属于当前任务")
             self._record("resolved", token=token, evidence=evidence)
-            self._active = None
+            self._active = self._recovered.pop(0) if self._recovered else None
 
     @contextmanager
     def operation(self, request: ResourceRequest,

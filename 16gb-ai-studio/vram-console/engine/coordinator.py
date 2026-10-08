@@ -243,12 +243,15 @@ def reconcile_uncertain() -> dict:
                 "error": error or "尚无对应任务的结束记录，资源预留继续保留"}
     try:
         fresh_gpu()
+        from engine.queue import reconcile_task
+        if active.get('job_id') and not reconcile_task(
+                active['job_id'], active['token'], prompt_id, record['status']['status_str']):
+            return {'ok': False, 'code': 'TASK_EVIDENCE_MISMATCH', 'error': '任务身份不匹配，保留预留'}
         coordinator.resolve(active["token"], {"terminal": True, "prompt_id": prompt_id,
                                              "status": record["status"]["status_str"]})
-        from engine.queue import reconcile_task
-        reconcile_task(active.get("job_id"), active["token"], prompt_id,
-                       record["status"]["status_str"])
         log_event("resource_reconciled", owner=active["owner"], prompt_id=prompt_id)
         return {"ok": True, "resolved": True, "prompt_id": prompt_id}
     except ResourceDenied as error:
         return error.result()
+    except Exception as error:
+        return {'ok': False, 'code': 'TASK_STORAGE_UNAVAILABLE', 'error': str(error)}

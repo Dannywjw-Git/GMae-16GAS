@@ -19,6 +19,8 @@ from core.registry import registry
 from engine.coordinator import OperationSpec, coordinated_operation, _model_budget
 from core.resource_coordinator import ResourceDenied
 from core.exceptions import ConfigError
+from core.task_store import TaskStore, TaskConflict
+from core.task_dispatch import TaskDispatcher, DispatchUncertain
 from engine.gen_stats import load_gen_stats, save_gen_stats, update_gen_stats
 
 # 队列状态 — 已迁移到 registry（状态包装）
@@ -35,7 +37,70 @@ if _queue_state is None:
 # 可变对象直接引用（修改字段不需要 global）
 _tasks = _queue_state["tasks"]
 _task_queue = _queue_state["task_queue"]
-_task_lock = threading.Lock()
+_task_lock = threading.RLock()
+
+
+def _store():
+    with _task_lock:
+        store = registry.get('task_store')
+        if store is None:
+            store = TaskStore(os.environ.get('GMAE_TASK_DB', os.path.join(BASE_DIR, 'data', 'tasks.sqlite3')))
+            registry.set('task_store', store)
+        return store
+
+
+def _runtime_task(record):
+    return {**record['intent'], 'id': record['id'], 'status': record['status'],
+            'created': record['created'], 'started': None, 'ended': None,
+            'error': '', 'progress': '', 'prompt_id': None, 'result': None,
+            **record['checkpoint'], '_version': record['version']}
+
+
+def _persist(task, status=None, **fields):
+    """Commit before publishing in-memory changes; caller uses the same RLock."""
+    with _task_lock:
+        status = status or task['status']
+        if '_version' in task:
+            record = _store().checkpoint(task['id'], task['_version'], status, fields)
+            task['_version'] = record['version']
+        task.update(fields)
+        task['status'] = status
+
+
+def _start_worker():
+    if _task_queue and not _queue_state['worker_alive']:
+        _queue_state['worker_alive'] = True
+        threading.Thread(target=_queue_worker, daemon=True).start()
+
+
+def queue_restore():
+    """Restore durable facts before background mutation threads or new requests.
+
+    Storage errors abort startup. Unknown execution installs GPU holds; only
+    pre-submission tasks may be resumed. No backend request is issued here.
+    """
+    from engine.coordinator import get_coordinator
+    from core.resource_coordinator import ResourceRequest
+    with _task_lock:
+        if _queue_state.get('restored'):
+            return
+        records = _store().snapshot()
+        for record in records:
+            task = _runtime_task(record)
+            _tasks[task['id']] = task
+            if task['status'] in ('submitting', 'running', 'uncertain'):
+                lease = get_coordinator().restore_uncertain(
+                    ResourceRequest('generate', 'job:' + task['id'], 'comfyui', task['model']),
+                    {'job_id': task['id'], 'prompt_id': task.get('prompt_id') or task.get('submission_id'),
+                     'reason': '进程重启后执行未知，必须核验对应后端任务'})
+                _persist(task, 'uncertain', coordination={'token': lease.token, 'owner': 'job:' + task['id']})
+            elif task['status'] in ('queued', 'waiting_resource', 'precheck'):
+                if task.get('cancel_requested'):
+                    _persist(task, 'canceled', ended=int(time.time()))
+                else:
+                    _task_queue.append(task['id'])
+        _queue_state['restored'] = True
+        _start_worker()
 
 # 生成时间统计
 
@@ -78,7 +143,7 @@ def _apply_params(wf, params):
     return wf
 
 
-def queue_enqueue(model: str, params: dict) -> dict:
+def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
     """提交任务入队。model=registry comfyui 模型 id；params={prompt,seed,width,height,...}"""
     m = next((x for x in REGISTRY.get("comfyui", {}).get("models", []) if x["id"] == model), None)
     if not m:
@@ -86,23 +151,27 @@ def queue_enqueue(model: str, params: dict) -> dict:
     wf_name = m.get("workflow")
     if not wf_name or not _load_workflow(wf_name):
         return {"ok": False, "error": "工作流模板缺失: %s（需先在 ComfyUI 前端导出到 vram-console/workflows/）" % wf_name}
-    tid = uuid.uuid4().hex[:10]
-    task = {
-        "id": tid, "model": model, "workflow": wf_name,
-        "params": {k: v for k, v in (params or {}).items()},
-        "status": "queued", "progress": "", "prompt_id": None,
-        "created": int(time.time()), "started": None, "ended": None, "error": "",
-        "result": None,
-    }
-    with _task_lock:
-        _tasks[tid] = task
-        _task_queue.append(tid)
-        # 原子检查+启动：防止快速连续提交时创建多个 worker（16GB 卡必须串行）
-        if not _queue_state["worker_alive"]:
-            _queue_state["worker_alive"] = True
-            threading.Thread(target=_queue_worker, daemon=True).start()
+    if not isinstance(params, dict):
+        return {'ok': False, 'code': 'INVALID_INTENT', 'error': 'params 必须是对象'}
+    try:
+        queue_restore()
+        with _task_lock:
+            record, created = _store().accept(
+                {'model': model, 'workflow': wf_name, 'params': params}, idempotency_key)
+            tid = record['id']
+            task = _tasks.get(tid) or _runtime_task(record)
+            _tasks[tid] = task
+            if created:
+                _task_queue.append(tid)
+            _start_worker()
+    except TaskConflict as error:
+        return {'ok': False, 'code': 'IDEMPOTENCY_CONFLICT', 'error': str(error)}
+    except ValueError as error:
+        return {'ok': False, 'code': 'INVALID_INTENT', 'error': str(error)}
+    except Exception as error:
+        return {'ok': False, 'code': 'TASK_STORAGE_UNAVAILABLE', 'error': str(error)}
     log_event("queue_enqueue", task=tid, model=model, workflow=wf_name)
-    return {"ok": True, "task": task}
+    return {"ok": True, "task": dict(task), 'created': created}
 
 
 def _queue_submit_comfy(wf, submission_id=None):
@@ -159,22 +228,49 @@ def _queue_wait(prompt_id, task, timeout=3600):
 
 def _execute_reserved_task(task, lease, spec):
     """Keep one reservation through submission and execution confirmation."""
-    task["coordination"] = {"token": lease.token, "owner": spec.owner}
-    task["status"] = "precheck"
+    _persist(task, 'precheck', coordination={"token": lease.token, "owner": spec.owner})
     wf = _load_workflow(task["workflow"])
     if not wf:
         raise ConfigError("模板读取失败")
     wf = _apply_params(wf, task["params"])
     if task.get("cancel_requested"):
-        task["status"] = "canceled"
+        _persist(task, 'canceled', ended=int(time.time()))
         return
     lease.transition("verifying")
     _, decision = _model_budget(spec)
     if decision.get("decision") != "ok":
         raise ResourceDenied("ADMISSION_CHANGED", "提交前预算发生变化，拒绝提交")
-    task["budget"] = decision
-    task["status"] = "running"
-    task["started"] = int(time.time())
+    _persist(task, budget=decision, started=int(time.time()))
+    if '_version' in task:
+        def submit_durable(workflow, submission_id):
+            with _task_lock:
+                task.update(_runtime_task(_store().get(task['id'])))
+                lease.transition('running', prompt_id=submission_id, job_id=task['id'])
+            return _queue_submit_comfy(workflow, submission_id)
+
+        try:
+            TaskDispatcher(_store()).dispatch(
+                {'id': task['id'], 'status': task['status'], 'version': task['_version']},
+                wf, submit_durable)
+            with _task_lock:
+                task.update(_runtime_task(_store().get(task['id'])))
+        except DispatchUncertain as error:
+            lease.uncertain(str(error), prompt_id=error.submission_id, job_id=task['id'])
+            # A storage failure cannot erase the already committed submitting
+            # checkpoint. Retain the lease before attempting any further read.
+            task.update(status='uncertain', submission_id=error.submission_id, error=str(error))
+            try:
+                saved = next(row for row in _store().snapshot() if row['id'] == task['id'])
+                task['_version'] = saved['version']
+            except Exception as storage_error:
+                log_error('task_checkpoint_unavailable', error=storage_error)
+            return
+        pid = task.get('prompt_id')
+        if task['status'] == 'failed':
+            return
+        lease.transition('running', prompt_id=pid, job_id=task['id'])
+        _wait_reserved_task(task, lease, pid)
+        return
     submission_id = str(uuid.uuid4())
     task["submission_id"] = submission_id
     lease.transition("running", prompt_id=submission_id, job_id=task["id"])
@@ -196,19 +292,31 @@ def _execute_reserved_task(task, lease, spec):
     task["prompt_id"] = pid
     lease.transition("running", prompt_id=pid)
     task["progress"] = "已提交，资源预留保持至执行结束确认"
+    _wait_reserved_task(task, lease, pid)
+
+
+def _wait_reserved_task(task, lease, pid):
     try:
         rc = _queue_wait(pid, task)
     except Exception as error:
-        task["status"] = "uncertain"
-        task["error"] = "结束核验异常，资源预留保留: " + str(error)
-        lease.uncertain(task["error"], prompt_id=pid)
+        message = "结束核验异常，资源预留保留: " + str(error)
+        lease.uncertain(message, prompt_id=pid)
+        task['status'] = 'uncertain'
+        _persist(task, 'uncertain', error=message)
         return
     if rc == "uncertain":
-        task["status"] = "uncertain"
-        task["error"] = "执行超时或状态不可用；资源预留保留，等待核验"
-        lease.uncertain(task["error"], prompt_id=pid)
+        message = "执行超时或状态不可用；资源预留保留，等待核验"
+        lease.uncertain(message, prompt_id=pid)
+        task['status'] = 'uncertain'
+        _persist(task, 'uncertain', error=message)
     else:
-        task["status"] = "canceled" if task.get("cancel_requested") else ("done" if rc == "done" else "failed")
+        try:
+            _persist(task, 'canceled' if task.get('cancel_requested') else ('done' if rc == 'done' else 'failed'),
+                     ended=int(time.time()), result=task.get('result'), error=task.get('error', ''))
+        except Exception:
+            lease.uncertain('结束证据无法落盘，资源预留保留', prompt_id=pid)
+            task['status'] = 'uncertain'
+            raise
         lease.transition("completed" if rc == "done" else "failed")
 
 
@@ -216,9 +324,14 @@ def _run_task(task):
     """Wait for ownership and execute under one lifetime reservation."""
     spec = OperationSpec("generate", "comfyui", task["model"], owner="job:" + task["id"])
     try:
+        with _task_lock:
+            if task['status'] in TaskStore.TERMINAL:
+                return
+            if task['status'] == 'queued':
+                _persist(task, 'precheck')
         while True:
             if task.get("cancel_requested"):
-                task["status"] = "canceled"
+                _persist(task, 'canceled', ended=int(time.time()))
                 return
             try:
                 with coordinated_operation(spec) as lease:
@@ -228,12 +341,17 @@ def _run_task(task):
                 task["coordination"] = error.result()
                 if error.code not in ("RESOURCE_BUSY", "SERVICE_BUSY"):
                     raise
-                task["status"] = "waiting_resource"
-                task["progress"] = str(error)
+                if task['status'] != 'waiting_resource' or task.get('progress') != str(error):
+                    _persist(task, 'waiting_resource', progress=str(error), coordination=error.result())
                 time.sleep(0.25)
     except Exception as error:
-        task["status"] = "failed"
-        task["error"] = str(error)
+        if task['status'] == 'uncertain':
+            task['error'] = str(error)
+        else:
+            try:
+                _persist(task, 'failed', error=str(error), ended=int(time.time()))
+            except Exception as storage_error:
+                task['error'] = '任务状态无法保存: ' + str(storage_error)
     finally:
         task["ended"] = int(time.time()) if task["status"] not in ("waiting_resource", "uncertain") else None
         if task["status"] == "done" and task.get("started"):
@@ -253,7 +371,12 @@ def _queue_worker():
             tid = _task_queue.popleft()
         task = _tasks.get(tid)
         if task:
-            _run_task(task)
+            try:
+                _run_task(task)
+            except Exception as error:
+                # Observability failures must not strand queued tasks behind a
+                # permanently true worker flag. Execution retains its own lease.
+                log_error('queue_worker_exception', error=error, task=tid)
 
 
 def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool:
@@ -266,11 +389,15 @@ def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool
             return False
         if prompt_id not in (task.get("prompt_id"), task.get("submission_id")):
             return False
-        task["status"] = ("canceled" if task.get("cancel_requested") else
-                          "done" if status == "success" else "failed")
-        task["ended"] = int(time.time())
-        task["progress"] = "已核验对应任务的结束记录"
-        task["error"] = "" if status == "success" else "ComfyUI 执行失败（结束记录已核验）"
+        if '_version' in task:
+            saved = next(row for row in _store().snapshot() if row['id'] == task['id'])
+            task['_version'] = saved['version']
+            if saved['status'] != 'uncertain':
+                _persist(task, 'uncertain')
+        _persist(task, 'canceled' if task.get('cancel_requested') else
+                 'done' if status == 'success' else 'failed',
+                 ended=int(time.time()), progress='已核验对应任务的结束记录',
+                 error='' if status == 'success' else 'ComfyUI 执行失败（结束记录已核验）')
         return True
 
 
@@ -291,15 +418,20 @@ def queue_cancel(tid: str) -> dict:
         task = _tasks.get(tid)
         if not task:
             return {"ok": False, "error": "task not found"}
+        if '_version' in task:
+            saved = _store().get(tid)
+            was_uncertain = task['status'] == 'uncertain'
+            task.update(_runtime_task(saved))
+            if was_uncertain and saved['status'] not in TaskStore.TERMINAL:
+                task['status'] = 'uncertain'
         if task["status"] == "queued":
+            _persist(task, 'canceled', ended=int(time.time()))
             try:
                 _task_queue.remove(tid)
             except ValueError: pass  # 合理忽略：值解析失败，使用默认值
-            task["status"] = "canceled"
-            task["ended"] = int(time.time())
             log_event("queue_cancel", task=tid)
             return {"ok": True, "task": task}
-        if task["status"] in ("waiting_resource", "precheck", "freeing", "running"):
-            task["cancel_requested"] = True
+        if task["status"] in ("waiting_resource", "precheck", "freeing", "submitting", "running", "uncertain"):
+            _persist(task, cancel_requested=True)
             return {"ok": True, "note": "取消已请求；执行结束确认前仍保留资源预留", "task": task}
         return {"ok": False, "error": "已结束的任务无法取消"}
