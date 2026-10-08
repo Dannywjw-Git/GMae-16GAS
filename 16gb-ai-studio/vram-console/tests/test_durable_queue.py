@@ -17,6 +17,7 @@ _real_wait = queue._queue_wait
 def runtime(tmp_path, monkeypatch):
     path = tmp_path / 'tasks.sqlite3'
     registry.delete('task_store')
+    previous_journal = registry.get('operation_journal')
     monkeypatch.setenv('GMAE_TASK_DB', str(path))
     state = {'tasks': {}, 'task_queue': deque(), 'worker_alive': False}
     monkeypatch.setattr(queue, '_queue_state', state)
@@ -33,6 +34,10 @@ def runtime(tmp_path, monkeypatch):
         'ok': False, 'code': 'CANCEL_UNSUPPORTED'})
     yield path
     registry.delete('task_store')
+    if previous_journal is None:
+        registry.delete('operation_journal')
+    else:
+        registry.set('operation_journal', previous_journal)
 
 
 def restart():
@@ -246,3 +251,33 @@ def test_cancel_cannot_address_another_owners_job(runtime, monkeypatch):
     monkeypatch.setattr('clients.comfyui_client.cancel_job', cancel)
     assert queue._cancel_backend(current)['code'] == 'CANCEL_DEFERRED'
     cancel.assert_not_called()
+
+
+def test_task_and_operation_journal_share_one_restored_hold(runtime, monkeypatch):
+    coordinator.restore_resource_operations()
+    journal = registry.get('operation_journal')
+    accepted = queue.queue_enqueue('m', {})
+    current = queue._tasks[accepted['task']['id']]
+    monkeypatch.setattr(queue, '_queue_submit_comfy', lambda *args: (None, {'uncertain': True}))
+    queue._run_task(current)
+    assert len(journal.pending()) == 1
+    registry.delete('operation_journal')
+    registry.set('resource_coordinator', ResourceCoordinator())
+    coordinator.restore_resource_operations()
+    # The queue supplies the stronger durable submission identity.
+    assert coordinator.get_coordinator().snapshot()['active'] is None
+    queue._tasks.clear()
+    queue._task_queue.clear()
+    queue._queue_state['restored'] = False
+    registry.delete('task_store')
+    queue.queue_restore()
+    active = coordinator.get_coordinator().snapshot()['active']
+    assert active['journal_id'] == journal.pending()[0]['id']
+    assert not coordinator.get_coordinator().snapshot()['recovery_pending']
+    sid = current['submission_id']
+    monkeypatch.setattr('clients.comfyui_client._get', lambda path: (
+        True, {sid: {'status': {'status_str': 'success'}}}, ''))
+    monkeypatch.setattr(coordinator, 'fresh_gpu', lambda: {})
+    assert coordinator.reconcile_uncertain()['resolved']
+    assert not journal.pending()
+    assert coordinator.get_coordinator().snapshot()['active'] is None

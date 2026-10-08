@@ -1,5 +1,15 @@
 # GMae 阶段交接
 
+## 2026-10-08：手动资源操作持久保护
+
+- 分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。代码提交由本节对应 Git 历史锚定。
+- 实现：首次变更前写操作日志，包含准入过程中的释放；结束保存失败或异常保留预留，启动先恢复阻挡。生成日志与任务记录关联，不建立重复预留；部分终态保存失败可重复核验。
+- 验证：完整 380 项通过（新增 8 项日志测试与 1 项联合恢复测试）；Python 名称检查 0 阻断错误，66 项历史警告；源码编译与 diff 检查通过。
+- 上一提交 `72db3a1` 的 [PR CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720807934) 与 [push CI](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37720804074) 全部成功，本次提交 CI 尚待核验。
+- 未验证/缺口：实际 GPU 和 Docker/Ollama 故障实验未运行；无后端任务 ID 的手动操作尚无完整可信自动解除路径；跨进程排他未实现。详见 [资源操作恢复](resource-operation-recovery.md)。
+- 请 Chat Agent 评审：首次变更前记录的覆盖范围、嵌套操作与外层异常、联合恢复避免重复预留以及部分写入失败后的幂等核验。重点审查无任务 ID 操作的安全解除方案。
+- 下一步：补齐可信核验路径，再推进参数化 Profile 与受控真实 GPU 实验，不能把恢复阻挡本身宣称为完整自动恢复。
+
 ## 2026-10-08：指定任务取消与协议核验
 
 - 代码 commit：`4f35a27`。分支及 Draft PR：`feat/durable-task-lifecycle-20261008`，[PR #3](https://github.com/Dannywjw-Git/GMae-16GAS/pull/3)。

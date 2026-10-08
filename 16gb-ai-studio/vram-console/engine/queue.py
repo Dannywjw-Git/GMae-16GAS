@@ -85,6 +85,8 @@ def queue_restore():
         if _queue_state.get('restored'):
             return
         records = _store().snapshot()
+        journal = registry.get('operation_journal')
+        journal_ids = {row['intent']['owner']: row['id'] for row in journal.pending()} if journal else {}
         for record in records:
             task = _runtime_task(record)
             _tasks[task['id']] = task
@@ -92,6 +94,7 @@ def queue_restore():
                 lease = get_coordinator().restore_uncertain(
                     ResourceRequest('generate', 'job:' + task['id'], 'comfyui', task['model']),
                     {'job_id': task['id'], 'prompt_id': task.get('prompt_id') or task.get('submission_id'),
+                     **({'journal_id': journal_ids['job:' + task['id']]} if 'job:' + task['id'] in journal_ids else {}),
                      'reason': '进程重启后执行未知，必须核验对应后端任务'})
                 _persist(task, 'uncertain', coordination={'token': lease.token, 'owner': 'job:' + task['id']})
             elif task['status'] in ('queued', 'waiting_resource', 'precheck'):
@@ -247,6 +250,7 @@ def _execute_reserved_task(task, lease, spec):
     wf = _apply_params(wf, task["params"])
     if task.get("cancel_requested"):
         _persist(task, 'canceled', ended=int(time.time()))
+        lease.transition('completed')
         return
     lease.transition("verifying")
     _, decision = _model_budget(spec)
@@ -279,6 +283,7 @@ def _execute_reserved_task(task, lease, spec):
             return
         pid = task.get('prompt_id')
         if task['status'] == 'failed':
+            lease.transition('failed')
             return
         lease.transition('running', prompt_id=pid, job_id=task['id'])
         _wait_reserved_task(task, lease, pid)
@@ -395,11 +400,16 @@ def reconcile_task(job_id: str, token: str, prompt_id: str, status: str) -> bool
     """Apply trusted terminal evidence only to the matching uncertain task."""
     with _task_lock:
         task = _tasks.get(job_id)
-        if not task or task.get("status") != "uncertain":
+        if not task:
             return False
         if task.get("coordination", {}).get("token") != token:
             return False
         if prompt_id not in (task.get("prompt_id"), task.get("submission_id")):
+            return False
+        expected = 'canceled' if task.get('cancel_requested') else 'done' if status == 'success' else 'failed'
+        if task['status'] in TaskStore.TERMINAL:
+            return task['status'] == expected
+        if task['status'] != 'uncertain':
             return False
         if '_version' in task:
             saved = next(row for row in _store().snapshot() if row['id'] == task['id'])
