@@ -2,7 +2,7 @@
 
 ## 2026-10-08：启动校准与实际驻留来源验证
 
-分支 `feat/comfy-startup-calibration-20261008`，基于 PR #11 HEAD `2d8ef6e006ed0677971fd202f1b371820a3b3db6`；该基础提交 CI `37735496326`、`37735491789` 均 success。本阶段新 HEAD CI 待核验。
+代码提交 `27bc0fff556e35d0125d5b06c261bab60c96beb1`，见 [Draft PR #12](https://github.com/Dannywjw-Git/GMae-16GAS/pull/12)。代码 CI `37736312245` 排队、`37736293887` 运行中（写入时快照）。分支 `feat/comfy-startup-calibration-20261008`，基于 PR #11 HEAD `2d8ef6e006ed0677971fd202f1b371820a3b3db6`；该基础提交 CI `37735496326`、`37735491789` 均 success。本阶段新 HEAD CI 待核验。
 
 已实现：明确的本机受控启动校准入口，固定保守实验预算、GPU 0 锁、原账本、先卸载和 fresh 容量检查，命令回执与目标状态分离，拒绝未知/错误标记意图。实验不是生产 Profile，不自动改写预算，HTTP 不接受实验标志。修复 Windows Docker UTF-8 输出解码，正常重启仍要求已登记峰值。
 
