@@ -350,3 +350,33 @@ def test_acknowledged_release_without_reclaimed_memory_cannot_submit(gpu_environ
     assert current["status"] == "failed"
     assert current["coordination"]["code"] == "RELEASE_UNVERIFIED"
     submit.assert_not_called()
+
+
+@pytest.mark.parametrize('resident_peak,target_peak,exclusive', [(5, 5, False), (2, 2, True)])
+def test_residency_policy_requires_release_even_when_capacity_fits(gpu_environment, monkeypatch,
+                                                                  resident_peak, target_peak, exclusive):
+    state, config = gpu_environment
+    config['ollama']['models'].append({'id': 'resident', 'vram_gb': resident_peak, 'exclusive': exclusive})
+    config['comfyui']['models'][0]['vram_gb'] = target_peak
+    state.update(used_mb=1024 + resident_peak * 1024, free_mb=15360 - resident_peak * 1024,
+                 loaded=[{'name': 'resident', 'size_gb': resident_peak}])
+    released = Mock(return_value={'ok': False})
+    monkeypatch.setattr('engine.eviction_guard.gpu_guard_evict', released)
+    submit = Mock()
+    monkeypatch.setattr(queue, '_queue_submit_comfy', submit)
+    current = task()
+    queue._run_task(current)
+    released.assert_called_once()
+    submit.assert_not_called()
+    assert current['coordination']['code'] == 'RELEASE_FAILED'
+
+
+def test_calibrated_high_context_still_obeys_existing_8k_limit(gpu_environment, monkeypatch):
+    state, config = gpu_environment
+    config['ollama']['models'][0]['context_vram']['16384'] = 8
+    request = Mock()
+    monkeypatch.setattr(scene.urllib.request, 'urlopen', request)
+    rc, output = scene.load_model_api('llm', 16384)
+    assert rc == -1
+    assert 'CONTEXT_LIMIT' in output
+    request.assert_not_called()

@@ -71,6 +71,20 @@ def _model_budget(spec: OperationSpec, allow_rejected: bool = False) -> tuple[di
                  if m.get("id") == spec.model and m.get("source") == spec.service), None)
     if not result.get("ok") or item is None:
         raise ResourceDenied("BUDGET_UNAVAILABLE", result.get("error") or "模型未登记或预算缺失")
+    context_size = spec.ctx if spec.ctx is not None else item.get("default_ctx", 0)
+    if spec.service == "ollama" and context_size > 8192:
+        raise ResourceDenied("CONTEXT_LIMIT", "现行显存指南禁止 num_ctx 超过 8192")
+    # Capacity is necessary but does not override the project's residency rules.
+    # Unknown resident profiles cannot prove that a second large model is safe.
+    other_residents = [m for m in result.get("loaded_models", [])
+                       if (m.get("source"), m.get("id")) != (spec.service, spec.model)]
+    target_large = item.get("vram_gb", 0) >= 5
+    conflict = any(m.get("exclusive") or item.get("exclusive") or
+                   (target_large and (m.get("vram_gb", 0) >= 5 or m.get("vram_gb", 0) <= 0))
+                   for m in other_residents)
+    if conflict and item.get("decision") == "ok":
+        item = {**item, "decision": "free_L2" if spec.service == "comfyui" else "free_L1",
+                "note": "常驻互斥规则要求先释放冲突模型，之后重新核验"}
     if item.get("decision") == "reject" and not allow_rejected:
         raise ResourceDenied("BUDGET_REJECTED", item.get("note", "显存预算不足"), {"budget": item})
     return result, item

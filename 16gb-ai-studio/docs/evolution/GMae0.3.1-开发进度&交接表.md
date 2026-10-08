@@ -4,7 +4,7 @@
 
 <!-- 2026-10-08 resource coordinator -->
 
-当前分支 feat/resource-coordinator-20261008，基于审计修复 31c1f5f。323 项测试通过（含 7 项临时回环 HTTP 路由测试）；前端行为与语法检查通过，阻断级名称错误为 0。已创建草稿 PR #2（https://github.com/Dannywjw-Git/GMae-16GAS/pull/2），目标为审计修复分支；最终 CI 见 PR 当前检查，禁止将历史性能报告视为本次实测。
+当前分支 feat/resource-coordinator-20261008，基于审计修复 31c1f5f。326 项测试通过（含 7 项临时回环 HTTP 路由测试）；前端行为与语法检查通过，阻断级名称错误为 0。已创建草稿 PR #2（https://github.com/Dannywjw-Git/GMae-16GAS/pull/2），目标为审计修复分支；最终 CI 见 PR 当前检查，禁止将历史性能报告视为本次实测。
 
 详见[实现、约束与验收记录](../../../docs/resource-coordinator.md)。本段为最新状态；下文为历史记录。软件实现已提交草稿 PR #2，主分支未合并；最终验收证据见实现文档与 PR 当前检查。真实 GPU 性能、持久化及重启恢复属于后续阶段，尚未验证。
 
