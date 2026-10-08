@@ -3,7 +3,7 @@
 ## 2026-10-08：独立 Chat 评审整改
 
 - 来源：用户转述独立 Chat Agent 对 PR #4 及交接文件的评审；未提供可引用 GitHub 评论 URL。认可方向，要求优先跨进程所有权、目标状态、CI、Profile 与真实实验。已接受，无等待评审的依赖。
-- 分支：`feat/gpu-process-ownership-20261008`，基于 PR #5 的 `2452a2f`。
+- 分支：`feat/gpu-process-ownership-20261008`，代码提交 `2dca509`，基于 PR #5 的 `2452a2f`。[Draft PR #6](https://github.com/Dannywjw-Git/GMae-16GAS/pull/6)，新分支 CI 待核验。
 - 已实现：正式入口启动前同账户 GPU 0 系统锁，崩溃后保留原账本身份；不同账本拒绝接管。容器恢复增加精确名称 fresh inspect 及目标状态检查，证据明确 `gpu_idle_proven: false`。
 - 验证：完整 450 项通过（15.16 秒）；新增 12 项。真实子进程并发领取只允许一个持有者，杀进程后可重新取得系统锁、从原账本恢复未知阻挡；名称检查 65 既有警告、0 阻断，编译与 diff 检查通过。
 - PR #4 当前 HEAD 已重新查询为 `a1a2313379abc720d822e24b720fe84b79a21cdb`；完整 CI 两项均 success：[PR](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37722397491)、[push](https://github.com/Dannywjw-Git/GMae-16GAS/actions/runs/37722393528)。此结论不能替代新分支 CI。
