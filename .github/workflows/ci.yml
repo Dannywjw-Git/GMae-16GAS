@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, master, develop, refactor/v2, 'audit/**', 'feat/**']
   pull_request:
-    branches: [main, master, refactor/v2, 'audit/**']
+    branches: [main, master, refactor/v2, 'audit/**', 'feat/**']
 
 permissions:
   contents: read
