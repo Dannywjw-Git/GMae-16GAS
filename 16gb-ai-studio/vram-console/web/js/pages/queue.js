@@ -17,6 +17,15 @@ Object.assign(Pages, {
         <div class="page-header__subtitle">统一资源准入；执行结束确认前保留预算</div>
       </div>
       <div class="card mb-4"><div class="card__body" id="resource-coordination">正在读取资源状态…</div></div>
+      <div class="card mb-4">
+        <div class="card__header"><div class="card__title">混合负载 · 已测量请求</div></div>
+        <div class="card__body">
+          <p>将 SDXL / Ollama 固定测量请求加入同一队列，按提交顺序交替执行。执行前仍核验本机环境与资源；任意提示词需要重新校准。</p>
+          <select class="form-select" id="measured-preset"><option value="">正在读取本机 Profile…</option></select>
+          <div id="measured-preset-info" class="mb-3"></div>
+          <button class="btn btn--secondary" id="btn-submit-preset" disabled>加入混合队列</button>
+        </div>
+      </div>
       <div class="grid mb-4">
         <div class="col-5">
           <div class="card">
@@ -62,6 +71,8 @@ Object.assign(Pages, {
     // 加载模型列表（从 registry 获取，带 category 信息）
     await this._loadTaskModels();
     if (Router.current !== '/queue') return;  // 切页竞态守卫
+    await this._loadMeasuredPresets();
+    if (Router.current !== '/queue') return;
 
     // 模型变化时刷新动态参数
     Utils.$('#task-model').addEventListener('change', () => this._renderDynamicParams());
@@ -83,7 +94,7 @@ Object.assign(Pages, {
     this._checkTaskBudget();
 
     // 按钮事件
-    Utils.$('#btn-queue-refresh').onclick = () => this._loadQueue();
+    Utils.$('#btn-queue-refresh').onclick = () => { this._loadQueue(); this._loadMeasuredPresets(); };
     Utils.$('#btn-clear-done').onclick = () => this._clearDoneTasks();
     Utils.$('#btn-submit-task').onclick = async () => {
       const model = Utils.$('#task-model').value;
@@ -131,6 +142,57 @@ Object.assign(Pages, {
   _lastQueueTasks: [],         // 最近一次队列快照（供清空已完成使用）
   _queuePollTimer: null,       // 队列轮询定时器
 
+  async _loadMeasuredPresets() {
+    const generation = this._presetCatalogGeneration = (this._presetCatalogGeneration || 0) + 1;
+    const originalSelect = Utils.$('#measured-preset');
+    const res = await API.getMeasuredPresets();
+    if (generation !== this._presetCatalogGeneration || Utils.$('#measured-preset') !== originalSelect) return;
+    const select = Utils.$('#measured-preset');
+    const info = Utils.$('#measured-preset-info');
+    const button = Utils.$('#btn-submit-preset');
+    if (!select || !info || !button) return;
+    this._measuredPresets = res.ok && Array.isArray(res.presets) ? res.presets : [];
+    select.innerHTML = this._measuredPresets.length
+      ? this._measuredPresets.map(p => `<option value="${Utils.escapeHtml(p.id)}">${Utils.escapeHtml(p.model)} · ${p.source === 'comfyui' ? `${Utils.escapeHtml(p.width)} × ${Utils.escapeHtml(p.height)} · ${Utils.escapeHtml(p.steps)} 步` : `ctx ${Utils.escapeHtml(p.context_length)} · 输入实测 ${Utils.escapeHtml(p.prompt_tokens)} tokens`}</option>`).join('')
+      : '<option value="">没有可用的本机测量预设</option>';
+    const render = () => {
+      const preset = this._measuredPresets.find(p => p.id === select.value);
+      button.disabled = !preset || Boolean(this._presetSubmitting);
+      info.innerHTML = preset
+        ? `固定提示词（${Utils.escapeHtml(preset.prompt_characters ?? '?')} 字符）：${Utils.escapeHtml(preset.prompt_preview || '')}${preset.prompt_characters > 160 ? '…' : ''}<br>测量整卡峰值 ${Utils.escapeHtml(preset.measured_peak_mb)} MiB；测量包络 ${Utils.escapeHtml(preset.envelope_mb)} MiB，另保留系统安全余量。<br>${preset.source === 'comfyui' ? '固定图像配置；已安装驻留证据时由执行准入选择对应预算。' : `输出上限 ${Utils.escapeHtml(preset.max_output_tokens)} tokens；`}证据 ${Utils.escapeHtml(preset.evidence_sha256.slice(0, 12))}。<br>${Utils.escapeHtml(res.limitation || '')}`
+        : Utils.escapeHtml(res.ok ? '请通过受信任的校准工具安装本机 Profile；公开实验数据不能直接证明另一台机器可运行。' : (res.error?.message || '预设接口不可用'));
+    };
+    select.onchange = render;
+    button.onclick = () => this._submitMeasuredPreset();
+    render();
+  },
+
+  async _submitMeasuredPreset() {
+    const id = Utils.$('#measured-preset')?.value;
+    if (this._presetSubmitting || !this._measuredPresets?.some(p => p.id === id)) return;
+    if (!this._pendingPresetSubmission || this._pendingPresetSubmission.id !== id) {
+      this._pendingPresetSubmission = {id, key: Array.from(crypto.getRandomValues(new Uint8Array(16)), x => x.toString(16).padStart(2, '0')).join('')};
+    }
+    this._presetSubmitting = true;
+    const button = Utils.$('#btn-submit-preset');
+    button.disabled = true;
+    try {
+      const res = await API.submitMeasuredPreset({preset_id: id, idempotency_key: this._pendingPresetSubmission.key});
+      if (res.ok) {
+        this._pendingPresetSubmission = null;
+        Toast.success('固定测量请求已加入混合队列');
+        await this._loadQueue();
+      } else Toast.error(res.error?.message || '提交失败；重试将复用同一请求标识');
+    } catch (error) {
+      Toast.error('提交结果未知；重试将复用同一请求标识');
+    } finally {
+      this._presetSubmitting = false;
+      if (Utils.$('#btn-submit-preset') === button) {
+        button.disabled = !this._measuredPresets?.some(p => p.id === Utils.$('#measured-preset')?.value);
+      }
+    }
+  },
+
   /** 从 registry 加载模型列表（带 category，过滤 embedding） */
   async _loadTaskModels() {
     const reg = await API.getRegistry();
@@ -152,8 +214,7 @@ Object.assign(Pages, {
       const catLabel = category === 'video' ? '视频' : category === 'audio' ? '音频' : '图像';
       options.push(`<option value="${Utils.escapeHtml(id)}" data-category="${category}">${Utils.escapeHtml(label)} (${catLabel})</option>`);
     });
-    // 注意：Ollama 对话模型不在此队列页显示（队列系统当前只支持 ComfyUI 工作流模型）
-    // 对话功能请直接使用 Ollama 或 Open WebUI
+    // Ollama uses the separate exact measured-request selector above.
 
     select.innerHTML = options.length > 0
       ? options.join('')
@@ -337,12 +398,14 @@ Object.assign(Pages, {
             const ts = t.created || t.submitted_at || t.created_at;
             const timeStr = ts ? (typeof ts === 'number' ? new Date(ts * 1000).toLocaleString() : Utils.formatTime(ts)) : '—';
             const info = t.progress || (t.error ? t.error : '');
+            const output = t.source === 'ollama' && typeof t.result?.response === 'string'
+              ? `<details><summary>文本结果（${Utils.escapeHtml(t.result.metrics?.eval_count ?? '?')} tokens）</summary><pre style="white-space:pre-wrap">${Utils.escapeHtml(t.result.response)}</pre></details>` : '';
             return `
             <tr>
               <td class="text-mono">${String(i + 1).padStart(3, '0')}</td>
-              <td>${Utils.escapeHtml(t.model || t.workflow || '')}</td>
+              <td>${Utils.escapeHtml(t.model || t.workflow || '')}<br><small>${Utils.escapeHtml(t.source || 'comfyui')}</small></td>
               <td><span class="badge badge--${badgeCls(st(t))}">${Utils.escapeHtml(st(t) || '未知')}</span></td>
-              <td style="font-size:11px">${Utils.escapeHtml(info) || '—'}</td>
+              <td style="font-size:11px">${Utils.escapeHtml(info) || '—'}${output}</td>
               <td class="text-mono" style="font-size:11px">${timeStr}</td>
               <td class="table__actions">${STATUS_ACTIVE.includes(st(t)) ? `<button class="btn btn--ghost btn--sm" onclick="Pages._cancelTask('${id}')">取消</button>` : '—'}</td>
             </tr>`;
