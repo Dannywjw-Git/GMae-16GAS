@@ -12,6 +12,13 @@ def get_coordination(req: Request) -> Response:
     return Response.success(get_coordinator().snapshot())
 
 
+@router.get('/api/coordinator/residency')
+def get_residency(req: Request) -> Response:
+    """On-demand observation; absence never changes conservative admission."""
+    from clients.comfyui_client import residency_snapshot
+    return Response.from_result(residency_snapshot())
+
+
 @router.post("/api/coordinator/preview")
 def post_preview(req: Request) -> Response:
     """Bind requested controls; caller-provided capacity/profile peaks are ignored."""
