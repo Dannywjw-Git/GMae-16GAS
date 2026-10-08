@@ -8,7 +8,7 @@ Work Agent 负责主要技术执行，独立 Chat Agent 负责战略、架构复
 
 ## 最新阶段
 
-分支 `feat/phase-profile-calibration-20261008`，基于 PR #9 的 `2ef4329`，补齐显式加载条件及真实尺寸变化试验。完整 489 项测试通过（15.61 秒）。SDXL 512/768 各一次卸载后生成与一次保留驻留生成，四次均真实 success、采样器未缓存、0 采样错误；[报告和原始数据](phase-profile-calibration-2026-10-08.md)。本阶段 commit/Draft PR 随推送补充，CI 待核验。
+分支 `feat/phase-profile-calibration-20261008`，基于 PR #9 的 `2ef4329`，补齐显式加载条件及真实尺寸变化试验。完整 489 项测试通过（15.61 秒）。SDXL 512/768 各一次卸载后生成与一次保留驻留生成，四次均真实 success、采样器未缓存、0 采样错误；[报告和原始数据](phase-profile-calibration-2026-10-08.md)。代码 commit `56f1ac2`，[Draft PR #10](https://github.com/Dannywjw-Git/GMae-16GAS/pull/10)，新 HEAD CI 待核验。
 
 这些数据不证明编排加速；驻留时仍增长 672/1,536 MiB，warm 准入尚未实现。当前最高瓶颈为可信模型/组件驻留与分阶段预算，[下一阶段设计](phase-profile-design.md) 明确失败关闭条件。基础 PR #9 精确 HEAD `2ef4329b9d792ec9848cc9c0c435c6bcb22ca411` 的 CI `37730589456`、`37730586264` 均 success。
 
@@ -29,7 +29,7 @@ Work Agent 负责主要技术执行，独立 Chat Agent 负责战略、架构复
 | 参数化测量预算与可解释决策 | raw 重算、固定引用、fresh 身份核验、实际参数绑定 | 数据篡改/环境改变/余量替换/预演过期与实验条件测试通过 | 正式准入仅 512 SDXL 通过；512/768 加载条件原始校准通过，warm 准入及其他模型未验证 |
 | 性能对照与稳定交付 | 原始测量与独立分组分析、数据、阶段报告 | 当前完整 489 项通过 | 加载条件差异已测；策略收益与混合负载对照、Release、安装验收、最终演示未完成 |
 
-PR #1–#9 均为独立草稿、尚未合并；主分支保持不变。各阶段 commit、PR、验证和限制见 [HANDOFF](HANDOFF.md)。
+PR #1–#10 均为独立草稿、尚未合并；主分支保持不变。各阶段 commit、PR、验证和限制见 [HANDOFF](HANDOFF.md)。
 
 ## 当前最高优先级
 
