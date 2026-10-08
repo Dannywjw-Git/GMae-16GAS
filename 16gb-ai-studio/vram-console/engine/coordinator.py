@@ -26,6 +26,7 @@ class OperationSpec:
     ctx: int | None = None
     owner: str | None = None
     command_only: bool = False
+    startup_calibration: bool = False
     workflow: dict | None = None
     profile_reference: dict | None = None
 
@@ -196,6 +197,20 @@ def _assess_start(spec: OperationSpec, lease: ResourceLease, gpu: dict) -> None:
     from services.docker import docker_containers
     if spec.operation == "start" and spec.service in docker_containers(strict=True):
         return  # Already running; Docker start is idempotent.
+    if spec.startup_calibration is not False:
+        # CLI-only bootstrap experiment, never a measured production profile.
+        if (spec.startup_calibration is not True or spec.operation != "restart" or spec.service != "comfyui" or
+                not spec.command_only or gpu["used_mb"] >= 4096 or gpu["free_mb"] < 10752):
+            raise ResourceDenied("CALIBRATION_REJECTED", "启动校准需要独占空闲实验条件")
+        if gpu["used_mb"] + 10240 + 2560 > gpu["total_mb"]:
+            raise ResourceDenied("CALIBRATION_REJECTED", "保守启动实验预算与余量超过容量")
+        from services.ollama import list_loaded_models
+        other = list_loaded_models()
+        if not other.get("ok") or other.get("models") or "fooocus" in docker_containers(strict=True):
+            raise ResourceDenied("CALIBRATION_REJECTED", "其他 GPU 服务尚未确认空闲")
+        lease.transition("reserved", peak_mb=10240, calibration=True,
+                         budget_kind="unverified_experimental_capacity_bound", reserve_mb=2560)
+        return
     try:
         peak_gb = float(config["startup_vram_gb"])
         reserve_gb = float(REGISTRY.get("system", {}).get("vram_reserve_gb", 2.5))
@@ -211,6 +226,10 @@ def _assess_start(spec: OperationSpec, lease: ResourceLease, gpu: dict) -> None:
 
 def assess(spec: OperationSpec, lease: ResourceLease) -> None:
     """Assess while holding ownership, before executing any managed mutation."""
+    if spec.operation not in ("release", "scene", "combo", "load", "generate", "start", "restart", "unpause"):
+        raise ResourceDenied("UNSUPPORTED_OPERATION", "不支持的资源操作")
+    if spec.startup_calibration is not False and spec.operation != "restart":
+        raise ResourceDenied("CALIBRATION_REJECTED", "校准意图必须为明确重启操作")
     gpu = fresh_gpu()
     check_idle("all" if spec.operation in ("scene", "combo", "generate", "load") else spec.service)
     if spec.operation in ("load", "generate"):

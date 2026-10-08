@@ -380,3 +380,38 @@ def test_calibrated_high_context_still_obeys_existing_8k_limit(gpu_environment, 
     assert rc == -1
     assert 'CONTEXT_LIMIT' in output
     request.assert_not_called()
+
+
+@pytest.mark.parametrize('used,free,service,command_only', [(4096,12288,'comfyui',True), (1024,10000,'comfyui',True), (1024,15360,'ollama',True), (1024,15360,'comfyui',False)])
+def test_startup_calibration_rejects_unsafe_conditions(gpu_environment, used, free, service, command_only):
+    state, config = gpu_environment
+    state.update(used_mb=used, free_mb=free)
+    with pytest.raises(ResourceDenied):
+        with coordinator.coordinated_operation(coordinator.OperationSpec('restart', service, command_only=command_only, startup_calibration=True)):
+            pytest.fail('unsafe experiment admitted')
+
+
+def test_startup_calibration_does_not_install_profile(gpu_environment):
+    state, config = gpu_environment
+    config['containers'][0].pop('startup_vram_gb')
+    with coordinator.coordinated_operation(coordinator.OperationSpec('restart','comfyui', command_only=True,startup_calibration=True)) as lease:
+        assert lease.coordinator.snapshot()['active']['calibration'] is True
+    assert 'startup_vram_gb' not in config['containers'][0]
+    with pytest.raises(ResourceDenied, match='启动峰值未校准'):
+        with coordinator.coordinated_operation(coordinator.OperationSpec('restart','comfyui')):
+            pytest.fail('production restart bypassed calibration')
+
+
+def test_startup_calibration_refuses_resident_other_model(gpu_environment):
+    state, _ = gpu_environment
+    state['loaded'] = [{'name':'other', 'size_gb':1}]
+    with pytest.raises(ResourceDenied, match='其他 GPU 服务'):
+        with coordinator.coordinated_operation(coordinator.OperationSpec('restart','comfyui', command_only=True,startup_calibration=True)):
+            pytest.fail('other model ignored')
+
+
+@pytest.mark.parametrize('operation,flag', [('typo_restart',False), ('release',True)])
+def test_unknown_or_mislabeled_calibration_intent_is_denied(gpu_environment, operation, flag):
+    with pytest.raises(ResourceDenied):
+        with coordinator.coordinated_operation(coordinator.OperationSpec(operation,'comfyui',startup_calibration=flag)):
+            pytest.fail('unsupported intent admitted')
