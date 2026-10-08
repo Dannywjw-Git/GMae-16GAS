@@ -22,7 +22,7 @@ from core.resource_coordinator import ResourceDenied
 from core.exceptions import ConfigError
 from core.task_store import TaskStore, TaskConflict
 from core.task_dispatch import TaskDispatcher, DispatchUncertain
-from core.workload_profile import workload_fingerprint
+from core.workload_profile import workload_fingerprint, resource_configuration_fingerprint
 from engine.gen_stats import load_gen_stats, save_gen_stats, update_gen_stats
 
 # 队列状态 — 已迁移到 registry（状态包装）
@@ -192,11 +192,16 @@ def queue_enqueue(model: str, params: dict, idempotency_key=None) -> dict:
     try:
         effective = _apply_params(template, params)
         fingerprint = workload_fingerprint(effective)
+        configuration = resource_configuration_fingerprint(template)
+        if resource_configuration_fingerprint(effective) != configuration:
+            return {'ok': False, 'code': 'PROFILE_REQUIRED',
+                    'error': '任务资源参数与登记模板不同，缺少匹配测量 Profile，拒绝复用固定显存预算'}
         queue_restore()
         with _task_lock:
             record, created = _store().accept(
                 {'model': model, 'workflow': wf_name, 'params': params,
-                 'effective_workflow': effective, 'workflow_sha256': fingerprint}, idempotency_key)
+                 'effective_workflow': effective, 'workflow_sha256': fingerprint,
+                 'resource_configuration_sha256': configuration}, idempotency_key)
             tid = record['id']
             task = _tasks.get(tid) or _runtime_task(record)
             _tasks[tid] = task
@@ -280,14 +285,23 @@ def _queue_wait(prompt_id, task, timeout=3600):
 def _effective_workflow(task):
     """New tasks use their committed payload; legacy tasks bind once before execution."""
     wf = task.get('effective_workflow')
+    configuration = task.get('resource_configuration_sha256')
+    if configuration is None:
+        template = _load_workflow(task['workflow'])
+        if not template:
+            raise ConfigError('缺少资源配置模板，不能核验旧任务预算')
+        configuration = resource_configuration_fingerprint(template)
     if wf is None:
         template = _load_workflow(task['workflow'])
         if not template:
             raise ConfigError('模板读取失败')
         wf = _apply_params(template, task['params'])
-        _persist(task, effective_workflow=wf, workflow_sha256=workload_fingerprint(wf))
+        _persist(task, effective_workflow=wf, workflow_sha256=workload_fingerprint(wf),
+                 resource_configuration_sha256=configuration)
     if workload_fingerprint(wf) != task.get('workflow_sha256'):
         raise ValueError('已保存的工作流摘要不匹配，拒绝执行')
+    if resource_configuration_fingerprint(wf) != configuration:
+        raise ResourceDenied('PROFILE_REQUIRED', '资源参数缺少匹配测量 Profile，拒绝复用固定预算')
     return json.loads(json.dumps(wf, allow_nan=False))
 
 

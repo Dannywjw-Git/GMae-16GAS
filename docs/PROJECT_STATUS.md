@@ -10,6 +10,8 @@
 
 ## 可核验进度
 
+最新阶段：`feat/profile-admission-evidence-20261008` 增加参数变化拒绝复用静态预算，完整 452 项测试通过。首次 SDXL 512×512、8 步真实 GPU 基线成功，195 个原始样本；[报告及证据](real-gpu-baseline-2026-10-08.md)。测量 Profile 准入及真实混合负载对照仍未完成，单次结果不能证明调度收益。
+
 独立评审整改：分支 `feat/gpu-process-ownership-20261008` 已实现同账户正式入口跨进程锁及容器目标状态核验，完整 450 项离线测试通过；实际双服务/GPU 故障未验证。PR #4 当前 HEAD `a1a2313` 的 PR 与 push CI 已核验成功。跨账户及外部 GPU 客户端不在排他保证范围。下一优先级为测量 Profile 准入与真实 GPU 对照实验。
 
 整改代码提交 `2dca509`，见 [Draft PR #6](https://github.com/Dannywjw-Git/GMae-16GAS/pull/6)；新 CI 待核验。

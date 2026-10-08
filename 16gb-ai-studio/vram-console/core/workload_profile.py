@@ -13,6 +13,24 @@ def workload_fingerprint(workflow):
     return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
 
+def resource_configuration_fingerprint(workflow):
+    """Conservative control identity for legacy estimates, not measured evidence.
+
+    Text/seed/output names may vary; every other input and node identity remains
+    bound. This does not assert identical memory use across different prompts.
+    """
+    normalized = json.loads(json.dumps(workflow, allow_nan=False))
+    for node in normalized.values():
+        if not isinstance(node, dict):
+            raise ValueError('invalid workflow node')
+        inputs = node.get('inputs', {})
+        if not isinstance(inputs, dict):
+            raise ValueError('invalid workflow inputs')
+        for key in ('text', 'caption', 'seed', 'noise_seed', 'filename_prefix'):
+            inputs.pop(key, None)
+    return workload_fingerprint(normalized)
+
+
 def match_profile(profile, workflow, environment):
     """Return a conservative measured envelope only for an exact evidence match.
 

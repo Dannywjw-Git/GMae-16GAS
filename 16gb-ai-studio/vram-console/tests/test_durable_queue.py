@@ -92,6 +92,13 @@ def test_unbound_parameter_rejected_before_durable_accept(runtime):
     assert not TaskStore(runtime).snapshot()
 
 
+def test_changed_resource_controls_cannot_reuse_fixed_budget(runtime, monkeypatch):
+    monkeypatch.setattr(queue, '_load_workflow', lambda name: {'1': {'inputs': {'width': 1024}}})
+    result = queue.queue_enqueue('m', {'width': 2048})
+    assert result['code'] == 'PROFILE_REQUIRED'
+    assert not TaskStore(runtime).snapshot()
+
+
 def test_real_queue_dispatch_commits_before_rpc_and_terminal_before_release(runtime, monkeypatch):
     accepted = queue.queue_enqueue('m', {}, 'key')
     current = queue._tasks[accepted['task']['id']]
